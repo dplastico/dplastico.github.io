@@ -1,41 +1,72 @@
-# Welcome to Jekyll!
-#
-# This config file is meant for settings that affect your whole blog, values
-# which you are expected to set up once and rarely edit after that. If you find
-# yourself editing this file very often, consider using Jekyll's data files
-# feature for the data you need to update frequently.
-#
-# For technical reasons, this file is *NOT* reloaded automatically when you use
-# 'bundle exec jekyll serve'. If you change this file, please restart the server process.
+# Site metadata
+title: dplastico
+description: pwn and stuffs
 
-# Site settings
-# These are used to personalize your new site. If you look in the HTML files,
-# you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
-# You can create any custom variable you would like, and they will be accessible
-# in the templates via {{ site.myvariable }}.
-title: pwn & stuffs
-email: yo@dplastico.me
-description: >- # this means to ignore newlines until "baseurl:"
-  A place to right about securiry and things that keep my mind busy
-baseurl: "" # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
-twitter_username: dplastico
-github_username:  dplastico
+# Analytics
+show_downloads: true
+google_analytics:
 
-# Build settings
+# Theme data
 markdown: kramdown
-theme: minima
-plugins:
-  - jekyll-feed
+highlighter: rouge
 
-# Exclude from processing.
-# The following items will not be processed, by default. Create a custom list
-# to override the default setting.
-# exclude:
-#   - Gemfile
-#   - Gemfile.lock
-#   - node_modules
-#   - vendor/bundle/
-#   - vendor/cache/
-#   - vendor/gems/
-#   - vendor/ruby/
+# Gem plugins
+plugins:
+  - jekyll-seo-tag
+
+# Demo site specific elements
+baseurl: ""
+
+# Use YAML lists like this to dynamically choose names 
+# and relative/absolute links for the top-level links 
+# and navigation bar in the site.
+
+# For header links, the theme defaults to the following 
+# schema.
+# If they are not explicitly included, the correpsonding 
+# buttons don't populate in builds, though they do 
+# populate in deployments to GitHub Pages.
+# -------
+# github:
+#   repository_url: https://github.com/my/repository
+#   zip_url: https://github.com/my/repository/archive/branch.zip
+#   tar_url: https://github.com/my/repository/archive/branch.tar.gz
+
+# To customize header links, you need a list of items 
+# which include a name (button text) and URL to the 
+# resource.
+
+# header_links:
+#   - url: http://127.0.0.1:4000
+#     name: View Site
+#   - url: https://google.com
+#     name: Google Search
+#   - url: facebook.com
+#     name: Facebook
+#     Note that this is broken; the external protocol 
+#     is missing.
+#   - url: /
+#     name: ET Go Home
+
+# Likewise, navigation bar links can be customized and 
+# given custom text. These links can be relative or 
+# external.
+
+# nav_links:
+#   - url: /
+#     name: Home
+#   - url: /blog
+#     name: Dev Log
+#   - url: https://google.com
+#     name: Learn
+remote_theme: "etcadinfinitum/mixtape"
+
+show_downloads: true
+header_links:
+  # Formatted list of link/label pairs
+  - url: https://github.com/dplastico
+    name: Github
+  - url: https://twitter.com/dplastico
+    name: Twitter
+  - url: https://t.co/m2calVmSff?amp=1
+    name: l4t1n-HTB

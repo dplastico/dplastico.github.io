@@ -1,6 +1,29 @@
 ---
-# Feel free to add content and custom Front Matter to this file.
-# To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
-
-layout: home
+layout: default
 ---
+
+
+# Read for this month
+
+[Sunburst attack](https://research.checkpoint.com/2021/deep-into-the-sunburst-attack/) a deep look into the sunburst attack
+
+# Music for this month
+
+[Poolside](https://poolside.fm/) What can I say...?
+
+# Friends & Resources
+
+
+[Ropemporium.](https://ropemporium.com/) The best site to learn ROP IMO
+
+[Check Point Research.](https://research.checkpoint.com/) A very impressive research team.
+
+[Ricardo Narvaja](http://ricardonarvaja.info/) Cracking y exploiting en español
+
+[Phrack magazine <3](http://www.phrack.org/) Best hacking site ever!
+
+[c4e](https://c4ebt.github.io/) One of the best pwner, from Chile
+
+[s1kr10s](https://medium.com/@s1kr10s) Researcher, from Chile
+
+[s4vitar](https://www.youtube.com/channel/UCNHWpNqiM8yOQcHXtsluD7Q) Pentesting  & hacking en español
