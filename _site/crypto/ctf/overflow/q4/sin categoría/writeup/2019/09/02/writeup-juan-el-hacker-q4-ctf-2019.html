@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>Writeup, Juan el Hacker Q4 CTF 2019 | Your awesome title</title>
+<meta name="generator" content="Jekyll v3.8.5" />
+<meta property="og:title" content="Writeup, Juan el Hacker Q4 CTF 2019" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Juan el hacker es una maquina que cree como desafio para el CTF Q4 2019, la maquina esta inspirada en la serie de animé Serial Experimentals Lain, Como veterano de los 90, esta serie me inspiro mucho y se la recomiendo a todos los que ven en la tecnología algo más que una herramienta. También puse algunas cosas ocultas con una pequeña historia, quienes resolvieron la maquina o avanzaron saben de lo que hablo, por lo mismo estos mensajes los dejo afuera para que haya algo de sorpresa jeje :)" />
+<meta property="og:description" content="Juan el hacker es una maquina que cree como desafio para el CTF Q4 2019, la maquina esta inspirada en la serie de animé Serial Experimentals Lain, Como veterano de los 90, esta serie me inspiro mucho y se la recomiendo a todos los que ven en la tecnología algo más que una herramienta. También puse algunas cosas ocultas con una pequeña historia, quienes resolvieron la maquina o avanzaron saben de lo que hablo, por lo mismo estos mensajes los dejo afuera para que haya algo de sorpresa jeje :)" />
+<link rel="canonical" href="http://localhost:4000/crypto/ctf/overflow/q4/sin%20categor%C3%ADa/writeup/2019/09/02/writeup-juan-el-hacker-q4-ctf-2019.html" />
+<meta property="og:url" content="http://localhost:4000/crypto/ctf/overflow/q4/sin%20categor%C3%ADa/writeup/2019/09/02/writeup-juan-el-hacker-q4-ctf-2019.html" />
+<meta property="og:site_name" content="Your awesome title" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-09-02T02:12:00-04:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Writeup, Juan el Hacker Q4 CTF 2019" />
+<script type="application/ld+json">
+{"@type":"BlogPosting","url":"http://localhost:4000/crypto/ctf/overflow/q4/sin%20categor%C3%ADa/writeup/2019/09/02/writeup-juan-el-hacker-q4-ctf-2019.html","headline":"Writeup, Juan el Hacker Q4 CTF 2019","dateModified":"2019-09-02T02:12:00-04:00","datePublished":"2019-09-02T02:12:00-04:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/crypto/ctf/overflow/q4/sin%20categor%C3%ADa/writeup/2019/09/02/writeup-juan-el-hacker-q4-ctf-2019.html"},"description":"Juan el hacker es una maquina que cree como desafio para el CTF Q4 2019, la maquina esta inspirada en la serie de animé Serial Experimentals Lain, Como veterano de los 90, esta serie me inspiro mucho y se la recomiendo a todos los que ven en la tecnología algo más que una herramienta. También puse algunas cosas ocultas con una pequeña historia, quienes resolvieron la maquina o avanzaron saben de lo que hablo, por lo mismo estos mensajes los dejo afuera para que haya algo de sorpresa jeje :)","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Your awesome title" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Your awesome title</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Writeup, Juan el Hacker Q4 CTF 2019</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2019-09-02T02:12:00-04:00" itemprop="datePublished">Sep 2, 2019
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <!-- wp:paragraph -->
+<p>Juan el hacker es una maquina que cree como desafio para el CTF Q4 2019, la maquina esta inspirada en la serie de animé Serial Experimentals Lain, Como veterano de los 90, esta serie me inspiro mucho y se la recomiendo a todos los que ven en la tecnología algo más que una herramienta. También puse algunas cosas ocultas con una pequeña historia, quienes resolvieron la maquina o avanzaron saben de lo que hablo, por lo mismo estos mensajes los dejo afuera para que haya algo de sorpresa jeje :)</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Volviendo a lo nuestro: Al enumerar usando nmap la maquina solo vemos algunos servicios abiertos:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":104} -->
+<figure class="wp-block-image"><img src="/wp-content/uploads/2019/09/image-1024x354.png" alt="" class="wp-image-104" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Revisando la web no se vé mucho, pero si llama la atención el puerto 79, un viejo protocolo (de los 90 jejeje) que era usado para mostrar información de tu user, esta información es normalmente proporcianada en archivos .plan y .project los cuales se guardan en el home del user, para más información.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:core-embed/wordpress {"url":"https://touhidshaikh.com/blog/?p=914","type":"wp-embed","providerNameSlug":"touhid-m-shaikh","className":""} -->
+<figure class="wp-block-embed-wordpress wp-block-embed is-type-wp-embed is-provider-touhid-m-shaikh"><div class="wp-block-embed__wrapper">
+https://touhidshaikh.com/blog/?p=914
+</div></figure>
+<!-- /wp:core-embed/wordpress -->
+
+<!-- wp:paragraph -->
+<p>Usando este servicio descubrimos que el usuario juan (como el nombre de la maquina) muestra lo siguiente:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":105} -->
+<figure class="wp-block-image"><img src="/wp-content/uploads/2019/09/image-1-1024x296.png" alt="" class="wp-image-105" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Copiamos el output del project que es claramente un Hex el cual al pasarlo a ASCII nos muestra un texto cifrado, el cual parece ser un rot o caesar cipher, por lo cual al decodearlo encontramos lo siguiente:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":106} -->
+<figure class="wp-block-image"><img src="/wp-content/uploads/2019/09/image-2-1024x328.png" alt="" class="wp-image-106" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Esto parece la primera parte de un password ya que no funciona por si solo, pero nos habla de un sitio oculto, esto nos ayuda a descifrar que hacer con el output que entrega plan, el cual parece un MD5, lo pasamos por un decrypter y encontramos "hola_lain"</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":107} -->
+<figure class="wp-block-image"><img src="/wp-content/uploads/2019/09/image-3-1024x374.png" alt="" class="wp-image-107" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Con esto revisamos el sitio web y encontramos una pagina (hola lain, que también es una referencia a este animé</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":108} -->
+<figure class="wp-block-image"><img src="/wp-content/uploads/2019/09/image-4-1024x579.png" alt="" class="wp-image-108" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>EL formulario es un html plano, pero al enumerar directorios dentro de hola_lain, podemos descubrir un directorio "admin" que tiene solo una foto</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":109} -->
+<figure class="wp-block-image"><img src="/wp-content/uploads/2019/09/image-5.png" alt="" class="wp-image-109" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>la foto contiene un texto, sin contraseña usando steghide o similar, a gusto del participante se puede leer la segunda parte de la contraseña y formamos las credenciales para entrar como juan</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><em>juan:1missy0uch1saSt0pn0wchisa</em></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Una vez dentro como Juan debemos escapar una shell restringida usando el comando find , comparto esta pagina también con un link util y la forma de hacerlo</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><a href="https://www.hackplayers.com/2018/05/tecnicas-para-escapar-de-restricted--shells.html">https://www.hackplayers.com/2018/05/tecnicas-para-escapar-de-restricted--shells.html</a></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":110} -->
+<figure class="wp-block-image"><img src="/wp-content/uploads/2019/09/image-6-1024x503.png" alt="" class="wp-image-110" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {"id":111} -->
+<figure class="wp-block-image"><img src="/wp-content/uploads/2019/09/image-7-1024x392.png" alt="" class="wp-image-111" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Una vez ya dentro procedemos a enumerar,  y en el mismo directorio encontramos un archivo, que no se puede ejecutar, pero si podemos leerlo, por lo que procedemos a analizarlo y vemos los strings</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":112} -->
+<figure class="wp-block-image"><img src="/wp-content/uploads/2019/09/image-8.png" alt="" class="wp-image-112" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>El código dice "if 5elemets: "BOFetada" Como un pequeño cameo al equipo con el que participé en la hackaton de telefónica y mi maquina favorita jejeje si probamos los strings como passwords vemos que el usuario lainiwakura puede entrar con la contraseña "BOFetada"</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":113} -->
+<figure class="wp-block-image"><img src="/wp-content/uploads/2019/09/image-9.png" alt="" class="wp-image-113" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Ya dentro vemos claramente un archivo que llama la atención, es programa vulnerable a un buffer overflow de 32bit, que de hecho estudiando para el OSCE fue que me inspiré pensando en este exploit <a href="https://www.fuzzysecurity.com/exploits/7.html">https://www.fuzzysecurity.com/exploits/7.html</a></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Si quieren reproducirlo pueden usar este codigo en C:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>#include &lt;stdlib.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+int lain(char *str)
+{
+        char buffer[24];
+        
+
+        strcpy(buffer, str);
+        return 1;
+}
+
+int main(int argc, char **argv)
+{
+        char str[517];
+        FILE *badfile;
+        badfile = fopen("PHANTOMa", "r");
+        fread(str, sizeof(char), 517, badfile);
+        lain(str);
+        printf("salimos bien juan, pero no queremos eso ... :( \n");
+        return 1;
+
+}</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:paragraph -->
+<p>Es algo mucho mas sencillo, es un simple exploit de 32 bit, al tener el stack ejecutable (perdonen por la mala compilación de los binarios en el CTF hjejeje, muchos perdieron tiempo en eso)</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Volviendo al exploit de chisa, nos damos cuenta que lee el input de el archivo PHANTOMa, cada vez que de ejecuta, por lo que debemos enviar ahi nuestro input</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":114} -->
+<figure class="wp-block-image"><img src="/wp-content/uploads/2019/09/image-10-1024x73.png" alt="" class="wp-image-114" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Luego ejecutamos en gdb vemos que el EIP tiene un offset de 32, por lo que desde el byte dos en adelante podemos controlarlo, así que el plan es enviar un shellcode</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":115} -->
+<figure class="wp-block-image"><img src="/wp-content/uploads/2019/09/image-11-922x1024.png" alt="" class="wp-image-115" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>El plan es enviar un shellcode, pero no cualquier shellcode, en sistemas nuevos, incluso usando 32, las shell como dash y bash tienen un mecanismo de seguridad que "dropea" cualquier privilegio de SUID antes de ejcutarse, por lo que un shellcode normal que llame a /bin/sh no nos servirá, es por eso que ocupamos python para poder ejecutar el shellcode como root y no "dropear" privilegios cuando se ejecute la shell.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><a href="http://shell-storm.org/shellcode/files/shellcode-886.php">http://shell-storm.org/shellcode/files/shellcode-886.php</a></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Finalmente usamos este shellcode y copiamos el ouput del siguiente exploit a PHANTOMa (python exploit.py &gt; PHANTOMa)</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":116} -->
+<figure class="wp-block-image"><img src="/wp-content/uploads/2019/09/image-12-1024x165.png" alt="" class="wp-image-116" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Y con esto tenemos una shell de root:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":117} -->
+<figure class="wp-block-image"><img src="/wp-content/uploads/2019/09/image-13-1024x370.png" alt="" class="wp-image-117" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Espero que les haya gustado!!</p>
+<!-- /wp:paragraph -->
+
+  </div><a class="u-url" href="/crypto/ctf/overflow/q4/sin%20categor%C3%ADa/writeup/2019/09/02/writeup-juan-el-hacker-q4-ctf-2019.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Your awesome title</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Your awesome title</li><li><a class="u-email" href="mailto:your-email@example.com">your-email@example.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/jekyll"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">jekyll</span></a></li><li><a href="https://www.twitter.com/jekyllrb"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">jekyllrb</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

