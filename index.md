@@ -2,7 +2,6 @@
 layout: default
 ---
 
-
 # Read for this month
 
 [Sunburst attack](https://research.checkpoint.com/2021/deep-into-the-sunburst-attack/) a deep look into the sunburst attack
@@ -11,8 +10,7 @@ layout: default
 
 [Poolside.fm](https://poolside.fm/) What can I say...?
 
-# Friends & Resources
-
+# Resources
 
 [Ropemporium.](https://ropemporium.com/) The best site to learn ROP IMO
 
@@ -21,6 +19,8 @@ layout: default
 [Ricardo Narvaja](http://ricardonarvaja.info/) Cracking y exploiting en español
 
 [Phrack magazine <3](http://www.phrack.org/) Best hacking site ever!
+
+#Friends 
 
 [c4e](https://c4ebt.github.io/) One of the best pwner, from Chile
 
