@@ -6,7 +6,7 @@ comments: true
 categories: [Sin categoría]
 ---
 
-Hola, ya que he decidido migrar mi página a github pages,y para pastor este 2021, aprovecharé de hacer un write up de un binario que hice el fin de semana en [DICECTF 2021.](https://ctf.dicega.ng/) La parte de pwn estuvo bien buena. Solo alcance a hacer este rop y un heap a medias, pero al menos sirvió para mantener la práctica. 
+Hola, ya que he decidido migrar mi página a github pages,y para empezar este 2021, aprovecharé de hacer un write up de un binario que hice el fin de semana en [DICECTF 2021.](https://ctf.dicega.ng/) La parte de pwn estuvo bien buena. Solo alcance a hacer este rop y un heap a medias, pero al menos sirvió para mantener la práctica. 
 
 El binario en cuestión podemos ver que es de 64bit, puedes descargarlo de [aca](https://github.com/dplastico/heap_stream/blob/main/babyrop)  no tiene RELRO ni PIE, lo cual hace las cosas bastante sencillas. Eso sí, debemos considerar que probablemente ASLR si está habilitado en el sistema con lo que de todas formas necesitaremos de un leak.
 
