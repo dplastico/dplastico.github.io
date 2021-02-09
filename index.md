@@ -9,7 +9,7 @@ layout: default
 
 # Music for this month
 
-[Poolside](https://poolside.fm/) What can I say...?
+[Poolside.fm](https://poolside.fm/) What can I say...?
 
 # Friends & Resources
 
