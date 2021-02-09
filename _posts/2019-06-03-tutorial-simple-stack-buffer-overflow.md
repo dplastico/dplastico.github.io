@@ -295,7 +295,8 @@ except:
 <!-- /wp:paragraph -->
 
 <!-- wp:code -->
-```#!/usr/bin/python
+```python
+#!/usr/bin/python
 import socket
 import sys
 

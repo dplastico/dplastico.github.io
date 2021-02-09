@@ -116,7 +116,8 @@ https://touhidshaikh.com/blog/?p=914
 <!-- /wp:paragraph -->
 
 <!-- wp:code -->
-<pre class="wp-block-code"><code>#include &lt;stdlib.h&gt;
+```C
+#include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;string.h&gt;
 int lain(char *str)
@@ -138,7 +139,8 @@ int main(int argc, char **argv)
         printf("salimos bien juan, pero no queremos eso ... :( \n");
         return 1;
 
-}</code></pre>
+}
+```
 <!-- /wp:code -->
 
 <!-- wp:paragraph -->

