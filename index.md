@@ -12,9 +12,9 @@ layout: default
 
 # Resources
 
-[Ropemporium.](https://ropemporium.com/) The best site to learn ROP!
+[Ropemporium](https://ropemporium.com/) The best site to learn ROP!
 
-[Check Point Research.](https://research.checkpoint.com/) A very impressive research team.
+[Check Point Research](https://research.checkpoint.com/) A very impressive research team.
 
 [Ricardo Narvaja](http://ricardonarvaja.info/) Cracking y exploiting en español
 
@@ -22,9 +22,9 @@ layout: default
 
 # Friends 
 
-[c4e](https://c4ebt.github.io/) One of the best pwner, from Chile
+[c4e](https://c4ebt.github.io/) One of the best pwners from Chile
 
-[s1kr10s](https://medium.com/@s1kr10s) Researcher, from Chile
+[s1kr10s](https://medium.com/@s1kr10s) Researcher from Chile
 
 [s4vitar](https://www.youtube.com/channel/UCNHWpNqiM8yOQcHXtsluD7Q) Pentesting  & hacking en español
 
