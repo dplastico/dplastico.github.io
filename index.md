@@ -12,7 +12,7 @@ layout: default
 
 # Resources
 
-[Ropemporium.](https://ropemporium.com/) The best site to learn ROP IMO
+[Ropemporium.](https://ropemporium.com/) The best site to learn ROP!
 
 [Check Point Research.](https://research.checkpoint.com/) A very impressive research team.
 
