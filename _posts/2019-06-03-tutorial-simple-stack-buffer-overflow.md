@@ -295,7 +295,7 @@ except:
 <!-- /wp:paragraph -->
 
 <!-- wp:code -->
-<pre class="wp-block-code"><code>```#!/usr/bin/python
+<pre class="wp-block-code">```#!/usr/bin/python
 import socket
 import sys
 
@@ -321,7 +321,7 @@ try:
     s.close()
 except:
     print "Sin conexion al servidor"```
-</code></pre>
+</pre>
 <!-- /wp:code -->
 
 <!-- wp:paragraph -->
