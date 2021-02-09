@@ -28,4 +28,4 @@ layout: default
 
 [s4vitar](https://www.youtube.com/channel/UCNHWpNqiM8yOQcHXtsluD7Q) Pentesting  & hacking en español
 
-[Zerial](https://blog.zerial.org/)Info sobre cyber
+[Zerial](https://blog.zerial.org/) Info sobre cyber
