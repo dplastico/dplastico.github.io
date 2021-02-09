@@ -2,14 +2,14 @@
 declare -i versionado=$(cat verss)
 echo "adding...."
 git add .
-echo "probando"
+echo "Listo!"
 sleep 1
 echo "comiteando...."
 git commit -m  "v.$versionado"
 sleep 1
-echo "probando"
+echo "Listo!"
 ((versionado++))
 sleep 1
 git push
 echo $versionado > verss
-echo "listo!"
+echo "listo!, go!"
