@@ -10,7 +10,7 @@ Hola, ya que he decidido migrar mi página github pages,y para pastor este 2021,
 
 El binario en cuestión podemos ver que es de 64bit , sin RELRO ni PIE, lo cual hace las cosas bastante sencillas. Eso sí, debemos considerar que probablemente ASLR si está habilitado en el sistema con lo que de todas formas necesitaremos de un leak.
 
-![file](/assets/dice/dice1.png)
+![Imgur](https://i.imgur.com/wtXtqAk.png)
 
 Al revisar las funciones vemos que ocupa la función GETS (ya sabemos que esto lleva a buffer overflow), pero solo ocupa adicional a esto la función de ”write” para imprimir en pantalla.
 
