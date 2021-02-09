@@ -22,7 +22,7 @@ layout: default
 
 # Friends 
 
-[c4e](https://c4ebt.github.io/) One of the best pwners from Chile
+[c4e](https://c4ebt.github.io/) One of the best pwners (worldwide) from Chile
 
 [s1kr10s](https://medium.com/@s1kr10s) Researcher from Chile
 
