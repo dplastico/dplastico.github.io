@@ -20,7 +20,7 @@ layout: default
 
 [Phrack magazine <3](http://www.phrack.org/) Best hacking site ever!
 
-#Friends 
+# Friends 
 
 [c4e](https://c4ebt.github.io/) One of the best pwner, from Chile
 
