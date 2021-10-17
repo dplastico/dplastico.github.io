@@ -50,16 +50,16 @@ c = malloc(0x98, "YYYYYYYY")
 free(a)
 ```
 
-* **2.-** Request a chunk that overlaps the already double freed chunk as in the house of botcake, in this case I will  use a 0xc0 size chunk keeping the same 0xa1 (in this case) size of the already freed chunk, but zeroing the FD and BK (key field) of the free chunk in the way of the overlapped one. this is to overcome the double free mitigation that it will check if the address of the tcache struct is written on the "bk" of the free chunk as key. we zero it so we can free it again and generate a new DF situation.
+* **2.-** Request a chunk that overlaps the already double freed chunk as in the house of botcake, in this case I will  use a 0xc0 size chunk keeping the same 0xa1 (in this case) size of the already free chunk, but zeroing the FD and BK (key field) of the free chunk in the way of the one that overlaps. this is to overcome the double free mitigation that it will check if the address of the tcache struct is written on the "bk" of the free chunk as key. we zero it so we can free it again and generate a new DF situation.
  
 Example:
 ```python
 malloc(0xb8, p64(0)*19 +p64(0xa1)+p64(0)*2)
 ```
  
-* **3.-** Free the "a" chunk to generate the freed chunk on the tcache 0xa0 and now we free overlapped chunk 0xc0.
+* **3.-** Free the "a" chunk to generate the free chunk on the tcache 0xa0 and now we free overlapped chunk 0xc0.
  
-* **4.-** Request a 0xa0 chunk again to being served from the overlapped chunk and overwrite the size of the unsorted bin in this case should be 0x81, or the size that you got and the just overwrite the last 2 bytes of the libc pointer in the FD of the unsortedbin. This will be our 1/16 libc load-address entropy bruteforce of the stdout address.
+* **4.-** Request a 0xa0 chunk again to being served from the overlapped chunk and overwrite the size of the unsorted bin in this case should be 0x81, or the size that you got depending on the sizes you used, and then overwrite the last 2 bytes of the libc pointer in the FD of the unsortedbin with the stdout address as descibed [here]([here](https://vigneshsrao.github.io/posts/babytcache/)). This will be our 1/16 libc load-address entropy bruteforce of the stdout address.
  
 Example:
 ```python
@@ -73,7 +73,7 @@ Example:
 malloc(0xb8, p64(0)*19+p64(0x91)+p8(0x80))# 0x80 is modified to point forwards in the heap where the overwritten libc pointer is
 ```
 
-* **6.-** Request 2 chunks to clear the tcachebin list, and the the chunk will be served from the stdout address, using the technique described [here](https://vigneshsrao.github.io/posts/babytcache/) you will get a leak, even when the binary does not have any read function
+* **6.-** Request 2 chunks to clear the tcachebin list, and the the chunk will be served from the stdout address, using the technique described before,[again, here](https://vigneshsrao.github.io/posts/babytcache/), you will get a leak.
 
 * **7.-** You can now repeat the steps of the house of botcake to create an overlapped chunk, but this time you can modify the FD of the overlapped chunk in the tcache with the address of the free hook
 
@@ -81,7 +81,7 @@ malloc(0xb8, p64(0)*19+p64(0x91)+p8(0x80))# 0x80 is modified to point forwards i
 
 * **9.-** Request a 0xa0 chunk that will be served from the free hook, and write the system address
 
-* **10.-** Free the guard chunk, or the chunk where you write your command "/bin/sh\x00"
+* **10.-** Free the guard chunk, or the chunk where you write your command, for this example: "/bin/sh\x00"
 
 # Conclusion
  
