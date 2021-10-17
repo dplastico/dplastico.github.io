@@ -55,7 +55,7 @@ Example:
 malloc(0xb8, p64(0)*19 +p64(0xa1)+p64(0)*2)
 ```
  
-**3.-** Free the chunk to generate the freed chunk on the tcache 0xa0 and now we free overlapped chunk 0xc0.
+**3.-** Free the "a" chunk to generate the freed chunk on the tcache 0xa0 and now we free overlapped chunk 0xc0.
  
 **4.-** Request a 0xa0 chunk again to being served from the overlapped chunk and overwrite the size of the unsorted bin in this case should be 0x81, or the size that you got and the just overwrite the last 2 bytes of the libc pointer in the FD of the unsortedbin. This will be our 1/16 libc load-address entropy bruteforce of the stdout address.
  
