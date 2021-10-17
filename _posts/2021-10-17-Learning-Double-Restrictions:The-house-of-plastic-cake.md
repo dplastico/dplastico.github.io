@@ -55,13 +55,13 @@ Example:
 malloc(0xb8, p64(0)*19 +p64(0xa1)+p64(0)*2)
 ```
  
-**3.-** We free the chunk to generate the freed chunk on the tcache 0xa0 and now we free overlapped chunk 0xc0.
+**3.-** Free the chunk to generate the freed chunk on the tcache 0xa0 and now we free overlapped chunk 0xc0.
  
-**4.-** Request a 0xa0 chunk again to being served from the overlapped chunk and overwrite the size of the unsorted bin in this case should be 0x81, or the size that you got and the just overwrite the last 2 bytes of the libc pointer in the FD of the unsortedbin. This will be our 1/16 brute force of the stdout address
+**4.-** Request a 0xa0 chunk again to being served from the overlapped chunk and overwrite the size of the unsorted bin in this case should be 0x81, or the size that you got and the just overwrite the last 2 bytes of the libc pointer in the FD of the unsortedbin. This will be our 1/16 libc load-address entropy bruteforce of the stdout address.
  
 Example:
 ```python
-malloc(0x98, p64(0)*3 +p64(0x81)+p16(0x1760))
+malloc(0x98, p64(0)*3 +p64(0x81)+p16(0x1760)) #0x1760 are the last 4 bytes we bruteforce the 4th byte 
 ```
  
 **5.-** Now this is the tricky part, you need to now request another 0xc0 chunk that overlaps the chunk that you just allocate (that is also free) and keep the size (0xa1) and then modify the last byte of the FD to point to where the libc pointers that we modified are, this should be 0x20 bytes ahead, if not you just need to adjust the value according to the sizes you request, but the value should be fixed if you keep the consistency on the sizes.
@@ -71,7 +71,7 @@ Example:
 malloc(0xb8, p64(0)*19+p64(0x91)+p8(0x80))# 0x80 is modified to point forwards in the heap where the overwritten libc pointer is
 ```
 
-**6.-** Then Request 2 chunks to clear the tcachebin list, and the the chunk will be served from the stdout address, using the technique described [here](https://vigneshsrao.github.io/posts/babytcache/) you will get a leak, even when the binary does not have any read function
+**6.-** Request 2 chunks to clear the tcachebin list, and the the chunk will be served from the stdout address, using the technique described [here](https://vigneshsrao.github.io/posts/babytcache/) you will get a leak, even when the binary does not have any read function
 
 **7.-** You can now repeat the steps of the house of botcake to create an overlapped chunk, but this time you can modify the FD of the overlapped chunk in the tcache with the address of the free hook
 
