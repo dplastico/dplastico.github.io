@@ -127,7 +127,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 p, code {
-    font-size: 16px;
+    font-size: 32px;
 }
 
 pre {
@@ -150,7 +150,6 @@ pre.highlight {
 html {
     --scrollbarBG: black;
     --thumbBG: darkslateblue;
-    font-size: 16px;
 }
 body::-webkit-scrollbar {
     width: 11px;
