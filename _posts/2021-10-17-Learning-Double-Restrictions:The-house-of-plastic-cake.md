@@ -23,7 +23,7 @@ If the reader is not familiar with the topics discussed in this post this may he
  
 # Brief explanation
  
-The house of plastic-cake utilizes the house of botcake to generate an overlaped chunk, then a 3rd free of the same chunk  needs to be done in order to perform 2 writes: First, overwrite the las 2 bytes of the libc pointer generated in the unsorted bin to try to guess (1/16 chance) the stdout libc address. Second,it uses another write to point the FD of the already freed bug "forwards" on the heap to the modified libc address. This will trigger a leak, the using the already double freed chunk (using the same overlap), or performing another house of botcake it generates a shell overwriting the free hook.
+The house of plastic-cake utilizes the house of botcake to generate an overlaped chunk, then a 3rd free of the same chunk  needs to be done in order to perform 2 writes: First, overwrite the las 2 bytes of the libc pointer generated in the unsorted bin to try to guess (1/16 chance) the stdout libc address. Second,it uses another write to point the FD of the already freed bug "forwards" on the heap to the modified libc address. This will trigger a leak, then, using the already double freed chunk (using the same overlap), or performing another house of botcake it generates a shell overwriting the free hook.
  
 # Detailed explanation
  
