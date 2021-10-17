@@ -93,7 +93,3 @@ I wanted to thanks the people that help me to write this post:
 [c4e](https://c4ebt.github.io/) an amazing pwner and friend that is always in the mood to help me and put me in the right direction.
  
 Max Kamper creator of [Ropemporium](https://ropemporium.com/) who I want to thank for everything he has taught me about Heap.
- 
- 
- 
-
