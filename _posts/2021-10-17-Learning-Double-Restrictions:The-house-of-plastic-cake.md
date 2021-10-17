@@ -15,11 +15,11 @@ This is really not a "house" and I'm not claming it to be a new explotation tecn
 
 If the reader is not familiar with the topics discussed in this post this may help:
 
-[Double Free](https://heap-exploitation.dhavalkapil.com/attacks/double_free)
+- [Double Free](https://heap-exploitation.dhavalkapil.com/attacks/double_free)
 
-[House of Botcake](https://github.com/shellphish/how2heap/blob/master/glibc_2.31/house_of_botcake.c)
+- [House of Botcake](https://github.com/shellphish/how2heap/blob/master/glibc_2.31/house_of_botcake.c)
 
-[Leaking from stdout](https://vigneshsrao.github.io/posts/babytcache/)
+- [Leaking from stdout](https://vigneshsrao.github.io/posts/babytcache/)
  
 # Brief explanation
  
@@ -90,6 +90,6 @@ I really enjoy heap exploitation and this exercise help me a lot to better under
 
 I wanted to thanks the people that help me to write this post:
 
-[c4e](https://c4ebt.github.io/) an amazing pwner that helps me with doubts and also motivate me.
+- [c4e](https://c4ebt.github.io/) an amazing pwner that helps me with doubts and also motivate me.
 
-Max Kamper creator of [Ropemporium](https://ropemporium.com/) for all that he already teach me.
+- Max Kamper creator of [Ropemporium](https://ropemporium.com/) for all that he already teach me.
