@@ -71,7 +71,7 @@ malloc(0x98, p64(0)*3 +p64(0x81)+p16(0x1760))
 5.- Now this is the tricky part, you need to now request another 0xc0 chunk that overlaps the chunk that you just allocate (that is also free) and keep the size (0xa1) and then modify the last byte of the FD to point to where the libc pointers that we modified are, this should be 0x20 bytes ahead, if not you just need to adjust the value according to the sizes you request, but the value should be fixed if you keep the consistency on the sizes. 
 
 ```python
-malloc(0xb8, p64(0)*19+p64(0x91)+p8(0x80))# 0x80 is modified to point forwards in the heap where the overwritten libc point is
+malloc(0xb8, p64(0)*19+p64(0x91)+p8(0x80))# 0x80 is modified to point forwards in the heap where the overwritten libc pointer is
 ```
  
 6.- Then Request 2 malloc to clear the tcachebin list, and the the chunk will be served from the stdout address, using the technique described [here](https://vigneshsrao.github.io/posts/babytcache/) you will get a leak, even when the binary does not have any read function
