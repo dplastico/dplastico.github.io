@@ -82,7 +82,7 @@ malloc(0xb8, p64(0)*19+p64(0x91)+p8(0x80))# 0x80 is modified to point forwards i
  
 9.- Request a 0xa0 chunk that will be served from the free hook, and write the system address
  
-10.- Fre the guard chunk, or the chunk where you write your command "/bin/sh\x00"
+10.- Free the guard chunk, or the chunk where you write your command "/bin/sh\x00"
  
 # Conclusion
 
