@@ -48,7 +48,7 @@ c = malloc(0x98, "YYYYYYYY")
 free(a)
 ```
 
-**2.-** Request a chunk that overlaps the already double freed chunk as in the house of botcake, in this case I will  use a 0xc0 size chunk keeping the same 0xa1 (in this case) size of the freed chunk, but zeroing the FD and BK (key field) of the freed chunk in the way of the overlapped one. this is to overcome the double free mitigation that it will check if the address of the tcache struct is written on the "bk" of the freed chunk as key. we zeroit so we can freed again and generate a new DF situation.
+**2.-** Request a chunk that overlaps the already double freed chunk as in the house of botcake, in this case I will  use a 0xc0 size chunk keeping the same 0xa1 (in this case) size of the already freed chunk, but zeroing the FD and BK (key field) of the free chunk in the way of the overlapped one. this is to overcome the double free mitigation that it will check if the address of the tcache struct is written on the "bk" of the free chunk as key. we zero it so we can free it again and generate a new DF situation.
  
 Example:
 ```python
