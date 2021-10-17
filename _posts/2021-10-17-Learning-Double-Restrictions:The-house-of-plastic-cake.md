@@ -88,8 +88,8 @@ malloc(0xb8, p64(0)*19+p64(0x91)+p8(0x80))# 0x80 is modified to point forwards i
 I really enjoy heap exploitation and this exercise help me a lot to better understand malloc internals. I wouldn't really call it a "house" but it's a nice approach to exploit double free bugs that have more restrictions.Also maybe some variations are possible, a combination of House of Botcake + tcache dumping or tcache stashing unlink can maybe achieve the same goal.
 I hope this post is useful to more people that want top explore the heap internals. If you have any doubts about this post you can contact me at dicord dplastico#3901
  
-I wanted to thanks the people that help me to write this post:
+I wanted to thanks the people that help me to build the knowledge to write this post:
  
 [c4e](https://c4ebt.github.io/) an amazing pwner and friend that is always in the mood to help me and put me in the right direction.
  
-Max Kamper creator of [Ropemporium](https://ropemporium.com/) who I want to thank for everything he has taught me about Heap.
+Max Kamper creator of [Ropemporium](https://ropemporium.com/) from whom I have learned a lot about the Heap
