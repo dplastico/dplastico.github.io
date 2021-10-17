@@ -7,8 +7,8 @@ categories: [Sin categoría]
 ---
 # The house of plastic cake
 
-In the last couple of weeks I've been working on some [streams](https://www.youtube.com/watch?v=z-_JbUHwwSc) and studying around [tcache poisoning](https://github.com/shellphish/how2heap/blob/master/glibc_2.31/tcache_poisoning.c) and I decided to learn more about the tcache double free (I will refer also as DF sometimes) [mitigations](https://blog.infosectcbr.com.au/2019/09/linux-heap-glibc-tcache-double-free.html) and ways to leverage overlapped chunks using just this bug. I saw that almost all the techniques uses leaks, so using some knowledge I came with a workaround for the [house of botcake](https://github.com/shellphish/how2heap/blob/master/glibc_2.31/house_of_botcake.c) to drop a shell on binaries with just DF bugs, that doesn't leak any addresses and have no read or edit functions.
-This is really not a "house" and I'm not claiming it to be a new exploitation technique, but it's a good workaround and learning exercise that actually merges 2 techniques together to achieve the final result. It was tested in glibc 2.27, 2.29 and 2.31. I didn't test it far that and some new mitigations could make this technique invalid or maybe some variations are required
+In the last couple of weeks I've been working on some [streams](https://www.youtube.com/watch?v=z-_JbUHwwSc) and studying around [tcache poisoning](https://github.com/shellphish/how2heap/blob/master/glibc_2.31/tcache_poisoning.c) and I decided to learn more about the tcache double free (I will refer also as DF sometimes) [mitigations](https://blog.infosectcbr.com.au/2019/09/linux-heap-glibc-tcache-double-free.html) and ways to leverage overlapped chunks using just this bug. I noticed that almost all the techniques uses leaks, so using some knowledge I came with a workaround for the [house of botcake](https://github.com/shellphish/how2heap/blob/master/glibc_2.31/house_of_botcake.c) to drop a shell on binaries with just DF bugs, that doesn't leak any addresses and have no read or edit functions.
+This is maybe  not a really a "house" and I'm not claiming it to be a brand new exploitation technique, but it's a good workaround and learning exercise that actually merges 2 techniques together to achieve the final result. It was tested in glibc 2.27, 2.29 and 2.31. I didn't test it far that and some new mitigations could make this technique invalid or maybe some variations are required
  
 # Background knowledge
  
@@ -23,7 +23,7 @@ If the reader is not familiar with the topics discussed in this post this may he
 
 # Brief explanation
 
-The house of plastic-cake utilizes the house of botcake to generate an overlapped chunk, then a 3rd free of the same chunk  needs to be done in order to perform 2 writes: First, overwrite the last 2 bytes of the libc pointer generated in the unsorted bin to try to guess (1/16 chance) the stdout libc address. Second,it uses another write to point the FD of the already freed bug "forwards" on the heap to the modified libc address. This will trigger a leak, then, using the already double freed chunk (using the same overlap), or performing another house of botcake it generates a shell overwriting the free hook.
+The house of plastic-cake utilizes the house of botcake to generate an overlapped chunk, then a 3rd free of the same chunk  needs to be done in order to perform 2 writes: First, overwrite the last 2 bytes of the libc pointer generated in the unsorted bin to try to guess (1/16 chance) the stdout libc address. Second,it uses another write to point the FD of the already freed chunk "forwards" on the heap to a previously  modified libc address. This will trigger a leak, then, using the already double free chunk (using the same overlap), or performing another house of botcake it drops a shell overwriting the free hook.
 
 # Detailed explanation
 
