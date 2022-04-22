@@ -93,11 +93,11 @@ This concept will help us to determine the location of different functions and s
 
 As an example let's use the information in CFF explorer to test this.
 
-![](img/2022-03-27-13-10-38.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-27-13-10-38.png)
 
 You can see that the RVA of the .text section holds the 0x1000 value this means that the .text section shold load at BaseImage + 0x1000, we will inspect the preferred BaseImage of this binary later on, but is set to 0x400000, sothe address should load at 0x401000, let's open this on x32dbg and lets see if we can spot where the .text section was loaded, we can check this opening the executable on the debugger and go to view->Memory map
 
-![](img/2022-03-27-13-15-09.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-27-13-15-09.png)
 
 Listed above our calculations are correct, we can use this to refer to execution and this will be important when we will start going deeper into the binary it self
 
@@ -133,20 +133,20 @@ typedef struct _IMAGE_DOS_HEADER
 
 Above  we can see how the **DOS_HEADER** is structured in different fields with different sizes. This field contains information about the program and also about other structures in the PE. As an example, and something that can be useful to identify the start of a PE executable,  we can take a look at the value of the **e_magic** field. This field always Starts with a magic value of **0x45DA** which can be represented in ASCII as **"MZ"** This is a reference to  Marz Zbikowski who was the designer of MS-DOS executable format. Let's check this in CFF explorer, this tool have very nice interface to inspect the sections and structures and also, you see the Hex representation of the binary
 
-![](img/2022-03-27-12-45-32.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-27-12-45-32.png)
 
-![](img/2022-03-27-12-45-55.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-27-12-45-55.png)
 
 
 Listed Above is the CFF explorer representation of the DOS_HEADER, we can see the Values match our expected results and the 0x45DA is on the **e_magic** field. Also The Hex representation confirm the ASCII translation of this as **MZ**. 
 
 We can inspect this fields if we want, but the one is interested to us is the  **e_lfanew** field which is the only one required to have a value for the file to execute, this is because this fields contains a relative offset to the next header, the **NT_HEADER** which is crucial to execution, this fields is located at offset **0x3C** from the beginning of our file, we can check this in CFF explorer also
 
-![](img/2022-03-27-12-49-50.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-27-12-49-50.png)
 
 We can confirm the offset of **0x3c** and the value **0x80**, this value is the offset from the beginning of the file to the NT_HEADER. Which can also confirm in CFF Explorer clicking on the NT_HEADER section
 
-![](img/2022-03-27-12-51-25.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-27-12-51-25.png)
 
 ### DOS STUB
 
@@ -156,7 +156,7 @@ Next in the file found the **DOS STUB**. This is a small program created to prin
 
 before the **NT_HEADER** and after the DOS stub, if we look at the program we compiled using CFF explorer, we can see some NULL bytes, just before the **NT_HEADER**, in our case 0x80 bytes from the beginning of the file, this portion of memory is known as the RICH header. 
 
-![](img/2022-03-27-12-56-25.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-27-12-56-25.png)
 
 This header is only populated when the Microsoft Visual Studio suite was used to build the binary. It will contain information about the Tools and versions used. it also can be used as awy to missguided about the author of the program
 *https://securelist.com/the-devils-in-the-rich-header/84348/*
@@ -175,7 +175,7 @@ typedef struct _IMAGE_NT_HEADERS {
 ```
 Listed above is the structure of the header. The first field correspond to the PE Signature, this value it's a DWORD (4 byteS) and should always be "PE" (0x50 and 0x45 in hex) followed by 2 NULL bytes, we can see them in our binary
 
-![](img/2022-03-27-13-41-11.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-27-13-41-11.png)
 
 The second field correspond to another structure the **FILE_HEADER**  followed by the **OPTIONAL_HEADER**, let's take a look at this ones i'm more detail, since they provide a lot of information that can be useful to us
 
@@ -260,7 +260,7 @@ We can see the different field of the **OPTIONAL_HEADER** structure and  that it
 As we mentioned above, the DataDirectory array is part of the **DATA_DIRECTORY** struct, and the size of this array is determined by IMAGE_NUMBEROF_DIRECTORY_ENTRIES value in winnt.h, if we look at the source code of mingw we can see that this value is fixed to 16, so we can take not of this.
 *https://github.com/Alexpux/mingw-w64/blob/master/mingw-w64-tools/widl/include/winnt.h*
 
-![](img/2022-03-27-14-02-52.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-27-14-02-52.png)
 
 this is how the **DATA_DIRECTORY** struct is defined:
 
@@ -278,7 +278,7 @@ The DataDirectory is data in the sections of the PE file this can have different
 
 As mentioned above this structure holds the address of the functions needed for the binary to load and run, this address is resolved in runtime since their original value is the RVA to the function inside the needed module. once the binary is executed this address are resolved and populated in the **IAT**
 
-![](img/2022-03-27-14-12-37.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-27-14-12-37.png)
 
 ### Section Table or Section Headers
 
@@ -335,7 +335,7 @@ typedef struct _IMAGE_SECTION_HEADER {
 
 Above is a representation of this structure which have different fields, we can observe them in CFF explorer also:
 
-![](img/2022-03-27-17-17-24.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-27-17-17-24.png)
 
 *https://docs.microsoft.com/en-us/windows/win32/debug/pe-format#section-flags*
 
@@ -381,25 +381,25 @@ Execute:
 
 With this the file will be packed. You can check the size of the new packed_upx.exe file is smaller than the original, this is due to the compression that UPX apply, and if you execute it works properly
 
-![](img/2022-03-27-17-43-51.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-27-17-43-51.png)
 
 Let's take a look now at the binary itself and see if we can spot more differences.
 unpacked.exe:
-![](img/2022-03-27-17-48-09.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-27-17-48-09.png)
 
 packed_upx.exe:
-![](img/2022-03-27-17-48-52.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-27-17-48-52.png)
 
 The common sections that we saw before in the now unpacked.exe are replaced for 3 sections UPX0 UPX1 UPX2 in the packed_upx.exe binary that show us how the data is changed inside the binary and in the regular structure of itself. 
 
 
-![](img/2022-03-27-17-50-40.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-27-17-50-40.png)
 Above also, the  entrypoint of the binary in x32dbg in runtime, looks totally different and it changes also
 unpacked.exe:
-![](img/2022-03-27-17-53-01.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-27-17-53-01.png)
 
 packed_upx.exe:
-![](img/2022-03-27-17-52-18.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-27-17-52-18.png)
 
 Finally listed above you can see that there's also a difference between the number of functions called from different DLLs, there are much more in the original file than in the compressed one. This is because the packer, in order to compress the size, will try to load everything that it needs with the least amount possible of *API calls*. This is, on the case of UPX, to effectively reduce the size of the binary
 
@@ -414,7 +414,7 @@ In order to better understand how a packer can manipulate an executable outside 
 
 We now also know that ASLR should be disable on the binary, since we compiled with the "-no-pie" flag, but we can still check this out. If the flag **IMAGE_FILE_RELOCS_STRIPPED** un Characteristics is set to 0x0001, ASLR should be disable for the binary. We can verify this on CFF explorer
 
-![](img/2022-03-26-19-50-00.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-26-19-50-00.png)
 
 Great, also we will use for this section  the **pefile** python module, that will allow us to parse information from the PE structures and also modify them. You can install it with the command:
 
@@ -439,11 +439,11 @@ print(lastSection)
 ```
 
 When executed we can see the results:
-![](img/2022-03-27-18-09-42.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-27-18-09-42.png)
 
 And we can cross reference them with the information on CFF Explorer
 
-![](img/2022-03-27-18-11-06.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-27-18-11-06.png)
 
 Great the pefile module works, we can learn more about what we can do with this module in their documentation 
 *https://github.com/erocarrera/pefile/blob/wiki/UsageExamples.md#introduction*
@@ -508,15 +508,15 @@ pe.__structures__.append(newSection)
 #write the modified pe to an executable file on disk
 pe.write('./python_packed.exe')
 ```
-![](img/2022-03-27-00-16-15.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-27-00-16-15.png)
 
 Execution looks clean and the python_packed.exe file was created. We can explore the binary with CFF again to see if we managed to modify the PE.
 
-![](img/2022-03-27-00-17-39.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-27-00-17-39.png)
 
 Listed above appears the new section created named ".packed".  but when we try to execute the newly created file we receive an error that the file cannot be run in put PC
 
-![](img/2022-03-27-00-21-06.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-27-00-21-06.png)
 
 Why does this happen? The new section we created has no values in any field of the section, we need to populate the permissions. Let's set Execute, Read and Execute permissions so that way later we can try to execute shellcode we can add this  values, in order to that we need to set the flags for the Characteristics Field of the sections header to match the .text section so we need to set the flags IMAGE_SCN_CNT_CODE,IMAGE_SCN_MEM_EXECUTE, IIMAGE_SCN_MEM_READ. We can search for this values in the microsoft documentation and then add them the new Section
 *https://docs.microsoft.com/en-us/windows/win32/debug/pe-format#section-flags*
@@ -560,11 +560,11 @@ pe.OPTIONAL_HEADER.SizeOfImage += alignSectionSize(0x100, pe.OPTIONAL_HEADER.Sec
 
 The program executes cleanly and the packed binary is created, and also executes properly as you can see in the following image:
 
-![](img/2022-03-27-02-18-18.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-27-02-18-18.png)
 
 Also If we open the newly created binary in CFF we can see that the sections were set as we planned. 
 
-![](img/2022-03-27-02-20-01.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-27-02-20-01.png)
 
 So our POC works, we can modify the PE, but we only added a section, we still need to redirect the execution of the program, we could overwrite The section in .text where on the Entry Point we previously identified, but why don't we just overwrite the value in "AddressOfEntryPoint" field, this should redirect the execution.
 
@@ -584,11 +584,11 @@ print(f"[*] Etnry Point in Execution = {hex(exec_ep)}")
 ```
 Listed above we can find the values of ImageBase and  AddressOfEntryPoint were set to a variable, we can calculate in the exec_ep variable the value of the Original Entry Point in memory, since we compile the binary with -fno-pie flag
 
-![](img/2022-03-27-03-30-01.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-27-03-30-01.png)
 
 Since when the no relocation flag was setted we know that this address will be fixed, still lets check it out in a debugger. We need to pass some exceptions until we reach the INT3 breakpoint for Entry Point, as you can see below, the entry point matches. So we now know how to obtain the address of entry point and now lest modified to point out our code
 
-![](img/2022-03-27-03-46-45.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-27-03-46-45.png)
 
 Now let's modify the Entry point and print it to see if we have the same result in our analysis. Keep in mind that we need to calculate the SizeOfRawData first, and we can accomplish this by using our alignment function to obtain the size we should use in the field
 
@@ -606,11 +606,11 @@ new_ep = pe.OPTIONAL_HEADER.AddressOfEntryPoint + imageBase
 print(f"[*] Modified entry point at {hex(new_ep)}")
 ```
 
-![](img/2022-03-27-18-58-04.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-27-18-58-04.png)
 
 After execution we see the code is executed correctly and it display the address 0x411000
 
-![](img/2022-03-27-18-58-58.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-27-18-58-58.png)
 
 And when dynamically analyzing in the debugger we see above that the entry point matches the patched Entry Point address. We were able to redirect the code execution on the executable
 
@@ -746,9 +746,9 @@ Listed above is the code used to modify the binary. With what we have learned pl
 - Executes shellcode on ".data"
 - Return Execution to OEP (Original Entry Point)
 
-![](img/2022-03-31-01-33-26.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-31-01-33-26.png)
 
-![](img/2022-03-31-01-33-39.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-31-01-33-39.png)
 
 Great, above we can see that after executing the program a MessageBox appears and once we click on it, execution is redirected to the OEP and the program continues normal execution.
 
@@ -788,14 +788,14 @@ We can compile it with
 ```bash
 gcc -fno-pie testing.c -o testing
 ```
-![](img/2022-03-28-00-06-42.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-28-00-06-42.png)
 
 We can test it's working by simply executing it as shown above. Now that we know that our program works,lets create a backup copy and  pack it using upx with the following command:
 
 ```bash
 upx testing.exe
 ```
-![](img/2022-03-28-00-10-57.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-28-00-10-57.png)
 
 First we can confirm that our binary works, by just executing it.
 
@@ -803,19 +803,19 @@ First we can confirm that our binary works, by just executing it.
 
 Let's now pack the just created "testing.exe" binary using UPX, and let's analyze this binary remember we can pack it using the upx binary and exe
 
-![](img/2022-03-28-00-17-48.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-28-00-17-48.png)
 
 No issues seem to appear so we can now check how the binary is being altered and the sections have been renamed to UPX0, UPX1 and UPX3. This time we will use IDA to check the segments, we can do it by going to view -> segments. We will use IDA because we will start to apply more Reverse Engineering from now on.
 
-![](img/2022-03-28-00-23-09.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-28-00-23-09.png)
 
 Also if we look at the code we cannot identify the usual Entry  Point or functions, as an example below we will contrat how the code looks in the backup with no UPX packing and with packing
 
-![](img/2022-03-28-00-26-09.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-28-00-26-09.png)
 
 Listed above we can see how the main functions and the assembly code of the binary looks normal
 
-![](img/2022-03-28-00-27-31.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-28-00-27-31.png)
 
 While above we can clearly see the code has changed and it looks more difficult to follow or spot.
 
@@ -833,39 +833,39 @@ For this section we will use **x32dbg** Since we will dynamically analyze the bi
 
 Since we already know how, in theory, a packer like UPX works, we will assume that from the entry point will start to run functionality to resolve imported functions and restore the code to a certain memory region, where it will jump after to execute the original executable
 
-![](img/2022-03-28-16-52-05.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-28-16-52-05.png)
 
 We can take a note or screenshot of the entry point, and if we scroll down we will see imported modules  and then the main function
 
-![](img/2022-03-28-16-55-52.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-28-16-55-52.png)
 
 So we expect to follow the execution of the code in the packed binary and let's try to figure out if we can extract the original file from the executable.
 
 First let's examine the entry point
 
-![](img/2022-03-28-17-07-58.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-28-17-07-58.png)
 
 We can see that the entry point, as we expected, looks totally different. From here we can do several things to try to look for the original code, but something to keep in mind is our first instruction, PUSHAD in address 0x00412170, this instruction pushes the contents of the general-purpose registers onto the stack. This can be used to preserve the state of the registers to later on restore it with a POPAD instruction; this instruction pops values from the stack into the general-purpose registers. Taking that into consideration we can follow up the code looking for a POPAD instruction to see where this registers are restored
 
 
-![](img/2022-03-28-17-19-28.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-28-17-19-28.png)
 
 We found a POPAD in the address 0x003122ED, follow by a small jump back, and right after to instructions call our attention, first we see the stack pointer being modified, so the stack now point in another direction, and then in address 0x0041230B a JMP instruction  to a different memory region in address 0x004012E0. Let's investigate that
 
-![](img/2022-03-28-17-24-39.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-28-17-24-39.png)
 
 Listed above are the regions that we can access through the "memory map" tab in x32dbg, and we can determine that the address 0x004012E0 corresponds to the section UPX0, while our curren EIP where the execution is currently located in address 0x00412170 corresponds to UPX2 section. Let's follow the memory to where the jump is pointing to 0x004012E0. We can accomplish this right clicking on the jmp instruction and selectrin 
 "follow in dump" and the selecting the mentioned address
 
-![](img/2022-03-28-17-30-13.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-28-17-30-13.png)
 
 Listed above we can see that the region only contains NULL bytes, this means that after execution the stub created by the packer will decompress the data into this region and will allocate the original code, let's test this by setting a breakpoint on the jump (you can just select the instruction and press F2, or right click breakpoints and then select toggle), and start tracing the execution from there. A nice feature by x32dbg is that the memory region selected will automatically change if that's the case so we will spot immediately if the 
 
-![](img/2022-03-28-17-37-27.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-28-17-37-27.png)
 
 After hitting our breakpoint we can  see that the region is now fully populated with data, lets see if this match our original entry point:
 
-![](img/2022-03-28-17-40-40.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-28-17-40-40.png)
 
 Great, we can see that the jmp instruction lands us on what looks exactly like our entry point. Lets see now if we can extract the binary
 
@@ -875,27 +875,27 @@ To extract the binary we will relay on a plugin commonly used with x32dbg, since
 *https://github.com/NtQuery/Scylla*
 
 
-![](img/2022-03-28-17-45-19.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-28-17-45-19.png)
 
 Once the plugin is open ad shown above click on "IAT autosearch", and then on "Get Imports"  after that you can just click on "dump" and named the binary, I will call it "extracted.exe". Lets test if we were success by executing the binary
 
-![](img/2022-03-28-17-58-55.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-28-17-58-55.png)
 
 The binary fails in execution, something must be wrong with the binary, so let's open the executable in CFF explorer to investigate
 
-![](img/2022-03-28-18-02-58.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-28-18-02-58.png)
 
 Listed above in the IAT from the extracted payload we can see that the IAT was not properly reconstructed by the Scylla plugin. 
 
-![](img/2022-03-28-18-07-55.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-28-18-07-55.png)
 
 This have a quick fix, after dumping our "extracted.exe" we should select "fix binary"as shown above  on the dump section, and select our "extracted.exe" file.This should Create a file named "extracted_SYC.exe" in the current directory.
 
-![](img/2022-03-28-18-10-18.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-28-18-10-18.png)
 
 We can see that the issue was fixed and now the binary executes properly
 
-![](img/2022-03-28-18-11-06.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-28-18-11-06.png)
 
 # Manually unpack a malware sample
 
@@ -914,19 +914,19 @@ https://blog.malwarebytes.com/detections/ransom-globeimposter/#:~:text=GlobeImpo
 All Right!, so we downloaded the sample malware and put it in our desktop,
 I will rename it as globelimposter.exe and we can see that it has a calendar Icon, a trick for the user to think it's a safe file.
 
-![](img/2022-03-29-14-06-23.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-29-14-06-23.png)
 
 I took a screenshot of the VM in this state, the idea is to show the malware is really dangerous, you don't need to recreate this, and as mentioned before, be EXTRA careful when working with malware samples and only execute them in a controlled environment.
 
 If we execute the malware, we will see that it will encrypt our files, let's take a look (If you want try this again, be careful)
 
-![](img/2022-03-29-20-26-44.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-29-20-26-44.png)
 
 Listed above we can see  the malware being executed and the files on the desktop being renamed and encrypted.
 
 Now let's take a static look with CFF Explorer. The sections looks good, nothing suspicious, so let's see if we can get something from more deeper analysis
 
-![](img/2022-03-29-14-11-24.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-29-14-11-24.png)
 
 Listed above the sections of the *globelimposter* ransomware. 
 
@@ -940,13 +940,13 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 ```
 so on the entry point we can look for this function, obviously there are no symbols for this program 
 
-![](img/2022-03-29-15-20-18.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-29-15-20-18.png)
 
 We can still search for the WinMain function; the first parameter, the *hInstance* definition it's a handle to a module or to the instance. so we can see on the block of code listed above the value "0x400000" is being passed last to the function *sub_401100* and before that a 0 is passed and on as the *hPrevInstance* value and according to  Microsoft documentation this value should be zero since is a  16 bit legacy parameter, so 0x400000 looks like the handle and a zero after cab gave a clue that this is the WinMain function so let's rename it _winmain for now, and let's inspect that function
 
 If we follow what we learn so far, there should be a call to either Import de obfuscated or hidden Windows modules and functions that will be imported, usually this is done with LoadLibraryA and *GetProcessAddress*, as mentioned before. But we already can realize that the code has some obfuscation and part of the code is clearly meant to try to difficult the reverse engineering process and the analysis from potential EDR solutions.
 
-![](img/2022-03-29-15-27-33.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-29-15-27-33.png)
 
 Listed above you can see that there are a lot if calls different WIN APIs, like *WinHttpOpen*, but they are only taking "0" as arguments, again this is to distract, someone looking at the file, from what the malware is really doing
 
@@ -961,16 +961,16 @@ To do this we should resolve the KERNEL32.dll (or the module where the function 
 
 If we look for the string representation of any of these functions, we would not find it. This is common in malware since the program will try to hide the call to these functions, since they are usually on packing and process injection.
 
-![](img/2022-03-29-15-55-04.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-29-15-55-04.png)
 
 Listed above we do find a call to GetProcAddress, great, but we cannot identify at first glance what  values are being passed as arguments. There's some movement of certain ASCII characters being stored in an offset of memory that IDAnamed "mem" if we take note of them, they look like ascii characters being stored, then they are pushed as argument to GetProcAddress and remember that the return of this function is the address of the requested one and by standard by microsoft documentation it will be returned on EAX
 
-![](img/2022-03-29-16-05-49.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-29-16-05-49.png)
 
 If we use python as shown above we can Identify the string constructed as *VirtualProtect*, so we now know that this malware will try to change some permissions in a memory region, and maybe after that continue execution there.
 
 
-![](img/2022-03-29-16-37-07.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-29-16-37-07.png)
 
 Following the code inside this block we can see that right after the call to *GetProcAddress* EAX is being moved to a memory location on **0x518b90** that IDA has renamed *dword_518B90* (keep in mind that this section may be subject to ASLR) . So we should definitely check what data is being passed and where this function returns.
 
@@ -978,7 +978,7 @@ Also keep in mind that there's a call to a value on the stack right after, This 
 
 Remember that VirtualProtect will change the permissions in an specific memory area, so this should be an address on the same region that VirtualProtect is changing permissions, we can take a look at where a value is passed to the named "ebp+var_14" location to see where is pointing
 
-![](img/2022-03-29-18-08-21.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-29-18-08-21.png)
 
 Above we can check that the value **0x8700** is passed to the stack, that IDA renamed as "ebp+ubytes" this value is then moved to ECX and then pushed to the stack followed by a 0 being pushed also and later a call to *LocalAlloc*. 
 *https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-localalloc*
@@ -1008,27 +1008,27 @@ Ok then so lets execute the file on the debugger but, again we should pause on E
 Once we open the file on x32dbg we can check the breakpoints tab to check the breakpoint that x32dbg sets by default on the entry point of the program. so we are safe to click run since we will hit that breakpoint, again be EXTRA careful and always check first
 
 
-![](img/2022-03-29-14-19-54.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-29-14-19-54.png)
 
 So lets click run and we can observe that we are on the entry point same as IDA
 
-![](img/2022-03-29-14-22-07.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-29-14-22-07.png)
 
  a cool function from x32dbg is to display the memory as graph, in the same way as IDA, if we click "g" on the screen it will display the memory as graph, let's give it a try and lets see if we can spot the call to WinMain
 
-![](img/2022-03-29-18-33-09.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-29-18-33-09.png)
 
 Great, now let's follow that address on the call  (after the push 400000 value) and let's set a breakpoint using the "F2" key on the first instruction, it should turn red, as the image below
-![](img/2022-03-29-18-35-28.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-29-18-35-28.png)
 
 Now we can press run and the execution will stop at our breakpoint. We will see a buffer being set with 0xF4 bytes size so this indicates that we land in the proper function, and we can also go to graph mode and look for the call to VirtualProtect instruction Lets set a breakpoint there
 
 
-![](img/2022-03-29-18-39-17.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-29-18-39-17.png)
 
 Now that we are in the break point let's take a look at the arguments being passed to the function
 
-![](img/2022-03-29-18-45-46.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-29-18-45-46.png)
 
 After we hit the break point we see that x32dbg has renamed the offset of memory to VirtualProtect and at bottom right we can see the contents of the stack, so we can inspect the argument to the funcion
 
@@ -1051,92 +1051,92 @@ We know the arguments of VirtualProtect form microsoft documentation, so from ab
 The last argument is an address where the previous permissions flag will be written. If we right click over the first argument in ou case 0x0085AFE8 and press follow in memory map, we can check the permission are not set to execute
 
 
-![](img/2022-03-29-18-55-48.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-29-18-55-48.png)
 
 If we do the same, right click but this time we press follow in disassembler we will see that there's actual code on that region, so this confirms our static analysis that the program will change the permissions on this region in order to execute code on it.
 
-![](img/2022-03-29-18-57-54.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-29-18-57-54.png)
 
 Let's return to where our EIP is (you can double click on the EIP on the register section on x32dbg) and let's set a breakpoint on the next instruction after the call to VirtualProtect where we are pointing now, this should be the call to EBP-0x14
 
-![](img/2022-03-29-18-59-51.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-29-18-59-51.png)
 
 Let's click run.
 
 
 After hitting the breakpoint again, we can step into the function to see if we are direct into the code, we can do this with "F7" key or clicking on the "step into" icon
 
-![](img/2022-03-29-19-02-54.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-29-19-02-54.png)
 
 Great, we can see  that the execution was properly redirected and that we are now going to execute code in this region, we can play along with the code (remember to be careful since we are working with malware so if something fails you should revert the vm). Also we can press on the "push ebp" instruction, right click and add as a function to better display information.
 
-![](img/2022-03-29-19-35-52.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-29-19-35-52.png)
 
 Let's set a breakpoint on the first function being called and then "step into" with the "F7" key. If we follow the coe will hit apoint where some values are pushed on the stack as the image below :
-![](img/2022-03-29-20-10-47.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-29-20-10-47.png)
 
 This is a common obfuscation technique instead of writing the string the developer needs its build during execution. we can see the string being built by clicking "follow address in dump" to one of this values being pushed for example the one being pushed from ebp-0x28
 
 
-![](img/2022-03-29-20-16-52.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-29-20-16-52.png)
 
 
 Above we can see the string Kernel32.dll in UNICODE being constructed, so we assume that this will probably load some modules, let's execute this function until it returns by clicking on the up arrow in the menu
 
-![](img/2022-03-29-20-21-56.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-29-20-21-56.png)
 
 Before we return we can see also that the string LoadLibraryA has been resolved so it will probably resolve APIs that the malware needs to start executing
 
-![](img/2022-03-29-20-48-02.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-29-20-48-02.png)
 
 After return we can step through the code and see who various API are being resolved as the example for VirtualAlloc above. Now since we are resolving the API,  Let's see if we can find an interesting JMP to register or JMP to memory instruction that can lead us to where maybe The Original Entry Point for the malicious code is.
 
-![](img/2022-03-29-20-51-45.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-29-20-51-45.png)
 
 If we look at the image above we do find a JMP EAX, and it seems that the malware developer made some mistake and they leave a string that will be print to the debugger telling us that we will "JUMP to OEP), let's set a breakpoint in this JMP instruction and let's follow execution
 
-![](img/2022-03-29-20-56-11.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-29-20-56-11.png)
 
 Above we can see that the jump took us to this code. We can assume it's our Original Entry Point (OEP), but right after the first call, we see an exit call, so let's step into the first function, that should be our OEP. 
 
-![](img/2022-03-30-16-19-33.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-30-16-19-33.png)
 
 Above we can see the Original Entry Point, how do we know this? We can take a look at what compilers do for different languages and that way identify if it corresponds to an Entry Point. The best resource I found is this image from  a CLS tutorial where you can see that the call to a jmp (like in our example) is common for Visual Studio. That's why we can observe that this is the Entry Point for the program.
 *https://drive.google.com/drive/folders/1g90QJNfJ4mlV8_JT-S4t__1VifO2A4l_*
 *http://clsexploits.info/*
 
-![](img/2022-03-30-16-25-25.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-30-16-25-25.png)
 
 
 With this information, let's try to extract it with Scylla again,
 
-![](img/2022-03-30-01-26-20.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-30-01-26-20.png)
 
 As you can see above, After getting the IAT with IAT Autosearch and Getting the imports with Scylla, We got an error trying to import a module, we should remove this module if we want to dump the binary if not, and execute it, otherwise it will nor run, and only static analysis could be performed, We can do this by right clicking on the module and pressing "Delete Tree Node". And then dump , let's dump the file as "globelimposter_dump.exe"
 
 
-![](img/2022-03-30-01-31-05.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-30-01-31-05.png)
 
 Also as shown above, don't forget to "Fix Dump" the globelimposter_dump.exe, with this SYLLA  will create a file named : globelimposter_dump_SYC.exe, And we can open it on IDa and see that we analyze and perform static analysis on it as shown below
 
-![](img/2022-03-29-21-05-19.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-29-21-05-19.png)
 
 Also we can run floss and direct the output to a text file, to see the strings from the dumped binary to start analyzing as show below
 
-![](img/2022-03-30-01-35-59.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-30-01-35-59.png)
 
 Some registers and commands are populated, there could be still more obfuscation, but for now we can work on this binary to analyze more data and get new **IOC**, we successfully extract the packed executable. Also we can check if it's unpacked with a software like DetectitEasy, that will reveal that the compiler used was indeed Visual C/C++ as the next image displays
 *https://github.com/horsicq/Detect-It-Easy*
 
-![](img/2022-03-31-13-51-31.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-31-13-51-31.png)
 
 Now  to finalize let's run the unpacked version of the malware, to see if it will encrypt our files again. We can take a screenshot before the malware is executed, as shown below
 
-![](img/2022-03-30-01-39-08.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-30-01-39-08.png)
 
 And another one after execution we can see the files on the desktop being renamed and encrypted again, on the image below:
 
-![](img/2022-03-30-01-46-44.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-30-01-46-44.png)
 
 Amazing, the unpacked version works flawlessly, We successfully unpacked the malware sample.
 
