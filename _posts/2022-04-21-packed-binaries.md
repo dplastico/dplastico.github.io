@@ -900,7 +900,8 @@ We can see that the issue was fixed and now the binary executes properly
 # Manually unpack a malware sample
 
 Using what we learn lets try to unpack a malware sample, using the tools we have used so far, in order to do that a disclaimer need to be made, you need to be EXTRA careful when dealing with malware, I will use a real sample on this link:
-#### https[:]// malshare.com/sample.php?action=detail&hash=612974dcb49adef982d9ad8d9cbdde36 
+
+https[:]// malshare.com/sample.php?action=detail&hash=612974dcb49adef982d9ad8d9cbdde36 
 
 the URL is altered just in case, but the download is not direct, but just to be safe and also this is a  good practice when sharing malware samples links, you will also need to create a user to be able to download the file, and also please use it on a VM isolated from your network and your host computer. 
 
@@ -933,7 +934,7 @@ Listed above the sections of the *globelimposter* ransomware.
 ## Static Analysis
 
 Let's open first the binary in IDA for some static analysis and let's see if we can spot something through the code. It is good to know that every Windows program should have a WinMain  or wWinMain Function as entry point
-##### https://docs.microsoft.com/en-us/windows/win32/learnwin32/winmain--the-application-entry-point 
+*https://docs.microsoft.com/en-us/windows/win32/learnwin32/winmain--the-application-entry-point*
 
 ```c++
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow);
