@@ -72,7 +72,7 @@ PE stands for **Portable Executable** and it is a format file for executables, D
 
 A typical PE format will have the following structure on file:
 
-![](2022-03-31-02-22-58.png)
+![](img/2022-03-31-02-22-58.png)
 
 
 *https://www.trustwave.com/images/slblog-03-02-2018-10-57-10/spiderlabs/85e5a55d-2522-4483-836a-1726932dec1f.png?v=0.0.1*
