@@ -353,7 +353,7 @@ With this we covered a summarized version about how the PE is formed and informa
 
 ## What is a packed binary?
 
-A packed binary can be referred to as an executable file that is compressed or altered from its original state and is able to execute normally in memory. a "packed binary" it's usually built from a "runtime packer" which we will refer to as "packer".
+A packed binary can be referred to as an executable file that is compressed or altered from its original state and is able to execute normally in memory. A "packed binary" it's usually built from a "runtime packer" which we will refer to as "packer".
 
 Packers are known for compression, since they were known for trying to compress the size of the binary itself on disk, but preserve the execution.  These techniques are usually known as "Executable Compression", the idea is that a file can combine compressed data with a decompression code in the same executable, so as described above, it can remain compressed on disk, but executed properly in memory.
 
@@ -1102,7 +1102,7 @@ Above we can see that the jump took us to this code. We can assume it's our Orig
 
 ![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-30-16-19-33.png)
 
-Above we can see the Original Entry Point, how do we know this? We can take a look at what compilers do for different languages and that way identify if it corresponds to an Entry Point. The best resource I found is this image from  a CLS tutorial (thanks to **@solid**) where you can see that the call to a jmp (like in our example) is common for Visual Studio. That's why we can observe that this is the Entry Point for the program.
+Above we can see the Original Entry Point, how do we know this? We can take a look at what compilers do for different languages and that way identify if it corresponds to an Entry Point. The best resource I found is this image from  a CLS tutorial (thanks to **@solid_cls**) where you can see that the call to a jmp (like in our example) is common for Visual Studio. That's why we can observe that this is the Entry Point for the program.
 *https://drive.google.com/drive/folders/1g90QJNfJ4mlV8_JT-S4t__1VifO2A4l_*
 
 *https://t.me/crackslatinos*
