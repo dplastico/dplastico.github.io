@@ -1102,8 +1102,9 @@ Above we can see that the jump took us to this code. We can assume it's our Orig
 
 ![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-30-16-19-33.png)
 
-Above we can see the Original Entry Point, how do we know this? We can take a look at what compilers do for different languages and that way identify if it corresponds to an Entry Point. The best resource I found is this image from  a CLS tutorial (thanks to *@solid*) where you can see that the call to a jmp (like in our example) is common for Visual Studio. That's why we can observe that this is the Entry Point for the program.
+Above we can see the Original Entry Point, how do we know this? We can take a look at what compilers do for different languages and that way identify if it corresponds to an Entry Point. The best resource I found is this image from  a CLS tutorial (thanks to **@solid**) where you can see that the call to a jmp (like in our example) is common for Visual Studio. That's why we can observe that this is the Entry Point for the program.
 *https://drive.google.com/drive/folders/1g90QJNfJ4mlV8_JT-S4t__1VifO2A4l_*
+
 *https://t.me/crackslatinos*
 
 ![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-30-16-25-25.png)
