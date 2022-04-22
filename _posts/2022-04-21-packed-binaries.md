@@ -59,7 +59,7 @@ gcc hello.c -fno-pie -o a.exe
 
 We can now test our binary it should print to stdout the string "AAAA hello", the idea behind the "AAAA" is just to easily identify the string in memory if we need to
 
-![](_posts/img/2022-03-27-02-33-18.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-27-02-33-18.png)
 
 Great, so we have a binary and we want to "pack" it, so before manipulating the binary, lets better understand how it is constructed, and we can investigate this, since in Windows executables follow the **PE format**, a file format for executables files. Let's take a look at it.
 
