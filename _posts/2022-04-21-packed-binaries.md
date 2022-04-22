@@ -72,7 +72,7 @@ PE stands for **Portable Executable** and it is a format file for executables, D
 
 A typical PE format will have the following structure on file:
 
-![img](https://resources.infosecinstitute.com/wp-content/uploads/112015_2323_2MalwareRes1.jpg)
+![](https://www.trustwave.com/images/slblog-03-02-2018-10-57-10/spiderlabs/85e5a55d-2522-4483-836a-1726932dec1f.png?v=0.0.1)
 
 
 *https://www.trustwave.com/images/slblog-03-02-2018-10-57-10/spiderlabs/85e5a55d-2522-4483-836a-1726932dec1f.png?v=0.0.1*
