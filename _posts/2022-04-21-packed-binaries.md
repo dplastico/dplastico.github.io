@@ -59,7 +59,7 @@ gcc hello.c -fno-pie -o a.exe
 
 We can now test our binary it should print to stdout the string "AAAA hello", the idea behind the "AAAA" is just to easily identify the string in memory if we need to
 
-![](img/2022-03-27-02-33-18.png)
+![](/_posts/img/2022-03-27-02-33-18.png)
 
 Great, so we have a binary and we want to "pack" it, so before manipulating the binary, lets better understand how it is constructed, and we can investigate this, since in Windows executables follow the **PE format**, a file format for executables files. Let's take a look at it.
 
@@ -72,10 +72,10 @@ PE stands for **Portable Executable** and it is a format file for executables, D
 
 A typical PE format will have the following structure on file:
 
-![](https://www.trustwave.com/images/slblog-03-02-2018-10-57-10/spiderlabs/85e5a55d-2522-4483-836a-1726932dec1f.png?v=0.0.1)
+![](https://resources.infosecinstitute.com/wp-content/uploads/112015_2323_2MalwareRes1.jpg)
 
 
-*https://www.trustwave.com/images/slblog-03-02-2018-10-57-10/spiderlabs/85e5a55d-2522-4483-836a-1726932dec1f.png?v=0.0.1*
+*https://resources.infosecinstitute.com/*
 
 
 The diagram above represents the PE Structure. And as Its highlighted, we can observe 2 main subdivisions: **The headers** and **The Section(s)** and also he's different components. In order to better understand it it's necessary to describe each of this in detail
