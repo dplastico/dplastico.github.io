@@ -854,8 +854,8 @@ We found a POPAD in the address 0x003122ED, follow by a small jump back, and rig
 
 ![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-28-17-24-39.png)
 
-Listed above are the regions that we can access through the "memory map" tab in x32dbg, and we can determine that the address 0x004012E0 corresponds to the section UPX0, while our curren EIP where the execution is currently located in address 0x00412170 corresponds to UPX2 section. Let's follow the memory to where the jump is pointing to 0x004012E0. We can accomplish this right clicking on the jmp instruction and selectrin 
-"follow in dump" and the selecting the mentioned address
+Listed above are the regions that we can access through the "memory map" tab in x32dbg, and we can determine that the address 0x004012E0 corresponds to the section UPX0, while our curren EIP where the execution is currently located in address 0x00412170 corresponds to UPX2 section. Let's follow the memory to where the jump is pointing to 0x004012E0. We can accomplish this right clicking on the jmp instruction and selecting 
+"follow in dump" and then selecting again the mentioned address
 
 ![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-28-17-30-13.png)
 
