@@ -951,7 +951,7 @@ If we follow what we learn so far, there should be a call to either Import de ob
 
 Listed above you can see that there are a lot if calls different WIN APIs, like *WinHttpOpen*, but they are only taking "0" as arguments, again this is to distract, someone looking at the file, from what the malware is really doing
 
-So now that we are in WinMain, we can try to find the malicious code.The program would probably move execution  with  call  instruction to a function or a jmp opcode to a function where the "stub" that will unpack the malicious program is located, or maybe it will return to the same function we are now and then jump again
+So now that we are in WinMain, we can try to look for the malicious code of the malware. The program would probably move execution  with a call  instruction to a function or a jmp opcode to the function where the "stub" that will unpack the malicious program is located, or maybe it will return to the same function we are now and then jump again
 
 Also, we already know that in order to "unpack" the malicious code to some location. Some APIs that are used can be *VirtualProtect*, *VirtualAlloc* or *WriteProcessMemory*, This API's can change the permissions in a certain memory region, write bytes to memory and other things, I will strongly recommend to read about this 3 functions
 *https://docs.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-virtualprotect*
