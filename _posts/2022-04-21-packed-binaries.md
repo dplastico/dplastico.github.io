@@ -32,7 +32,7 @@ With that said, Lets get it!
 - Any Text Editor
 
 # Executable files and the PE Format
-##### https://docs.fileformat.com/executable/exe/
+*https://docs.fileformat.com/executable/exe/*
 
 Before starts analyzing and modifying executables, we need to answer the question: **What is an executable File?**
 
@@ -64,7 +64,7 @@ We can now test our binary it should print to stdout the string "AAAA hello", th
 Great, so we have a binary and we want to "pack" it, so before manipulating the binary, lets better understand how it is constructed, and we can investigate this, since in Windows executables follow the **PE format**, a file format for executables files. Let's take a look at it.
 
 ## What is the  PE format? 
-##### https://docs.microsoft.com/en-us/windows/win32/debug/pe-format
+*https://docs.microsoft.com/en-us/windows/win32/debug/pe-format*
 
 PE stands for **Portable Executable** and it is a format file for executables, DLLs, and other binaries that are executed under Windows systems on x64 and x86 architectures. The PE format is a Data Structure  that contains information necessary for the OS to load and execute the binary. This can include the **IAT** (Import Address Table) and the **TLS** (Thread Local Storage) The PE format is a successor of the previous format used on Windows NT systems called **COFF** (Common Object File Format) which is present still on the structures as a table.
 
@@ -271,7 +271,7 @@ typedef struct _IMAGE_DATA_DIRECTORY {
 } IMAGE_DATA_DIRECTORY, *PIMAGE_DATA_DIRECTORY;
 ```
 The DataDirectory is data in the sections of the PE file this can have different information that the loader needs to start the binary, one of the most significant is the Iport Table, or IAT for *Import Address Table* which holds all the functions and modules that the binary needs to load in order to run
-##### https://docs.microsoft.com/en-us/windows/win32/debug/pe-format#optional-header-data-directories-image-only
+*https://docs.microsoft.com/en-us/windows/win32/debug/pe-format#optional-header-data-directories-image-only*
 
 
 ### Import Address Table IAT
