@@ -10,9 +10,9 @@ categories: [Sin categoría]
 
 # PACKED BINARIES (And how to unpack them)
 
-Hello all!I'm writing this post for learning purposes, as research about the topic on the title. The main idea is to better understand how the packing mechanism works, to have a better understanding  of the techniques and ways to apply this, with a special focusing on malware development and analysis, and how today's malware executables try to hide from different detection systems
+Hello all! I'm writing this post for learning purposes, as research about the topic on the title. The main idea is to better understand how the packing mechanism works, to have a better understanding  of the techniques and ways to apply this, with a special focusing on malware development and analysis, and how today's malware executables try to hide from different detection systems.
 
-That's why, in my style, I think that before starting to look for unpacking mechanisms or similar resources, we first need to understand how an actual binary is formed, what is the structure of itself and how a "packer" will use this information to create a "packed" executable
+That's why, in my style, I think that before starting to look for unpacking mechanisms or similar resources, we first need to understand how an actual binary is formed, what is the structure of itself and how a "packer" will use this information to create a "packed" executable.
 
 We will need to identify the sections that we want to read or modify if necessary when packing executables and also this will provide good information if we are performing any Reverse Engineering work specially in modified binaries or malware samples that try to "hide" information on the binary itself. (this would be the main goal behind it, how can malicious code can hide from Reverse Engineering)
 
@@ -75,7 +75,7 @@ A typical PE format will have the following structure on file:
 ![](2022-03-31-02-22-58.png)
 
 
-##### https://www.trustwave.com/images/slblog-03-02-2018-10-57-10/spiderlabs/85e5a55d-2522-4483-836a-1726932dec1f.png?v=0.0.1
+*https://www.trustwave.com/images/slblog-03-02-2018-10-57-10/spiderlabs/85e5a55d-2522-4483-836a-1726932dec1f.png?v=0.0.1*
 
 
 The diagram above represents the PE Structure. And as Its highlighted, we can observe 2 main subdivisions: **The headers** and **The Section(s)** and also he's different components. In order to better understand it it's necessary to describe each of this in detail
@@ -102,7 +102,7 @@ You can see that the RVA of the .text section holds the 0x1000 value this means 
 Listed above our calculations are correct, we can use this to refer to execution and this will be important when we will start going deeper into the binary it self
 
 ### DOS HEADER
-##### https://docs.microsoft.com/en-us/archive/msdn-magazine/2002/february/inside-windows-win32-portable-executable-file-format-in-detail
+*https://docs.microsoft.com/en-us/archive/msdn-magazine/2002/february/inside-windows-win32-portable-executable-file-format-in-detail*
 
 The **DOS_HEADER**, is the first piece of every PE executable, is not important to the functionality of current programs but is  present for legacy compatibility. The **DOS_HEADER** structure is 64 bytes long and the main purpose of the header is to make the file be able to execute under MS-DOS
 
@@ -159,7 +159,7 @@ before the **NT_HEADER** and after the DOS stub, if we look at the program we co
 ![](img/2022-03-27-12-56-25.png)
 
 This header is only populated when the Microsoft Visual Studio suite was used to build the binary. It will contain information about the Tools and versions used. it also can be used as awy to missguided about the author of the program
-##### https://securelist.com/the-devils-in-the-rich-header/84348/
+*https://securelist.com/the-devils-in-the-rich-header/84348/*
 
 ### NT HEADER
 
@@ -180,7 +180,7 @@ Listed above is the structure of the header. The first field correspond to the P
 The second field correspond to another structure the **FILE_HEADER**  followed by the **OPTIONAL_HEADER**, let's take a look at this ones i'm more detail, since they provide a lot of information that can be useful to us
 
 ### FILE_HEADER
-##### https://docs.microsoft.com/en-us/windows/win32/debug/pe-format#coff-file-header-object-and-image
+*https://docs.microsoft.com/en-us/windows/win32/debug/pe-format#coff-file-header-object-and-image*
 
 Let's start with the **FILE_HEADER**This header Contains a standard Common Object File Format header (COFF), which holds information about the PE.
 
@@ -204,7 +204,7 @@ The fields on the structure can be summarized as follow:
 - *NumberOfSymbols* : (self explanatory)
 - *SizeOfOptionalHeader* : self explanatory
 - *Characteristics* : Its a flag field which can be combine to provide info for the binary, as an example if the flag 0x2000 is set, this will indicate that the file is a DLL
-##### https://docs.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-image_file_header
+*https://docs.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-image_file_header*
 
 ### OPTIONAL_HEADER
 
@@ -258,7 +258,7 @@ We can see the different field of the **OPTIONAL_HEADER** structure and  that it
 ### DATA_DIRECTORY 
 
 As we mentioned above, the DataDirectory array is part of the **DATA_DIRECTORY** struct, and the size of this array is determined by IMAGE_NUMBEROF_DIRECTORY_ENTRIES value in winnt.h, if we look at the source code of mingw we can see that this value is fixed to 16, so we can take not of this.
-##### https://github.com/Alexpux/mingw-w64/blob/master/mingw-w64-tools/widl/include/winnt.h
+*https://github.com/Alexpux/mingw-w64/blob/master/mingw-w64-tools/widl/include/winnt.h*
 
 ![](img/2022-03-27-14-02-52.png)
 
@@ -312,7 +312,7 @@ This table its located right after the OPTIONAL HEADER, this is required due to 
 ### SECTIONS 
 
 Sections are regions of memory that contain the actual code or data needed to execute the binary, so far none of the fields in the headers that we take a look at contain actual code, only references and information. Section do contain code and information used during execution. This section starts at the end of the headers section and can have different names, some of them are reserved.
-##### https://docs.microsoft.com/en-us/windows/win32/debug/pe-format#special-sections
+*https://docs.microsoft.com/en-us/windows/win32/debug/pe-format#special-sections*
 
 
 ```c++
@@ -337,7 +337,7 @@ Above is a representation of this structure which have different fields, we can 
 
 ![](img/2022-03-27-17-17-24.png)
 
-##### https://docs.microsoft.com/en-us/windows/win32/debug/pe-format#section-flags
+*https://docs.microsoft.com/en-us/windows/win32/debug/pe-format#section-flags*
 
 Some of the sections presents in an unpacked PE executable to keep in mind are:
 
@@ -364,7 +364,7 @@ We will take a look at a packed binary, we will pack and modify the structure of
 # Packing binaries
 
 ## Packing a binary with UPX
-##### https://github.com/upx
+*https://github.com/upx*
 
 Before we start analyzing packed binaries lets try ourselves to first pack the binary we just created, for that I will rename the a.exe binary to **unpacked.exe** also lets create a copy of the same program to pack and lets call it **upx_packed.exe**
 
@@ -405,8 +405,8 @@ Finally listed above you can see that there's also a difference between the numb
 
 This is interesting since LoadLibraryA  will allow you to load a module and *GetProcAddress* to resolve the Address of a given function, so the packer can start resolving the function that it will use. This can explain why there are only a few functions being imported and the reason behind it.
 
-##### https://docs.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-getprocaddress
-##### https://docs.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-loadlibrarya
+*https://docs.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-getprocaddress*
+*https://docs.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-loadlibrarya*
 
 ## Creating a Simple "packer" (more like a "patcher") in python
 
@@ -421,7 +421,7 @@ Great, also we will use for this section  the **pefile** python module, that wil
 ```bash
 pip install pefile
 ```
-#####  https://github.com/erocarrera/pefile
+*https://github.com/erocarrera/pefile*
 
 Great,  to test how it works let's read all the data from the executable to a variable and then check the last section of the binary, let use the following code:
 
@@ -446,7 +446,7 @@ And we can cross reference them with the information on CFF Explorer
 ![](img/2022-03-27-18-11-06.png)
 
 Great the pefile module works, we can learn more about what we can do with this module in their documentation 
-##### https://github.com/erocarrera/pefile/blob/wiki/UsageExamples.md#introduction
+*https://github.com/erocarrera/pefile/blob/wiki/UsageExamples.md#introduction*
 
 So now the question remains, What can we build in order to "pack" this binary, we could encode or rename a section, but to do something more interactive, and simple, lets just create a "packed section" and inject some code there, that will execute before, the binary executes itself. This sounds nothing to do with packers, but it will simplify the fact of building a proper packer tool, instead lets have more the "hacker" approach. With this in consideration lets then try to execute the following
 
@@ -519,14 +519,14 @@ Listed above appears the new section created named ".packed".  but when we try t
 ![](img/2022-03-27-00-21-06.png)
 
 Why does this happen? The new section we created has no values in any field of the section, we need to populate the permissions. Let's set Execute, Read and Execute permissions so that way later we can try to execute shellcode we can add this  values, in order to that we need to set the flags for the Characteristics Field of the sections header to match the .text section so we need to set the flags IMAGE_SCN_CNT_CODE,IMAGE_SCN_MEM_EXECUTE, IIMAGE_SCN_MEM_READ. We can search for this values in the microsoft documentation and then add them the new Section
-##### https://docs.microsoft.com/en-us/windows/win32/debug/pe-format#section-flags
+*https://docs.microsoft.com/en-us/windows/win32/debug/pe-format#section-flags*
 
 
 ```python
 newSection.Characteristics = 0x40000000 | 0x20000000 | 0x20 # IMAGE_SCN_MEM_READ | IMAGE_SCN_MEM_EXECUTE | IMAGE_SCN_CNT_CODE 
 ```
 Now we also need to set the Values for the Misc, Physical Address, VirtualSize fields, let's set them to an arbitrary 0x100 size
-##### https://stackoverflow.com/questions/35685589/how-do-i-make-space-for-my-code-cave-in-a-windows-pe-32bit-executable
+*https://stackoverflow.com/questions/35685589/how-do-i-make-space-for-my-code-cave-in-a-windows-pe-32bit-executable*
 
 ```python
 newSection.Misc = 0x100
@@ -617,7 +617,7 @@ And when dynamically analyzing in the debugger we see above that the entry point
 ## Creating a simple shellcode
 
 Since we are testing the "packer" to see if  it can hide malicious code, let's start by creating a payload, in the form of a shellcode that can help us to execute something. Let's try to pop up a window with a message. for this we will create the shellcode in a separate file to just print it and copied into our payload, you can obviously use something to generate the payload, in my case I will use a python script to compile the instructions, there's no room on this post to properly explain shellcoding, you could also create compiled code and use it, but this is something to make it easy and also, Shellcoding is always a good exercise, you can use the shellcode form this post or try one yourself.
-##### https://www.corelan.be/index.php/2010/02/25/exploit-writing-tutorial-part-9-introduction-to-win32-shellcoding/
+*https://www.corelan.be/index.php/2010/02/25/exploit-writing-tutorial-part-9-introduction-to-win32-shellcoding/*
 
 ```python
 import struct
@@ -872,7 +872,7 @@ Great, we can see that the jmp instruction lands us on what looks exactly like o
 ## Extracting the binary
 
 To extract the binary we will relay on a plugin commonly used with x32dbg, since we can obviously manually extract the bytes, but we will need to manually import the modules and that could be tedious, let's use the **Scylla** plugin, this plugin will build a binary from file from the memory location we are pointing to. The plugin is located under plugins while keeping selected the first instruction on the Original Entry Point, OEP.
-##### https://github.com/NtQuery/Scylla
+*https://github.com/NtQuery/Scylla*
 
 
 ![](img/2022-03-28-17-45-19.png)
@@ -900,16 +900,16 @@ We can see that the issue was fixed and now the binary executes properly
 # Manually unpack a malware sample
 
 Using what we learn lets try to unpack a malware sample, using the tools we have used so far, in order to do that a disclaimer need to be made, you need to be EXTRA careful when dealing with malware, I will use a real sample on this link:
-##### https[:]// malshare.com/sample.php?action=detail&hash=612974dcb49adef982d9ad8d9cbdde36 
+#### https[:]// malshare.com/sample.php?action=detail&hash=612974dcb49adef982d9ad8d9cbdde36 
 
 the URL is altered just in case, but the download is not direct, but just to be safe and also this is a  good practice when sharing malware samples links, you will also need to create a user to be able to download the file, and also please use it on a VM isolated from your network and your host computer. 
 
 I will  be using the FLARE VM, which I recommend, please use this link if you want to install it.
-##### https://github.com/mandiant/flare-vm
+*https://github.com/mandiant/flare-vm*
 
 We will also be working with a sample of GlobelImposter a malware from the Ransomware family
-##### https://en.wikipedia.org/wiki/Ransomware
-##### https://blog.malwarebytes.com/detections/ransom-globeimposter/#:~:text=GlobeImposter%20is%20a%20ransomware%20application,mimics%20the%20Globe%20ransomware%20family%20.
+*https://en.wikipedia.org/wiki/Ransomware*
+https://blog.malwarebytes.com/detections/ransom-globeimposter/#:~:text=GlobeImposter%20is%20a%20ransomware%20application,mimics%20the%20Globe%20ransomware%20family%20.
 
 All Right!, so we downloaded the sample malware and put it in our desktop,
 I will rename it as globelimposter.exe and we can see that it has a calendar Icon, a trick for the user to think it's a safe file.
@@ -953,9 +953,9 @@ Listed above you can see that there are a lot if calls different WIN APIs, like 
 So now that we are in WinMain, we can try to find the malicious code.The program would probably move execution  with  call  instruction to a function or a jmp opcode to a function where the "stub" that will unpack the malicious program is located, or maybe it will return to the same function we are now and then jump again
 
 Also, we already know that in order to "unpack" the malicious code to some location. Some APIs that are used can be *VirtualProtect*, *VirtualAlloc* or *WriteProcessMemory*, This API's can change the permissions in a certain memory region, write bytes to memory and other things, I will strongly recommend to read about this 3 functions
-##### https://docs.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-virtualprotect
-##### https://docs.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-virtualalloc
-##### https://docs.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-writeprocessmemory
+*https://docs.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-virtualprotect*
+*https://docs.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-virtualalloc*
+*https://docs.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-writeprocessmemory*
 
 To do this we should resolve the KERNEL32.dll (or the module where the function we want it to use is located) and then a string with the name be resolved by *GetProcAddress*. Let's see if we can spot that functionality on the disassembly.
 
@@ -981,7 +981,7 @@ Remember that VirtualProtect will change the permissions in an specific memory a
 ![](img/2022-03-29-18-08-21.png)
 
 Above we can check that the value **0x8700** is passed to the stack, that IDA renamed as "ebp+ubytes" this value is then moved to ECX and then pushed to the stack followed by a 0 being pushed also and later a call to *LocalAlloc*. 
-##### https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-localalloc
+*https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-localalloc*
 
 ```c++
 DECLSPEC_ALLOCATOR HLOCAL LocalAlloc(
@@ -991,7 +991,7 @@ DECLSPEC_ALLOCATOR HLOCAL LocalAlloc(
 ```
 
 Above we can see the details of the function This function will allocate memory on the heap, using the uBytes as size in our case we know is 0x8700 bytes and the a flag value of zero as uFlags, if we look at the documentation of the API, we know that a value of zero will make the function return a pointer to the allocated data, we know by convention the return value of a function is on EAX so we now know that this will be the region that VirtualProtect will change permissions.
-##### https://docs.microsoft.com/en-us/windows/win32/memory/heap-functions
+*https://docs.microsoft.com/en-us/windows/win32/memory/heap-functions*
 
 Lets see if our analysis is correct by analyzing the program in the debugger.
 
@@ -1046,7 +1046,7 @@ We know the arguments of VirtualProtect form microsoft documentation, so from ab
 - 0x0085AFE8 will be the address from which *VirtualProtect* will change permissions
 - 0x8700 will be the size of the memory space that will be affected
 - 0x40 flag indicate that the permission will be set to  **PAGE_EXECUTE_READWRITE** according to the memory protection constant 
-##### https://docs.microsoft.com/en-us/windows/win32/memory/memory-protection-constants
+*https://docs.microsoft.com/en-us/windows/win32/memory/memory-protection-constants*
 
 The last argument is an address where the previous permissions flag will be written. If we right click over the first argument in ou case 0x0085AFE8 and press follow in memory map, we can check the permission are not set to execute
 
@@ -1102,8 +1102,8 @@ Above we can see that the jump took us to this code. We can assume it's our Orig
 ![](img/2022-03-30-16-19-33.png)
 
 Above we can see the Original Entry Point, how do we know this? We can take a look at what compilers do for different languages and that way identify if it corresponds to an Entry Point. The best resource I found is this image from  a CLS tutorial where you can see that the call to a jmp (like in our example) is common for Visual Studio. That's why we can observe that this is the Entry Point for the program.
-##### https://drive.google.com/drive/folders/1g90QJNfJ4mlV8_JT-S4t__1VifO2A4l_
-##### http://clsexploits.info/
+*https://drive.google.com/drive/folders/1g90QJNfJ4mlV8_JT-S4t__1VifO2A4l_*
+*http://clsexploits.info/*
 
 ![](img/2022-03-30-16-25-25.png)
 
@@ -1126,7 +1126,7 @@ Also we can run floss and direct the output to a text file, to see the strings f
 ![](img/2022-03-30-01-35-59.png)
 
 Some registers and commands are populated, there could be still more obfuscation, but for now we can work on this binary to analyze more data and get new **IOC**, we successfully extract the packed executable. Also we can check if it's unpacked with a software like DetectitEasy, that will reveal that the compiler used was indeed Visual C/C++ as the next image displays
-##### https://github.com/horsicq/Detect-It-Easy
+*https://github.com/horsicq/Detect-It-Easy*
 
 ![](img/2022-03-31-13-51-31.png)
 
