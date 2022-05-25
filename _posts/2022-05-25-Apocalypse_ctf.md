@@ -2,13 +2,13 @@
 
 Last week I have some time (not that much as I wish jejeje) to solve some of the PWN challenges at the **Apocalypse CTF** by Hack The Box, I manage to solve all challenges except for the last one. And I finished the "Sabotage" challenge after the CTF. I wanted to practice my  writing, so I decided to create a few entries for some challenge that I found interesting, so I hope it is useful to someone.
 
-Here's a link to the challenges explained on this post
+[Here's a link to the challenges explained on this post](https://github.com/dplastico/dplastico.github.io/tree/main/_posts/apoca_bins)
 
 ## Space Pirate 3: Retribution
 
 This challenge was the 3rd and last from a series of introductory challenges (simple easy buffer overflows), I will not go that much into BOF's exploitation since I did that a lot in the past, you can read about BOFs and watch stream (in spanish)here:
 
-https://dplastico.github.io/sin%20categor%C3%ADa/2020/11/17/ropemporium-2020-soluciones.html
+[](https://dplastico.github.io/sin%20categor%C3%ADa/2020/11/17/ropemporium-2020-soluciones.html)
 
 I picked this one since it has more protections than the previous one, you need to bypass ASLR, PIE, NX and FULL RELRO. We can verify the above by running checksec on the binary as shown below
 
