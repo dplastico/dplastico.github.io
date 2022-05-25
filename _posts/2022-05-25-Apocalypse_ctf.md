@@ -12,15 +12,15 @@ https://dplastico.github.io/sin%20categor%C3%ADa/2020/11/17/ropemporium-2020-sol
 
 I picked this one since it has more protections than the previos one, you need to bypass ASLR, PIE, NX and FULL RELRO. We can verify the above by runing checksek on the binary as shown below
 
-![](2022-05-25-12-00-38.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-05-25-12-00-38.png)
 
 We are provided with a custom libc on the binary folder under the glibc/libc.so.6, If you want to know which libc version is it you can use the libc-database https://github.com/niklasb/libc-database  to verify if the checksum of the libc correspond to any known version, that way we can learn about the restrictions on it. for that we con use the "identify" utility in libc-database ash shown below
 
-![](2022-05-25-12-04-19.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-05-25-12-04-19.png)
 
 We are dealing with an old version 2.23. With this information, lets dig deeper into the binary to find the vulnerability and exploit it.
 
-![](2022-05-25-12-06-55.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-05-25-12-06-55.png)
 
 Above we can see that the program just let us choose 2 options "Show missiles" that display some stats and then "Change Target's location" which let us enter some cordinates and then confirmed with a y/n question.
 
@@ -91,7 +91,7 @@ Above is the Pseudo Code from the disassenbly of the **missile_launcher()** func
 ```
 As shown above we will read input from the user and the print the buffer (buf) as a string after "y =" if we dont send any input it will just print whatever the buf variable is pointing at, so bvasically not providing an input will provide us with a leak as shown below:
 
-![](2022-05-25-12-30-38.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-05-25-12-30-38.png)
 
 Great now lets move on to see how we can use this leak to chain it agains another vulnerability since by it self will not help use to exploit the binary. For that we can follow alone the same mentioend function missile_launcher() it worth notice that the buf variable in this represenation is a char type buffer of 32 bytes (char buf[32]) but it's used to read the confirmation y/n answer with a read dunction that allows to write 0x84, so we have a 0x64 BOF in this function, as shown below
 
@@ -99,7 +99,7 @@ Great now lets move on to see how we can use this leak to chain it agains anothe
   printf("\n[*] New coordinates: x = [0x53e5854620fb399f], y = %s\n[*] Verify new coordinates? (y/n): ", buf);
   read(0, v1, 0x84uLL); // <-! overflow!
 ```
-![](2022-05-25-12-37-13.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-05-25-12-37-13.png)
 
 ### Exploit plan
 
@@ -187,13 +187,13 @@ r.interactive()
 This was a very fun challenge to solve. It's an x64 program with FULL RELRO, Canary, NX, and PIE enabled. I used the libc-database as previously discused to found out this was a 2.31 glibc version. This is worth notice sine you will see on the putput below that in my case I use https://github.com/NixOS/patchelf to patch the boinary with a glibc version of my own compiled with symbols. This way I can use commands like "vis" in pwndbg
 
 
-![](2022-05-25-13-20-41.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-05-25-13-20-41.png)
 
 ### Walktrough & Reverse Engineering 
 
 The program dunctionality is on a menu with different options that point to functions.
 
-![](2022-05-25-13-25-55.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-05-25-13-25-55.png)
 
 From Reverse Engineering you can right away see that there's a "win" function called unlock_storage(). If you managed to redirect code execution to it, it will execute a shell, as shwon below
 
@@ -239,7 +239,7 @@ I didn'r endedup using this stack leak, but I keep it just in case there's a not
 
 Using the same idea and after debugging I noticed that after 7 bytes (8 if you count out the "0xA") you can leak a binary address, It's fun tomentioned that I didnt discover this trough Reverse Engineering. Sometimes palying with the binary functionality can be useful. In this case I was reading the output from the "1" option that print out some named, and "Phasers" Was one of them. So I noticed some strage data after I use this and then I looked on IDA to confirm the leak.
 
-![](2022-05-25-13-47-12.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-05-25-13-47-12.png)
 
 Using a similar function like this one below you can leak the address
 
@@ -258,11 +258,11 @@ def leak_2():
 
 Now this is where things get interesting and a lesson on how to always look at the disasembly and not trus always the pseudo code. Now I will explain what my thought process was, maybe there's a more efficient way to discover the bug, but in my case it start with this. I first notices that when you call option "1" from the menu the "storage" variable is passed to the RAX register and then mov the value at RAX + 0x48 to RDX to then CALL RDX as shwon below:
 
-![](2022-05-25-13-58-48.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-05-25-13-58-48.png)
 
 Also Using GDB I could confirm that "storage" is an address pointing  to a 0x60 size chunk on the heap and that at 0x48 from it you can find the function that print the storage 
 
-![](2022-05-25-14-01-55.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-05-25-14-01-55.png)
 
 So if we somehow manage to control RAX at 0x48 or the storage address, we would be able to redirect the code execution. 
 
@@ -368,11 +368,11 @@ r.interactive()
 
 I love heap challenges so I really enjoy this one I did similar challenges on some CTF's before, but still this was a good opportunity to write about it. The binary ahs full protections
 
-![](2022-05-25-14-21-08.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-05-25-14-21-08.png)
 
 And it's running libc 2.27
 
-![](2022-05-25-14-21-45.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-05-25-14-21-45.png)
 
 
 I inmediatly notice  that this looks like a "note" challenge, so as usual before anything and to speed up debugging I created an sekeleton with the functions so I can the easily use python with GDB to easily debug, This is something that I recommed to do on thos kind of challenges. you can find the skeleton below:
@@ -521,7 +521,7 @@ As you can see v1 will hold the value returned by the lenght of the string on th
 
 Let's check strlen documentation before contiuing
 
-![](2022-05-25-14-48-13.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-05-25-14-48-13.png)
 
 So strlen count each char on a string until it find a NULL byte we can combine this information with the fact that to allocated chunks will have the size field of it self right after the data of the previos one. So this will generate a **1 byte overflow.**
 
@@ -533,7 +533,7 @@ b = make(0x18, b"B"*0x18)
 ```
 Now if we examine this in GDB with the vis command you will see the chunks allocated:
 
-![](2022-05-25-14-56-39.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-05-25-14-56-39.png)
 
 As it's highlited strlen will coun the size of the next chunk as part of the string generating a 1 byte overflow if we edit a "filled" chunk
 
@@ -559,7 +559,7 @@ so as shown above first we generated a 0x20 size chunk (0x18, will gave you a 0x
 
 So now we can free the large chunk and this will genrate a chunk in the unsorted bin, leaving 2 libc address as FD and BK in the freed chunk in our case, **chunk b**
 
-![](2022-05-25-15-14-47.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-05-25-15-14-47.png)
 
 now we can generate an overflow editing **chunk d** if we calculate the size to our previous freed chumk will be 0x490, we need to add that as a fake "prev_size" because we wanto to caus e backward consolidation and this field will be checked and it needs to match the size of the chunk. so we edit **chunk d** as follow
 ```python
@@ -569,11 +569,11 @@ delete(e)
 ```
 this way we also clear the flag on the 0x30 size also indicating that the previous chunk is free. son when this chunk is free it will trigger backwards consolidation. but not before editing with the same overflow the **chunk a** that can modify our initial 0x430 chunk to the calculated 0x490 size
 
-![](2022-05-25-15-20-34.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-05-25-15-20-34.png)
 
 Now we have this big free chunk in the unsorted bin overlaping our 0x20 chunks in the "middle", we can now allocate a chunk of a size that will just overlap a created chunk writing  the FD and BK of the unsorted bin on an allocated chunk, so ten using the read functions we can have a leak and then calculate the libc base address as display below
 
-![](2022-05-25-15-24-17.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-05-25-15-24-17.png)
 
 #### Exploit
 
@@ -592,7 +592,7 @@ delete(guard)
 As you noticed we overwrite the tcache entry woth the free_hook, this is because any address written to this hook will be executed once free is trigger. 
 
 
-![](2022-05-25-15-35-25.png)
+![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-05-25-15-35-25.png)
 
 Now the only thing that's left is to replace the 0xdeadbeef value with the system address and then as we prepare before free the **guard chunk** that holds the "/bin/sh\0" value that will be used as argument to the hooked function, in this case, system.
 
