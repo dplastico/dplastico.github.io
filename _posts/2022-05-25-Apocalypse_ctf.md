@@ -6,9 +6,9 @@ Last week I have some time (not that much as I wish jejeje) to solve some of the
 
 ## Space Pirate 3: Retribution
 
-This challenge was the 3rd and last from a series of introductory challenges (simple easy buffer overflows), I will not go that much into BOF's exploitation since I did that a lot in the past, you can read about BOFs and watch stream (in spanish)here:
+This challenge was the 3rd and last from a series of introductory challenges (simple easy buffer overflows), I will not go that much into BOF's exploitation since I did that a lot in the past, you can read about BOFs and watch stream (in spanish)
 
-[](https://dplastico.github.io/sin%20categor%C3%ADa/2020/11/17/ropemporium-2020-soluciones.html)
+[Here](https://dplastico.github.io/sin%20categor%C3%ADa/2020/11/17/ropemporium-2020-soluciones.html)
 
 I picked this one since it has more protections than the previous one, you need to bypass ASLR, PIE, NX and FULL RELRO. We can verify the above by running checksec on the binary as shown below
 
@@ -184,7 +184,7 @@ r.interactive()
 ```
 ## Trick Or Deal
 
-This was a very fun challenge to solve. It's an x64 program with FULL RELRO, Canary, NX, and PIE enabled. I used the libc-database as previously discussed to find out this was a 2.31 glibc version. This is worth notice since you will see on the output below that in my case I use https://github.com/NixOS/patchelf to patch the boinary with a glibc version of my own compiled with symbols. This way I can use commands like "vis" in pwndbg
+This was a very fun challenge to solve. It's an x64 program with FULL RELRO, Canary, NX, and PIE enabled. I used the libc-database as previously discussed to find out this was a 2.31 glibc version. This is worth notice since you will see on the output below that in my case I use [patchelf](https://github.com/NixOS/patchelf) to patch the boinary with a glibc version of my own compiled with symbols. This way I can use commands like "vis" in pwndbg
 
 
 ![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-05-25-13-20-41.png)
@@ -435,9 +435,9 @@ With this it's easy also to follow along this post if you want to try to solve i
 
 Also since I did some write ups of heap challenges before I will skip some basic details of the techniques that will be used, but if you are not familiar with heap exploitation you can read the following articles before if you like:
 
-https://heap-exploitation.dhavalkapil.com/
-https://github.com/shellphish/how2heap
-https://github.com/dplastico/lockdown-tcache-poison
+[https://heap-exploitation.dhavalkapil.com/](https://heap-exploitation.dhavalkapil.com/)
+[https://github.com/shellphish/how2heap](https://github.com/shellphish/how2heap)
+[https://github.com/dplastico/lockdown-tcache-poison](https://github.com/dplastico/lockdown-tcache-poison)
 
 **Walkthrough & Reverse Engineering**
 
@@ -541,7 +541,7 @@ With this into consideration we need to leverage an exploit that will abuse this
 
 **Leak** 
 
-To generate a leak and basically to exploit the binary we will create a "fake" chunk that will overlap allocated chunks this is known as Overlkaping chunks https://heap-exploitation.dhavalkapil.com/attacks/shrinking_free_chunks. This can be trigger by creatign a situation where backwards concolidation https://sourceware.org/git/?p=glibc.git;a=commit;h=17f487b7afa7cd6c316040f3e6c86dc96b2eec30 will be executed generating this chunk. A good example on how to exploit this in a very similar way can be found on this excellent post by great pwner f4d3 here https://f4d3.io/hacktivitycon-pwn/
+To generate a leak and basically to exploit the binary we will create a "fake" chunk that will overlap allocated chunks this is known as [Overlkaping chunks](https://heap-exploitation.dhavalkapil.com/attacks/shrinking_free_chunks). This can be trigger by creatign a situation where [backwards concolidation](https://sourceware.org/git/?p=glibc.git;a=commit;h=17f487b7afa7cd6c316040f3e6c86dc96b2eec30) will be executed generating this chunk. A good example on how to exploit this in a very similar way can be found on this excellent post by great pwner [f4d3 here](https://f4d3.io/hacktivitycon-pwn/)
 
 To continue with the plan lets first create a heap layout that help us to achieve our goal
 
@@ -685,9 +685,6 @@ r.interactive()
 
 #HTB{0n3_l1bc_2.27_w1th_3xtr4_tc4ch3_pl3453}
 ```
-
-
-
 ## Conclusion
 
 I really enjoyed the pwn challenges on this CTF, I would love to have more time to finish  all of them and also to maybe do some RE challs. but maybe next time, you can contact me at @dplastico for any feedback.
