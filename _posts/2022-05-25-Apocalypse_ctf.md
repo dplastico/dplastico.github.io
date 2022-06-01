@@ -184,7 +184,7 @@ r.interactive()
 ```
 ## Trick Or Deal
 
-This was a very fun challenge to solve. It's an x64 program with FULL RELRO, Canary, NX, and PIE enabled. I used the libc-database as previously discussed to find out this was a 2.31 glibc version. This is worth notice since you will see on the output below that in my case I use [patchelf](https://github.com/NixOS/patchelf) to patch the boinary with a glibc version of my own compiled with symbols. This way I can use commands like "vis" in pwndbg
+This was a very fun challenge to solve. It's an x64 program with FULL RELRO, Canary, NX, and PIE enabled. I used the libc-database as previously discussed to find out this was a 2.31 glibc version. This is worth notice since you will see on the output below that in my case I use [patchelf](https://github.com/NixOS/patchelf) to patch the binary with a glibc version of my own compiled with symbols. This way I can use commands like "vis" in pwndbg
 
 
 ![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-05-25-13-20-41.png)
