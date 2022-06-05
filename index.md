@@ -3,6 +3,7 @@ layout: default
 ---
 
 # Welcome!
+
              ________________________________________________
             /                                                \
            |    _________________________________________     |
@@ -32,10 +33,3 @@ layout: default
 :-------------------------------------------------------------------------:
 `---._.-------------------------------------------------------------._.---'
 
-# Friends 
-
-[c4e](https://c4ebt.github.io/) One of the best pwners (worldwide) from Chile
-
-[s1kr10s](https://medium.com/@s1kr10s) Researcher from Chile
-
-[Zerial](https://blog.zerial.org/) Info sobre cyber
