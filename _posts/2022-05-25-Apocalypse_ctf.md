@@ -1,20 +1,20 @@
 # Apocalypse CTF by HTB (pwn challenges)
 
-Last week I have some time (not that much as I wish jejeje) to solve some of the PWN challenges at the **Apocalypse CTF** by Hack The Box, I manage to solve all challenges except for the last one. And I finished the "Sabotage" challenge after the CTF. I wanted to practice my  writing, so I decided to create a few entries for some challenge that I found interesting, so I hope it is useful to someone.
+Last week I have some time (not that much as I wish jejeje) to solve some of the PWN challenges at the **Apocalypse CTF** by Hack The Box, I manage to solve all pwn challenges except for the last one, and I finished the "Sabotage" challenge after the CTF. I wanted to practice my writing, and keep this blog alive, so I decided to create a few entries for some challenges that I found interesting, so I hope it is useful to someone.
 
 [Here's a link to the challenges explained on this post](https://github.com/dplastico/dplastico.github.io/tree/main/_posts/apoca_bins)
 
 ## Space Pirate 3: Retribution
 
-This challenge was the 3rd and last from a series of introductory challenges (simple easy buffer overflows), I will not go that much into BOF's exploitation since I did that a lot in the past, you can read about BOFs and watch stream (in spanish)
+This challenge was the 3rd and last from a series of introductory challenges (some simple and easy buffer overflows), I will not go that much into BOF's exploitation since I did that a lot in the past, you can read about BOFs and watch streams (in spanish)
 
 [Here](https://dplastico.github.io/sin%20categor%C3%ADa/2020/11/17/ropemporium-2020-soluciones.html)
 
-I picked this one since it has more protections than the previous one, you need to bypass ASLR, PIE, NX and FULL RELRO. We can verify the above by running checksec on the binary as shown below
+I picked this challenfe since it had more protections than the previous ones, to pwn it, you need to bypass ASLR, PIE, NX and FULL RELRO. We can verify the above by running checksec on the binary as shown below
 
 ![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-05-25-12-00-38.png)
 
-We are provided with a custom libc on the binary folder under the glibc/libc.so.6, If you want to know which glibc version is it you can use the libc-database https://github.com/niklasb/libc-database  to verify if the checksum of the libc correspond to any known version, that way we can learn about the restrictions on it. for that we con use the "identify" utility in libc-database ash shown below
+We are provided with a custom glibc for this binary  under the folder glibc/libc.so.6, If you want to know which glibc version is it you can use the libc-database https://github.com/niklasb/libc-database  to verify if the checksum of the glibc correspond to any known one, that way we can learn about the restrictions on it. for that we con use the "identify" utility in libc-database ash shown below
 
 ![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-05-25-12-04-19.png)
 
@@ -22,11 +22,11 @@ We are dealing with an old version 2.23. With this information, lets dig deeper 
 
 ![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-05-25-12-06-55.png)
 
-Above we can see that the program just lets us choose 2 options: "Show missiles" that display some stats and then "Change Target's location" which lets us enter some coordinates and then confirm with a/n question.
+Above we can see that the program just let us choose 2 options: "Show missiles" that display some stats and then "Change Target's location" which lets us enter some coordinates and then confirm with a/n question.
 
 **Analysis & Reverse Engineering** 
 
-Looking at the disassembly code (I'm using IDA pro for this example, but you can achieve the same goal using Ghidra) we found the mentioned functions
+Looking at the disassembly code (I'm using IDA pro for this example, but you can achieve the same goal using Ghidra) we found the mentioned functions:
 
 ```c
 int __cdecl __noreturn main(int argc, const char **argv, const char **envp)
@@ -55,7 +55,7 @@ int __cdecl __noreturn main(int argc, const char **argv, const char **envp)
 }
 ```
 
-Setup and Banner functions are just to prepare the binary for the challenge (buffering and printing the banner) So let's examine this functions, lets focus on *missile_launcher()* sin the *show_missiles()* function seems to only print and no apparent format string vulnerability.
+Setup and banner functions are just to prepare the binary for the challenge (buffering and printing the banner) So let's examine this functions, lets focus on *missile_launcher()* sin the *show_missiles()* function seems to only print and no apparent format string vulnerability.
 
 ```c
 int missile_launcher()
@@ -83,7 +83,7 @@ int missile_launcher()
 }
 ```
 
-Above is the Pseudo Code from the disassembly of the *missile_launcher()* function showed us a bug that allows us to leak an address from the binary code, how? if you check these lines in detail you can understand it.
+Above is the Pseudo Code from the disassembly of the *missile_launcher()* function We can spot a bug that allows us to leak an address from the binary code, how? if you check these lines in detail you will be able to  understand it.
 
 ```c
   read(0, buf, 0x1FuLL);
@@ -93,7 +93,7 @@ As shown above we will read input from the user and the print the buffer (buf) a
 
 ![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-05-25-12-30-38.png)
 
-Great, now let's move on to see how we can use this leak to chain it against another vulnerability since by itself will not help us to exploit the binary. For that we can follow along the same mentioned function missile_launcher() it worth notice that the buf variable in this representation is a char type buffer of 32 bytes (char buf[32]) but it's used to read the confirmation y/n answer with a read function that allows to write 0x84, so we have a 0x64 BOF in this function, as shown below
+Great, now let's move on to see how we can use this leak to chain it against another vulnerability since by itself will not help us to exploit the binary. For that we can follow along the same mentioned function missile_launcher() it worth notice that the *buf* variable in this representation is a *char* data type buffer of 32 bytes (char buf[32]) but it's used to read the confirmation y/n answer with a read function that allows to write 0x84, so we have a 0x64 BOF in this function, as shown below
 
 ```c
   printf("\n[*] New coordinates: x = [0x53e5854620fb399f], y = %s\n[*] Verify new coordinates? (y/n): ", buf);
@@ -119,7 +119,7 @@ With all this information exploitation becomes trivial, as I mentioned at the be
 - Identify an address with the "/bin/sh" string in libc
 - call system with the "/bin/sh" string as argument (rdi)
 
-The final code is below:
+The final code for this challenge is below:
 
 ```python
 #!/usr/bin/python3
@@ -184,7 +184,7 @@ r.interactive()
 ```
 ## Trick Or Deal
 
-This was a very fun challenge to solve. It's an x64 program with FULL RELRO, Canary, NX, and PIE enabled. I used the libc-database as previously discussed to find out this was a 2.31 glibc version. This is worth notice since you will see on the output below that in my case I use [patchelf](https://github.com/NixOS/patchelf) to patch the binary with a glibc version of my own compiled with symbols. This way I can use commands like "vis" in pwndbg
+This was a very fun challenge to solve. It's an x64 program with FULL RELRO, Canary, NX, and PIE enabled. I used the libc-database as previously discussed to find out this was a 2.31 glibc version. This is worth notice since you will see on the output below a custom glibc, in my case I use [patchelf](https://github.com/NixOS/patchelf) to patch the binary with a glibc version of my own compiled with symbols. This way I can use commands like "vis" in pwndbg and have better visualization of the heap layout
 
 
 ![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-05-25-13-20-41.png)
@@ -224,7 +224,7 @@ size_t buy()
 }
 ```
 
-If you noticed we have a 72 buffer, that will be printed to stdout as a string, so if we provided a short name it can print the rest of the data on the stack until it find a NULL byte, after some trial and error I manage to leak a stack address sending 64 bytes as shown in the following function where data will be 64 byte length
+If you noticed we have a 72 bytes buffer size, that will be printed to stdout as a string, so if we provided a short name it can print the rest of the data on the stack until it find a NULL byte, after some trial and error I manage to leak a stack address sending 64 bytes as shown in the following function where data ,will be 64 byte length
 
 ```python
 def leak_1(data):
@@ -256,7 +256,7 @@ def leak_2():
     return leak
 ```
 
-Now this is where things get interesting and a lesson on how to always look at the disassembly and not always the pseudo code. Now I will explain what my thought process was, maybe there's a more efficient way to discover the bug, but in my case it starts with this. I first notices that when you call option "1" from the menu the "storage" variable is passed to the RAX register and then mov the value at RAX + 0x48 to RDX to then CALL RDX as shown below:
+Now this is where things get interesting and a lesson on how to always look at the disassembly and not always the pseudo code. I will explain what my thought process was, maybe there's a more efficient way to discover this bug, but in my case it starts with this: I first noticed that when you call option "1" from the menu the "storage" variable is passed to the RAX register and then mov the value at RAX + 0x48 to RDX to then CALL RDX as shown below:
 
 ![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-05-25-13-58-48.png)
 
@@ -375,7 +375,7 @@ And it's running libc 2.27
 ![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-05-25-14-21-45.png)
 
 
-I immediately noticed  that this looks like a "note" challenge, so as usual before anything and to speed up debugging I created a skeleton with the functions so I can easily use python with GDB to easily debug, This is something that I recommend to do on this kind of challenge. you can find the skeleton below:
+I immediately noticed  that this looks like a *"note"* challenge, so as usual before anything and to speed up debugging I created a skeleton with the functions so I can easily use python with GDB to  debug, This is something that I recommend to do on this kind of challenge. you can find the skeleton below:
 
 ```python
 #!/usr/bin/python3
@@ -508,8 +508,7 @@ unsigned __int64 __fastcall edit_order(__int64 a1)
   return __readfsqword(0x28u) ^ v4;
 }
 ```
-
-We can see on the "if '' statement that checks that the index is no less than 0 and more than 20 (you are limited to 20 allocations). but it also check whether the pointer on the heap represented by *"(_QWORD *)(8LL * num + a1)"*.
+As shown above at the "if '' statement that checks if the index is no less than 0 and more than 20 (you are limited to 20 allocations). but it also check whether the pointer on the heap represented by *"(_QWORD *)(8LL * num + a1)"*.
 
 Considering this we can spot the bug on this 2 lines:
 
@@ -517,13 +516,13 @@ Considering this we can spot the bug on this 2 lines:
     v1 = strlen(*(const char **)(8LL * num + a1));
     read(0, *(void **)(8LL * num + a1), v1);
 ```
-As you can see v1 will hold the value returned by the length of the string on the heap. and then that value is used by read as the size of data to write on the same heap chunk
+The pseudo code representation show that *v1* will hold the value returned by the length of the string on the heap. and then, that value is used by read as the size of data to write on the same heap chunk
 
 Let's check strlen documentation before continuing
 
 ![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-05-25-14-48-13.png)
 
-So the *strlen* function counts each char on a string until it finds a NULL byte. We can combine this information with the fact that the allocated chunks will have the size field of itself right after the data of the previous one. So this will generate a *1 byte overflow.*
+The *strlen* function counts each char on a string until it finds a NULL byte. We can combine this information with the fact that the allocated chunks will have the size field of itself right after the data of the previous one. So this will generate a *1 byte overflow.*
 
 As an example if we allocate 2 chunks with the following code:
 
