@@ -10,7 +10,7 @@ This challenge was the 3rd and last from a series of introductory challenges (so
 
 [Here](https://dplastico.github.io/sin%20categor%C3%ADa/2020/11/17/ropemporium-2020-soluciones.html)
 
-I picked this challenfe since it had more protections than the previous ones, to pwn it, you need to bypass ASLR, PIE, NX and FULL RELRO. We can verify the above by running checksec on the binary as shown below
+I picked this challenge since it had more protections than the previous ones, to pwn it, you need to bypass ASLR, PIE, NX and FULL RELRO. We can verify the above by running checksec on the binary as shown below
 
 ![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-05-25-12-00-38.png)
 
