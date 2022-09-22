@@ -51,7 +51,7 @@ int main(){
 
 Following is the command to compile it:
 
-"`bash
+```bash
 
 gcc hello.c -fno-pie -o a.exe
 
@@ -86,7 +86,7 @@ Before digging into the headers, It's necessary to clear the dust in some concep
 
 RVA or **Relative Virtual Address** is a value that represents the offset to the image base that corresponds to the **Virtual Address** of that specific address in an example:
 
-"`python
+```python
 VA = RVA + BaseImage
 ```
 This concept will help us to determine the location of different functions and sections in the binary. The base image can be preferred if no **ASLR** (Address Space Layout Randomization) is enabled; otherwise, it can be randomized, so this can change the Virtual Address value in every binary load. In our case, we will compile the binaries with no ASLR just to make it accessible to focus on the concepts and not on bypassing randomization, but this is important to keep in mind. 
@@ -418,14 +418,14 @@ We now also know that ASLR should be disabled on the binary since we compiled wi
 
 Great, also we will use for this section the **pefile** python module, which will allow us to parse information from the PE structures and also modify them. You can install it with the command:
 
-"`bash
+```bash
 pip install pefile
 ```
 *https://github.com/erocarrera/pefile*
 
 Great,  to test how it works, let's read all the data from the executable to a variable and then check the last section of the binary. Let's use the following code:
 
-"`python
+```python
 #!/usr/bin/python3
 import sys
 import pefile
@@ -460,7 +460,7 @@ Ok, we have our objectives. Let's start by creating our new section where we wil
  We can accomplish that with the following code:
 
 
-"`python
+```python
 #!/usr/bin/python3
 import sys
 import pefile
@@ -481,7 +481,7 @@ newSection.set_file_offset(lastSection.get_file_offset() + lastSection.sizeof())
 Let's now set our newly created section after the last section in the binary that we identified under "lastSection" we will name this section as ".packed ."But also, before that, we need to address an issue. At this point, if we add the new section, it will not be displayed under sections. This is because the sections depend on the NumberOfSections field in the FILE_HEADER. So we need to add 1 to the current value on it before writing this to the file. So let's code this and write this to an executable, we will read from the "unpacked.exe" file, and we will write to a new file that we will call "packed_python.exe":
 
 
-"`python
+```python
 #!/usr/bin/python3
 import sys
 import pefile
@@ -522,20 +522,20 @@ Why does this happen? The new section we created has no values in any field of t
 *https://docs.microsoft.com/en-us/windows/win32/debug/pe-format#section-flags*
 
 
-"`python
+```python
 newSection.Characteristics = 0x40000000 | 0x20000000 | 0x20 # IMAGE_SCN_MEM_READ | IMAGE_SCN_MEM_EXECUTE | IMAGE_SCN_CNT_CODE 
 ```
 Now we also need to set the Values for the Misc, Physical Address, and VirtualSize fields. Let's set them to an arbitrary 0x100 size
 *https://stackoverflow.com/questions/35685589/how-do-i-make-space-for-my-code-cave-in-a-windows-pe-32bit-executable*
 
-"`python
+```python
 newSection.Misc = 0x100
 newSection.Misc_PhysicalAddress = 0x100 
 newSection.Misc_VirtualSize = 0x100
 ```
 Next, the section Virtual Address needs to be set. Since we can parse the fields in the lastSection variable object, let's add to his virtual address and use the following function to calculate the proper size for the Virtual address, the code it's self-explanatory.
 
-"`python
+```python
 #This is a function to properly align the size of the new section we are adding 
 def alignSectionSize(size, align):
 
@@ -548,13 +548,13 @@ def alignSectionSize(size, align):
 
 With this in consideration, let's add it to the newSection object Variable:
 
-"`python
+```python
 newSection.VirtualAddress = lastSection.VirtualAddress + alignSectionSize(lastSection.Misc_VirtualSize, pe.OPTIONAL_HEADER.SectionAlignment)
 ```
 
 Finally, we can set the SizeOfImage this time, we will pass as an argument the 0x100 value chosen before for the VirtualSize. We are ready to write these changes and test if the binary can now execute.
 
-"`python
+```python
 pe.OPTIONAL_HEADER.SizeOfImage += alignSectionSize(0x100, pe.OPTIONAL_HEADER.SectionAlignment)
 ```
 
@@ -571,7 +571,7 @@ So our POC works, we can modify the PE, but we only added a section, and we stil
 We know the entry point of the program since we can parse the AddressOfEntryPoint field in the OPTIONAL_HEADER. We know that this value is the Relative Address to the ImageBase, which we can also Obtain from the ImageBase Field also in the OPTIONAL_HEADER. Let's add those values and prints to the program in case we need to follow the flow of execution.
 
 
-"`python
+```python
 #Getting the value of the ImageBase into a variable
 imageBase = pe.OPTIONAL_HEADER.ImageBase
 print(f"[*] Imagebase = {hex(imageBase)}")
@@ -594,7 +594,7 @@ Now let's modify the Entry point and print it to see if we have the same result 
 
 We can code the above like this:
 
-"`python
+```python
 #in order to write, we need to align the SizeofRawData of the section
 newSection.SizeOfRawData = alignSectionSize(0x100, pe.OPTIONAL_HEADER.FileAlignment)
 
@@ -619,7 +619,7 @@ And when dynamically analyzing in the debugger, we see above that the entry poin
 Since we are testing the "packer" to see if it can hide malicious code, let's start by creating a payload in the form of a shellcode that can help us to execute something. Let's try to pop up a window with a message. For this, we will create the shellcode in a separate file to just print it and copied into our payload. You can obviously use something to generate the payload. In my case, I will use a python script to compile the instructions. There's no room on this post to properly explain shellcode, you could also create compiled code and use it, but this is something to make it easy also. Shellcoding is always a good exercise. You can use the shellcode from this post or try one yourself.
 *https://www.corelan.be/index.php/2010/02/25/exploit-writing-tutorial-part-9-introduction-to-win32-shellcoding/*
 
-"`python
+```python
 import struct
 from keystone import *
 import sys
@@ -652,12 +652,12 @@ print(f'"{total_shellcode}"')
 ```
 We can use the code above to create the shellcode. As I mentioned, I will not provide details on the shellcode creation. You can use this base script to create yours or use the raw bytes used in this post. They are Position Independent. It should work on your code. This is the generated shellcode you can use if you don't want to code it:
 
-"`python
+```python
 "\x60\x89\xe5\x81\xc4\xf0\xf9\xff\xff\x31\xc9\x64\x8b\x71\x30\x8b\x76\x0c\x8b\x76\x1c\x8b\x5e\x08\x8b\x7e\x20\x8b\x36\x66\x39\x4f\x18\x75\xf2\xeb\x06\x5e\x89\x75\x04\xeb\x54\xe8\xf5\xff\xff\xff\x60\x8b\x43\x3c\x8b\x7c\x03\x78\x01\xdf\x8b\x4f\x18\x8b\x47\x20\x01\xd8\x89\x45\xfc\xe3\x36\x49\x8b\x45\xfc\x8b\x34\x88\x01\xde\x31\xc0\x99\xfc\xac\x84\xc0\x74\x07\xc1\xca\x0d\x01\xc2\xeb\xf4\x3b\x54\x24\x24\x75\xdf\x8b\x57\x24\x01\xda\x66\x8b\x0c\x4a\x8b\x57\x1c\x01\xda\x8b\x04\x8a\x01\xd8\x89\x44\x24\x1c\x61\xc3\x68\x83\xb9\xb5\x78\xff\x55\x04\x89\x45\x10\x68\x8e\x4e\x0e\xec\xff\x55\x04\x89\x45\x14\x31\xc0\x66\xb8\x6c\x6c\x50\x68\x33\x32\x2e\x64\x68\x75\x73\x65\x72\x54\xff\x55\x14\x89\xc3\x68\xa8\xa2\x4d\xbc\xff\x55\x04\x89\x45\x20\x31\xc0\x66\x05\x65\x64\x50\x68\x68\x61\x63\x6b\x89\xe2\x31\xc0\x50\x68\x68\x61\x63\x6b\x89\xe7\x50\x52\x57\x50\xff\x55\x20\x31\xc0\x05\xe0\x12\x40\x00\xff\xe0"
 ```
 The created shellcode will pop a Message Box with the word "hacked" and then will redirect execution to the entry point. Now, let's upgrade our python script to write these changes to the "python_packed.exe".
 
-"`python
+```python
 #!/usr/bin/python3
 import sys
 import pefile
@@ -785,14 +785,14 @@ int main(){
 
 We can compile it with 
 
-"`bash
+```bash
 GCC -fno-pie testing.c -o testing
 ```
 ![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-28-00-06-42.png)
 
 We can test it's working by simply executing it as shown above. Now that we know that our program works, let's create a backup copy and  pack it using upx with the following command:
 
-"`bash
+```bash
 upx testing.exe
 ```
 ![](https://raw.githubusercontent.com/dplastico/dplastico.github.io/main/_posts/img/2022-03-28-00-10-57.png)
