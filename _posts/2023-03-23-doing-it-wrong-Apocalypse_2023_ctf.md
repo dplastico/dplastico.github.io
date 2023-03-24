@@ -24,7 +24,7 @@ Great quote!, I hope this will serve as an introduction to why I decided to solv
 
 ## Following along
 
-If you want to follow along this post will reading you can use the original binaries located [here](https://github.com/dplastico/dplastico.github.io/blob/main/_posts/apoca2023/void.zip). 
+If you want to follow along this post will reading you can use the original binaries located [here](apoca2023/void.zip). 
 
 ## The ugly way: ret2csu + Stack Pivot + Syscalls.
 
@@ -124,7 +124,7 @@ Once the above payload as sent and the overflow is triggered, the  _read()_ func
 
 To understand the above, we need to be familiar with ret2csu. You can read more about it [here](https://gist.github.com/kaftejiman/a853ccb659fc3633aa1e61a9e26266e9), and practice it [here](https://ropemporium.com/challenge/ret2csu.html), but I will try to explain what's is the plan at a high level. We are using the following gadgets represented in the picture below showing the putput of the command __objdump -d void -M Intel__
 
-![](https://github.com/dplastico/dplastico.github.io/raw/main/_posts/img/2023-03-24-13-13-39.png)
+![](img/2023-03-24-13-13-39.png)
 
 So first, we are using the  __pops__ gadget starting at 0x4011b2 at the end of the __libc_csu_init() function. This will allow us to control the gadgets poped, then we can use the gadget on the same functions. It is important to control RDX. Since we can pop r14 we can move it to RDX, but then as highlighted, we need to pass a call to a pointer on _[r15+rbx+8]_ since we want to just continue, we can use the _fini_ function also highlighted that has a _ptr_ on the address **0x403048** to this function, that basically "does nothing" as it can be observed, we should take care of the _RSP+8_ instruction setting a dummy value.
 
@@ -226,7 +226,7 @@ Above, we call read again, but this time after sending the payload, we just over
 
 We finalize obtaining a shell and the flag as below.
 
-![](https://github.com/dplastico/dplastico.github.io/raw/main/_posts/img/2023-03-24-13-41-16.png)
+![](img/2023-03-24-13-41-16.png)
 
 ## conclusion
 
