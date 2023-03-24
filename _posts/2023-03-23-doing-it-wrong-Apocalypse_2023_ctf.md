@@ -236,7 +236,7 @@ I want to thank the CTF organizers and the people sharing their solutions and co
 
 ## Final exploit
 
-Here's the final exploit, is not, curated so comments may contain mispelling and wrong description
+Here's the final exploit. It is not curated, so comments may contain misspellings and wrong descriptions.
 
 ```python
 #!/usr/bin/python3
