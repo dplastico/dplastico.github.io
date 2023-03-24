@@ -63,7 +63,7 @@ ssize_t vuln()
 
 We can observe the comment added where a buffer overflow occurs. In this case, we have a 0x40 buffer called _buf_, and the read function is called. This function will read from _stdin_ to the _buf_ buffer, but it will read 0xc8, leaving us with a 0x88 buffer overflow.
 
-Since the binary is tiny, there are only a few gadgets to work it. We will be able to control RDI, RDI, and RDX (the first 3 arguments a syscall Linux) due to ret2csu [ret2csu](https://i.blackhat.com/briefings/asia/2018/asia-18-Marco-return-to-csu-a-new-method-to-bypass-the-64-bit-Linux-ASLR-wp.pdf), and since we have a buffer overflow, we can use the read function as a _write-what-where_ primitive, since we can call it as many times as we want. How is that? The read function can be reached from _plt_. The binary has no _stack canaries_ or _PIE_, so we can overflow over and call read again, generating a 0x88 overflow.
+Since the binary is tiny, there are only a few gadgets to work it. We will be able to control RDI, RSI, and RDX (the first 3 arguments a syscall Linux) due to ret2csu [ret2csu](https://i.blackhat.com/briefings/asia/2018/asia-18-Marco-return-to-csu-a-new-method-to-bypass-the-64-bit-Linux-ASLR-wp.pdf), and since we have a buffer overflow, we can use the read function as a _write-what-where_ primitive, since we can call it as many times as we want. How is that? The read function can be reached from _plt_. The binary has no _stack canaries_ or _PIE_, so we can overflow over and call read again, generating a 0x88 overflow.
 
 Considering the above, a  _ROP chain_ sounds like the best way to approach it, but we have just a few gadgets. It's going to be hard to control all the registers to leak and then ROP to get a shell.
 
