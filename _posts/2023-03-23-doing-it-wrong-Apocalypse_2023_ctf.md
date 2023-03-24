@@ -16,9 +16,9 @@ ret2dlresolve is a technique  that targets the Dynamic Linker (dl) to resolve sy
 
 I never really put the time to understand how this technique is set up since it involves forging a fake *link_map*, and on other CTFs, I worked this around it without using it. (I just brute forced 1/16 the second byte of the GOT address to jump to other functions like *write()*) So I never needed to learn it.
 
-There's also a class in _pwntools_ that would do all the magic if you use it, but I tend to stay away of pwntools wrappers, I feel confortable using them, like in the case  of *sigreturn, House of Orange, format strings* and others, but it is because I really learned the technique underneath, to understand it clearly before using them. Again I want to bring what was discuss after the ctf by the user *Zopazz* which make me feel not so bad since, we have pretty similar reasoning about the subject.
+There's also a class in _pwntools_ that would do all the magic if you use it, but I tend to stay away of pwntools wrappers, I feel confortable using them, like in the case  of *sigreturn, House of Orange, format strings* and others, but it is because I really learned the technique underneath, to understand it clearly before using them. Again I want to bring what was discuss after the ctf by the user *Zopazz* which make me feel not so bad since, we have pretty similar reasoning about the subject. 
 
-*Personally since I've tried to learn the technique but never really understood it fully. I just don't use it. Which also forces me to use everything else in my arsenal of pwn knowledge. This imo makes it more fun n interesting too"*
+**Zopazz: Personally since I've tried to learn the technique but never really understood it fully. I just don't use it. Which also forces me to use everything else in my arsenal of pwn knowledge. This imo makes it more fun n interesting too"**
 
 Great quote!, I hope this will serve as an introduction to why I decided to solve this challenge the way I did it, and why I'm doing a write-up about it.
 
