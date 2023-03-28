@@ -22,9 +22,9 @@ There's also a class in _pwntools_ that would do all the magic if you use it, bu
 
 Great quote!, I hope this will serve as an introduction to why I decided to solve this challenge the way I did it, and why I'm doing a write-up about it.
 
-## Following along
+## Following along this post.
 
-If you want to follow along this post will reading you can use the original binaries located [here](https://github.com/dplastico/dplastico.github.io/blob/main/_posts/apoca2023/void.zip). 
+If you want to follow along this post while reading, you can use the original binaries located [here](https://github.com/dplastico/dplastico.github.io/blob/main/_posts/apoca2023/void.zip). 
 
 ## The ugly way: ret2csu + Stack Pivot + Syscalls.
 
@@ -87,11 +87,11 @@ Great, so we have a cool plan. We can setup the registers using _ret2csu_ and th
 
 We can't control the RAX register, at least not directly...There's still hope. The RAX register holds the return value of a function or syscall after it executes. So manipulating the return value of the _syscall_, we can use it to perform the desired call. And remember that the _syscall_ instructions have a return after? This means we can chain another _syscall_ so the former will return the desired value to propagate on RAX, and the ladder will execute the actual _syscall_.
 
-The above sounds like a plan. We don't need an actual leak, we only need to return a controlled value using a syscall, but the issue is that when we overwrite the LSB of the _GOT_ address, the return value in RAX is set to 1, forcing us to _write()_ the syscall number 1. No problem then, this syscall returns the value of bytes written, so we can just write 0x3b bytes to anywhere, and this will set up RAX at the _execve()_ syscall number. We can then use ret2csu to set the rest of the register and call _execve()_ to get a shell.
+The above sounds like a plan. We don't need an actual leak, we only need to return a controlled value using a syscall, but the issue is that when we overwrite the LSB of the _GOT_ address, the return value in RAX is set to 1, forcing us to use the  _write()_  syscall, number __1__. No problem then, Why?, Because this syscall returns the value of bytes written in the RAX register, so we can write 0x3b bytes to anywhere, and this will set up RAX at the _execve()_ syscall number. We can then use ret2csu to set the rest of the register and call _execve()_ to get a shell.
 
 Sounds too complicated? Well, maybe it is. Remember that we are doing this the __"ugly"__ way, not relying on pwntools wrappers. Let's analyze the exploit so we can have a better understanding of the details.
 
-First, let's start by setting some variables that will help us along the way obviously you can just use the address. This is just a reference and personal naming preference.
+First, let's start by setting some variables that will help us along the way obviously, you can just use the address. This is just a reference and personal naming preference.
 
 ```python
 #gadgets
