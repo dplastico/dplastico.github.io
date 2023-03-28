@@ -69,7 +69,7 @@ Considering the above, a  _ROP chain_ sounds like the best way to approach it, b
 
 One of the cool things about doing challenges just for fun is that you come up with crazy ideas you can test since you are not worried about the time (A cool thing about Apocalypse since it last so long). Since previously I solved similar challenges by overwriting the _GOT_ and brute-forcing to a one gadget or system address, I realize in this case, since we only have a _read()_ function, we can only brute force to get a close address, _write()_ was possible for example, but it would be a pain to brute-force it just to leak. And then figure out the rest, so we could just overwrite the _LSB_ on the _read()_ at _GOT_ and see where that can take us.
 
-Inspecting the _read()_ function in GDB, we can observe an interesting _syscall_ instructions.
+Inspecting the _read()_ function in GDB, we can observe an interesting _syscall_ instruction.
 
 ```
 0x00007ffff7ee1780 <+0>:	mov    eax,DWORD PTR fs:0x18
@@ -87,11 +87,11 @@ Great, so we have a cool plan. We can setup the registers using _ret2csu_ and th
 
 We can't control the RAX register, at least not directly...There's still hope. The RAX register holds the return value of a function or syscall after it executes. So manipulating the return value of the _syscall_, we can use it to perform the desired call. And remember that the _syscall_ instructions have a return after? This means we can chain another _syscall_ so the former will return the desired value to propagate on RAX, and the ladder will execute the actual _syscall_.
 
-The above sounds like a plan. We don't need an actual leak, we only need to return a controlled value using a syscall, but the issue is that when we overwrite the LSB of the _GOT_ address, the return value in RAX is set to 1, forcing us to _weite()_ the syscall number 1. No problem then, this syscall returns the value of bytes written, so we can just write 0x3b bytes to anywhere, and this will set up RAX at the _execve()_ syscall number. We can then use ret2csu to set the rest of the register and call _execve()_ to get a shell.
+The above sounds like a plan. We don't need an actual leak, we only need to return a controlled value using a syscall, but the issue is that when we overwrite the LSB of the _GOT_ address, the return value in RAX is set to 1, forcing us to _write()_ the syscall number 1. No problem then, this syscall returns the value of bytes written, so we can just write 0x3b bytes to anywhere, and this will set up RAX at the _execve()_ syscall number. We can then use ret2csu to set the rest of the register and call _execve()_ to get a shell.
 
 Sounds too complicated? Well, maybe it is. Remember that we are doing this the __"ugly"__ way, not relying on pwntools wrappers. Let's analyze the exploit so we can have a better understanding of the details.
 
-First, let's start by setting some variables that will help us along the way obviously you can just use the address. This is just a reference and personal naming preference
+First, let's start by setting some variables that will help us along the way obviously you can just use the address. This is just a reference and personal naming preference.
 
 ```python
 #gadgets
@@ -106,7 +106,7 @@ bss = 0x404030
 ret2csu_gdg = 0x401198
 ```
 
-Next, we will use the overflow to call _read()_ again. We will use an address on the _.bss_, sicne it has read and write permissions, in this case __0x404100__ to store the first _ROP chain_ 
+Next, we will use the overflow to call _read()_ again. We will use an address on the _.bss_, since it has read and write permissions, in this case __0x404100__ to store the first _ROP chain_ 
 
 ```python
 #1
@@ -120,9 +120,9 @@ payload += p64(0xcafebabe)
 payload += p64(elf.sym.read) # use the read function as write-what-where
 payload += p64(elf.sym.vuln) # go back to the vul function to overflow again
 ```
-Once the above payload as sent and the overflow is triggered, the  _read()_ function is executed, and we can write our payload, which will contain the _"/bin/sh"_ string and the ROP chain.
+Once the above payload is sent and the overflow is triggered, the  _read()_ function is executed, and we can write our payload, which will contain the _"/bin/sh"_ string and the ROP chain.
 
-To understand the above, we need to be familiar with ret2csu. You can read more about it [here](https://gist.github.com/kaftejiman/a853ccb659fc3633aa1e61a9e26266e9), and practice it [here](https://ropemporium.com/challenge/ret2csu.html), but I will try to explain what's is the plan at a high level. We are using the following gadgets represented in the picture below showing the putput of the command __objdump -d void -M Intel__
+To understand the above, we need to be familiar with __ret2csu__. You can read more about it [here](https://gist.github.com/kaftejiman/a853ccb659fc3633aa1e61a9e26266e9), and practice it [here](https://ropemporium.com/challenge/ret2csu.html), but I will try to explain what's is the plan at a high level. We are using the following gadgets represented in the picture below showing the putput of the command __objdump -d void -M Intel__
 
 ![](https://github.com/dplastico/dplastico.github.io/raw/main/_posts/img/2023-03-24-13-13-39.png)
 
