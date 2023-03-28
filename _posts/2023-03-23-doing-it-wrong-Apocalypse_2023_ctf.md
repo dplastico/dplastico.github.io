@@ -8,7 +8,7 @@ I was not thinking of writing any post for this year since all the challenges th
 
 On a great chat on discord after the CTF, on a post by *Zopazz* with [writeups for all pwn challenges](https://github.com/Mymaqn/HTBCA2023_Pwn_Writeups), I realized there were a lot of people that came up with different solutions, not all of them were the *intended* some very cool like using a gadget that I didn't catch to *add* the offset from a pointer to a "one gadget", and some others similar to the one I came up. 
 
-## The pretty way ret2dlresolve with pwntools
+## The pretty way: ret2dlresolve with pwntools
 
 I think the intended way for this challenge was to do a **ret2dlresolve**, as discussed by various pwners after the CTF.
 
