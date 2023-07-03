@@ -63,11 +63,11 @@ Changelog:
  - After our last custom server got hacked we made sure to enable all mitigations: ASLR, DEP, GS! Now it's 100% secure.
  ```
 
-So, now we know we are dealing with a file server that probably has all protections enabled. We can confirm this is the service running at port 2121 by doing a test, like connect to it using _netcat_ or something similar. We'll then spin up a Windows VM and start the exploiting, pwn, pwn, pwn. 
+So, now, we know we are dealing with a file server that probably has all protections enabled. We can confirm this is the service running at port 2121 by doing a test, like connect to it using _netcat_ or something similar. We'll then spin up a Windows VM and start the exploiting, pwn, pwn, pwn. 
 
-After checking that it is the same service running, we need to start with an exploit plan.
+After checking that it is the same service running, we'll need to start creating an exploit plan.
 
-We know that it will have all protections, so we'll need to leak memory from the binary. Also when debugging or inspecting with something like the _file_ command we'll be able to confirm the binary is 32-bit.
+We suspect that it will have all protections enabled, so we'll need to leak memory from the binary. Also when debugging or inspecting with something like the _file_ command we'll be able to confirm the binary is 32-bit.
 
 ```
 ➜ file filesrv.exe
@@ -75,7 +75,7 @@ filesrv.exe: PE32 executable (console) Intel 80386, for MS Windows, 5 sections
 ➜ 
 ```
 
-Ok, so what to do now? I usually try to start with a Static Analysis, but this is written in C++, and finding a function within a socket can be trickier (because of c++ objects, if you want to do it you can try start [from here](https://www.youtube.com/watch?v=o-FFGIloxvE)). One quick thing we can do is if we are bale to interact with the binary, is to take note of which output is being sent to stdout, like the string "__ERROR__" that is sent when you enter a wrong command, as we can observe.
+Ok, so what to do now? I usually try to start with a Static Analysis, but this is written in C++, and finding a function within a socket can be trickier (because of c++ objects, if you want to do it, and don't know how to, you can try starting [from here](https://www.youtube.com/watch?v=o-FFGIloxvE)). One quick thing we can do, if we are able to interact with the binary, is to take note of which output is being sent to stdout, like the string "__ERROR__" that is sent when you enter a wrong command, as we can observe.
 
 ```
 ➜ nc 10.10.73.242 2121
