@@ -174,9 +174,9 @@ Ok, we should collect gadgets at this point to start _roping_, I used __ropper__
 After collecting gadgets, let's start creating our rop-chain.
 
 
-Ok, but wait... This is a SEH overflow, so we cannot just go into "mordor and start ropping".
+Ok, but wait... This is a SEH overflow, so we cannot just go into "mordor" and start ropping.
 
-![](https://github.com/dplastico/dplastico.github.io/raw/main/_posts/img/2023-07-02-21-28-51.png)
+![](https://github.com/dplastico/dplastico.github.io/raw/main/_posts/img/2023-07-02-21-36-57.png)
 
 If we do the regular exploit plan for SEH, which is to find a "POP POP RET" gadget, we will jump and execute the NSEH, but this is pointless since we steal have not defeated __DEP__ and we will still need to execute something, this is a "stack pivot" gadget will help us. We just need to find a gadget that allows us to move the stack pointer to another area we control in our payload.
 
