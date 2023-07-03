@@ -8,7 +8,7 @@ Atnother thing about __Vulnlab__ is that once subscribed you can manage all the 
 
 ![](https://github.com/dplastico/dplastico.github.io/raw/main/_posts/img/2023-07-02-20-55-24.png)
 
-The machine is rated __Hard__ with good reason so this write-up will be more a like guide or a "manual" on how to exploit the machine, since I will assume some knowledge in binary exploitation and enumerating, otherwhise it will be too long to read. If you are not familiar with regular buffer overflows, I will recommmend you to try the __rainbow__ machine first, read and try some __ROP__ exercises [here](https://fuzzysecurity.com/tutorials/expDev/7.html), and then comeback to this one. As always this is just a recommendation, sicne learning is different for everyone ^^. I will also take the chance to recommend this machine to everyone that is studying for the __OSED__ certification, since it will help you prepare for it.
+The machine is rated __Hard__ with good reason so this write-up will be more like a guide or a "manual" on how to exploit the machine, since I will assume some knowledge in binary exploitation, otherwhise it will be too long to read. If you are not familiar with regular buffer overflows, I will recommmend you to try the __rainbow__ machine first, read and try some __ROP__ exercises [here](https://fuzzysecurity.com/tutorials/expDev/7.html), and then comeback to this one. As always this is just a recommendation, since learning is different for everyone ^^. I will also take the chance to recommend this machine to everyone that is studying for the __OSED__ certification, it will help you prepare for it.
 
 some of the tools or frameworks I will be using during this post are th following: (they are not mandatory, you can use any alternatives you like)
 
