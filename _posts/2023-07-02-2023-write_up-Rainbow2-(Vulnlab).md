@@ -2,7 +2,7 @@
 
 Hola Mundo!
 
-After passing OSEP and getting my OSC3 (yay!) I wanted to do something other than study and since I finally have time, I decided to try something I got in my TODO list for a long: [Vulnlab](https://www.vulnlab.com/) a penetretation testing & read teaming labs run by [xct](https://twitter.com/xct_de), one of my favorites hackers to follow (I highly recommend his content, specially the read team labs playlist on youtube) 
+After passing OSEP and getting my OSC3 (yay!) I wanted to do something other than study and since I finally have time, I decided to try something I got in my TODO list for a long: [Vulnlab](https://www.vulnlab.com/) a penetretation testing & read teaming labs run by [xct](https://twitter.com/xct_de), one of my favorites hackers to follow (I highly recommend his content, specially the red-team labs playlists on youtube) 
 
 Atnother thing about __Vulnlab__ is that once subscribed you can manage all the labs from discord, which is really cool, also you can search trough the machines and chains (more tahn one machine in an AD enviroment) to check what is the intended exploitation path, so you can search for what you want to practice. Since it was months without doing some pwning I started with the __rainbow__ machine a easy to medium binary exploitation machine that I really enjoyed, so after completing it,  I decided to try __rainbow2__. 
 
