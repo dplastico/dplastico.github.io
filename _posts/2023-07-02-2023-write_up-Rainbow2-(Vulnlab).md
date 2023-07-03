@@ -89,11 +89,11 @@ We can search for the __ERROR__ string above in IDA, but since we are dealing wi
 
 ![](https://github.com/dplastico/dplastico.github.io/raw/main/_posts/img/2023-07-02-15-33-41.png)
 
-Next, We can open the string window in IDA (Shift + f12) and search for the __ERROR__ string. We'll find it in the [.rdata](https://learn.microsoft.com/en-us/windows/win32/debug/pe-format#:~:text=IMAGE_SCN_CNT_INITIALIZED_DATA%20%7C%20IMAGE_SCN_MEM_READ-,.rdata,-Read%2Donly%20initialized) section at offset 0x000904C4 as shown below.
+Next, open the _strings_ window in IDA (Shift + f12) and search for the __ERROR__ string. We'll find it in the [.rdata](https://learn.microsoft.com/en-us/windows/win32/debug/pe-format#:~:text=IMAGE_SCN_CNT_INITIALIZED_DATA%20%7C%20IMAGE_SCN_MEM_READ-,.rdata,-Read%2Donly%20initialized) section at offset 0x000904C4 as shown below.
 
 ![](https://github.com/dplastico/dplastico.github.io/raw/main/_posts/img/2023-07-02-15-35-08.png)
 
-If we double-click on it. We'll see it on the .rdata section, and also, we'll be able to perform a cross-reference to see where it's being called, in this case, just one function.
+If we double-click on it. We'll see it on the _.rdata_ section, and also, we'll be able to perform a cross-reference to see where it's being called, in this case, just one function.
 
 ![](https://github.com/dplastico/dplastico.github.io/raw/main/_posts/img/2023-07-02-15-40-27.png)
 
