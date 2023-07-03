@@ -85,7 +85,7 @@ AAA
 ERROR
 ```
 
-We can search for the _ERROR_ string above in IDA, but since we are dealing with [ASLR](https://en.wikipedia.org/wiki/Address_space_layout_randomization), first we need to rebase the address of the executable to 0x0 so it shows the Offset and not the preferred address, I do this as a good practice, but this is not a necessary step. (File > Segments > Rebase Program)
+We can search for the __ERROR__ string above in IDA, but since we are dealing with [ASLR](https://en.wikipedia.org/wiki/Address_space_layout_randomization), first we need to rebase the address of the executable to 0x0 so it shows the Offset and not the preferred address, I do this as a good practice, but this is not a necessary step. (File > Segments > Rebase Program)
 
 ![](https://github.com/dplastico/dplastico.github.io/raw/main/_posts/img/2023-07-02-15-33-41.png)
 
@@ -93,11 +93,11 @@ Next, We can open the string window in IDA (Shift + f12) and search for the __ER
 
 ![](https://github.com/dplastico/dplastico.github.io/raw/main/_posts/img/2023-07-02-15-35-08.png)
 
-If we double-click on it. We'll see it on the .rdata section, and also, we can perform a cross-reference to see where it's being called, in this case, just one function.
+If we double-click on it. We'll see it on the .rdata section, and also, we'll be able to perform a cross-reference to see where it's being called, in this case, just one function.
 
 ![](https://github.com/dplastico/dplastico.github.io/raw/main/_posts/img/2023-07-02-15-40-27.png)
 
-From experience and looking at the graph view, we'll observe there's a flow control at the bottom of the function.
+From experience and looking at the above funcion in the graph view, we'll observe there's a flow control at the bottom of the function.
 
 ![](https://github.com/dplastico/dplastico.github.io/raw/main/_posts/img/2023-07-02-15-41-43.png)
 
@@ -145,13 +145,13 @@ Ok, so now we need to find a vulnerability, probably a Buffer Overflow, so, Afte
 payload = b"A"* 0xfb0
 
 ```
-And then, observe the crash using the _exchain_ command in widbg or similar in the debugger of your choosing.
+And then,let's observe the crash using the _exchain_ command in widbg or similar in the debugger of your choosing.
 
 ![](https://github.com/dplastico/dplastico.github.io/raw/main/_posts/img/2023-07-02-16-30-46.png)
 
-We can observe we can overflow the _SEH_ When we send a payload of size 0xfb0. The number 0xfb0 is something to keep in consideration since this size helps me to keep the exploit stable. We'll see later that when exploiting remote, the return address Offset to overwrite may vary, so I recommend this size, but you can overflow with more if you need to.
+At this point we can overflow the _SEH_ when we send a payload of size 0xfb0. The number 0xfb0 is something to keep in consideration since this size helps me to keep the exploit stable. We'll see later that when exploiting remote, the return address Offset to overwrite may vary, so I recommend this size, but you can overflow with more if you need to.
 
-Now we need to calculate the Offset of when the SEH value is being overwritten so we can exploit it. I used __msf-pattern__, from Kali and determined the proper Offset to overwrite the SEH at 0x408 bytes. We can confirm that sending the following payload
+Next, we need to calculate the Offset of when the SEH value is being overwritten so we can exploit it. I used __msf-pattern__, from Kali and determined the proper Offset to overwrite the SEH at 0x408 bytes. We can confirm that sending the following payload
 
 ```python
 payload = b"LST "
@@ -165,7 +165,7 @@ After that, we can confirm the crash again using the __!exchain__ command in win
 
 ![](https://github.com/dplastico/dplastico.github.io/raw/main/_posts/img/2023-07-02-16-47-00.png)
 
-After the above is verified, we can check for bad characters. This way, we can avoid the use of them when sending our ROP-chain, the characters found were: 0x00, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x20.
+When the above is verified, we can check for bad characters. This way, we can avoid the use of them when sending our ROP-chain, the characters found were: 0x00, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x20.
 
 So, what now? We need to defeat the next protection in our way [DEP](https://support.microsoft.com/en-us/topic/what-is-data-execution-prevention-dep-60dabc2b-90db-45fc-9b18-512419135817). We can use the good old __ROP__ for that. We can probably create a rop chain using something like __ropper__ or __mona__, but in many cases, I just create the chain myself. I just like to do things hard for me [uwu](https://dplastico.github.io/2023/03/23/doing-it-wrong-Apocalypse_2023_ctf.html)
 
@@ -180,7 +180,7 @@ Ok, but wait... This is a SEH overflow, so we cannot just go into "Mordor" and s
 
 If we do the regular exploit plan for SEH, which is to find a "POP POP RET" gadget, we will jump and execute the NSEH, but this is pointless since we steal have not defeated __DEP__ and we will still need to execute something, this is a "stack pivot" gadget will help us. We just need to find a gadget that allows us to move the stack pointer to another area we control in our payload.
 
-At Offset 0x00011396, there's an "add  esp, 0xe10" I ended up using. We can create a payload to accomplish what's being discussed, like the one below.
+After some exploration, at Offset 0x00011396, we'll find an "add  esp, 0xe10" I ended up using. We can create a payload to accomplish what's being discussed, like the one below.
 
 ```python
 buf = b""
