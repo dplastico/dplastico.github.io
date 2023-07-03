@@ -138,20 +138,20 @@ log.info(f"base address = {hex(filesrv)}")
 
 ![](https://github.com/dplastico/dplastico.github.io/raw/main/_posts/img/2023-07-02-16-18-43.png)
 
-Ok, so now we need to find a vulnerability, probably a Buffer Overflow, so, After trying again with the commands, we found out that the "LST" command is also vulnerable to a buffer overflow. We can test it by sending the following payload after the memory leaks
+Ok, so now we need to find a vulnerability, probably a Buffer Overflow. After trying again enumerating the commands, we'll found out that the "LST" command is also vulnerable to a buffer overflow. We can test it by sending the following payload after the memory leaks.
 
 ```python
 
 payload = b"A"* 0xfb0
 
 ```
-And then,let's observe the crash using the _exchain_ command in widbg or similar in the debugger of your choosing.
+Let's observe the crash using the _exchain_ command in widbg or a similar one in the debugger of your choosing.
 
 ![](https://github.com/dplastico/dplastico.github.io/raw/main/_posts/img/2023-07-02-16-30-46.png)
 
 At this point we can overflow the _SEH_ when we send a payload of size 0xfb0. The number 0xfb0 is something to keep in consideration since this size helps me to keep the exploit stable. We'll see later that when exploiting remote, the return address Offset to overwrite may vary, so I recommend this size, but you can overflow with more if you need to.
 
-Next, we need to calculate the Offset of when the SEH value is being overwritten so we can exploit it. I used __msf-pattern__, from Kali and determined the proper Offset to overwrite the SEH at 0x408 bytes. We can confirm that sending the following payload
+Next, we need to calculate the Offset of when the SEH value is being overwritten so we can exploit it. I used __msf-pattern__, from Kali and determined the proper Offset to overwrite the SEH at 0x408 bytes. We can confirm that sending the following payload.
 
 ```python
 payload = b"LST "
@@ -206,7 +206,7 @@ Great, so now it's time to start _ropping_? Well... let's wait a little bit...
 
 ![](https://i.kym-cdn.com/entries/icons/facebook/000/016/042/Wait-For-It.jpg)
 
-We need to figure out what rop chain we should create first and to do that, we can inspect the IAT in search for some imported Win32 API that allows us to manipulate memory in a way we can disable _DEP_, since this protection is enabled, we cannot execute Shellcode on the stack so we need a way to bypass this. The common APIs used __WriteProcessMemory__, __VirtualAlloc__, and __VirtualProtect__  are not listed on the IAT. We can verify that by looking at imports sections in IDA (you can also use windbg for this, it really doesn't matter)
+We need to figure out what rop chain we should create first and to do that, we can inspect the IAT in search for some imported Win32 API that allows us to manipulate memory in a way we can disable _DEP_, since this protection is enabled, we cannot execute Shellcode on the stack so we need a way to bypass this. The common APIs used __WriteProcessMemory__, __VirtualAlloc__, and __VirtualProtect__  are not listed on the IAT. We can verify that by looking at imports sections in IDA. (you can also use windbg for this, it really doesn't matter)
 
 Now If we remember, we also download from the FTP server a _kernel32.dll_ file, probably the one being used by the binary. It that's the case, it means that even if the API is not imported by the binary, we can calculate the Offset from another imported address f to any other API address we want form kernel32. So let's go ahead and do that.
 
@@ -220,11 +220,11 @@ We can create a variable for later use with this address.
 tlsfree_iat = filesrv+0x00090148
 ```
 
-Now we need to calculate the Offset of that address to __VirtualAlloc__ within _kernel32.dll_, so we can load the downloaded _kernel32.dll_ in IDA and check the __exports__, but first, we should rebase the program with the base address 0x0 to show us just the Offset to the base address. After that, we can observe the Offset to __TLSFree__: 0x192e0
+Now we need to calculate the Offset of that address to __VirtualAlloc__ within _kernel32.dll_, so we can load the downloaded _kernel32.dll_ in IDA and check the __exports__, but first, we should rebase the program with the base address 0x0 to show us just the Offset to the base address. After that, we can observe the Offset to __TLSFree__: 0x192e0.
 
 ![](https://github.com/dplastico/dplastico.github.io/raw/main/_posts/img/2023-07-02-17-18-18.png)
 
-Continuing, we can observe the Offset from the base address to __VirtualAlloc__ in this case: 0x16250
+Continuing, we can observe the Offset from the base address to __VirtualAlloc__ in this case: 0x16250.
 
 ![](https://github.com/dplastico/dplastico.github.io/raw/main/_posts/img/2023-07-02-17-18-49.png)
 
