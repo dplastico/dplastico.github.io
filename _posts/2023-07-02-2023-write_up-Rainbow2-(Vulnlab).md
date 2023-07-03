@@ -21,7 +21,7 @@ some of the tools or frameworks I will be using during this post are th followin
 
 So after all the talk above, and  once we got the machine running (again, from discord, really cool stuff), we got an IP address so we can run the usual nmap, as shown below.
 
-```cmd
+```
 # Nmap 7.94 scan initiated Sat Jun 24 01:17:24 2023 as: nmap -Pn -sV -sC -oN portscan.txt 10.10.88.129
 Nmap scan report for 10.10.88.129
 Host is up (0.24s latency).
