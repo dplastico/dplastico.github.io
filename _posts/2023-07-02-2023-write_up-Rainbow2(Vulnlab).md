@@ -6,7 +6,7 @@ After passing OSEP and getting my OSC3 (yay!) I wanted to do something other tha
 
 Atnother thing about __Vulnlab__ is that once subscribed you can manage all the labs from discord, which is really cool, also you can search trough the machines and chains (more tahn one machine in an AD enviroment) to check what is the intended exploitation path, so you can search for what you want to practice. Since it was months without doing some pwning I started with the __rainbow__ machine a easy to medium binary exploitation machine that I really enjoyed, so after completing it,  I decided to try __rainbow2__. 
 
-![](img/2023-07-02-20-55-24.png)
+![](https://github.com/dplastico/dplastico.github.io/raw/main/_posts/img/2023-07-02-20-55-24.png)
 
 The machine is rated __Hard__ with good reason so this write-up will be more a like guide or a "manual" on how to exploit the machine, since I will assume some knowledge in binary exploitation and enumerating, otherwhise it will be too long to read. If you are not familiar with regular buffer overflows, I will recommmend you to try the __rainbow__ machine first, read and try some __ROP__ exercises (link aca), and then comeback to this one. As always this is just a recommendation, sicne learning is different for everyone ^^. I will also take the chance to recommend this machine to everyone that is studying for the __OSED__ certification, since it will help you prepare for it.
 
@@ -87,19 +87,19 @@ ERROR
 
 We can search for the string above in IDA, but since we are dealing with [ASLR](https://en.wikipedia.org/wiki/Address_space_layout_randomization). First, we need to rebase the address of IDA to 0x0 so it shows the Offset and not the preferred address, I do this as a good practice, but this is not a necessary step, 
 
-![](img/2023-07-02-15-33-41.png)
+![](https://github.com/dplastico/dplastico.github.io/raw/main/_posts/img/2023-07-02-15-33-41.png)
 
 Next, We can open the string window in IDA (shif+f12) and search for the error string. We can find it in the [.rdata](https://learn.microsoft.com/en-us/windows/win32/debug/pe-format#:~:text=IMAGE_SCN_CNT_INITIALIZED_DATA%20%7C%20IMAGE_SCN_MEM_READ-,.rdata,-Read%2Donly%20initialized) section at offset 0x000904C4 as shown below.
 
-![](img/2023-07-02-15-35-08.png)
+![](https://github.com/dplastico/dplastico.github.io/raw/main/_posts/img/2023-07-02-15-35-08.png)
 
 If we double-click on it. We'll see it on the .rdata section, and also, we can perform a cross-reference to see where it's being called, in this case, just one function.
 
-![](img/2023-07-02-15-40-27.png)
+![](https://github.com/dplastico/dplastico.github.io/raw/main/_posts/img/2023-07-02-15-40-27.png)
 
 From experience and looking at the graph view, we'll observe there's a flow control at the bottom of the function.
 
-![](img/2023-07-02-15-41-43.png)
+![](https://github.com/dplastico/dplastico.github.io/raw/main/_posts/img/2023-07-02-15-41-43.png)
 
 This usually indicates there are different "paths" the flow can take. Exploring the disassembly can help us to identify and try different commands since We needed to leak an address, as my regular routine with pwn challenges, if I cannot quickly perform Reverse engineering (like in this case, since the binary is in C++, this will probably taker some time), I will just try to look for something like a [format string](https://ctf101.org/binary-exploitation/what-is-a-format-string-vulnerability/) bug, so after enumerating different commands I realize the _LST_ is vulnerable to format string, we can corroborate this by sending the command __LST %p-%p-%p__, and we'll observe hexadecimal values returned.
 
@@ -136,7 +136,7 @@ filesrv = leaks[2] - 0x14120
 log.info(f"base address = {hex(filesrv)}")
 ```
 
-![](img/2023-07-02-16-18-43.png)
+![](https://github.com/dplastico/dplastico.github.io/raw/main/_posts/img/2023-07-02-16-18-43.png)
 
 Ok, so now we need to find a vulnerability, probably a Buffer Overflow, so, After trying again with the commands, we found out that the "LST" command is also vulnerable to a buffer overflow. We can test it by sending the following payload after the memory leaks
 
@@ -147,7 +147,7 @@ payload = b"A"* 0xfb0
 ```
 And then, observe the crash using the _exchain_ command in widbg or similar in the debugger of your choosing.
 
-![](img/2023-07-02-16-30-46.png)
+![](https://github.com/dplastico/dplastico.github.io/raw/main/_posts/img/2023-07-02-16-30-46.png)
 
 We can observe we can overflow the _SEH_ When we send a payload of size 0xfb0. The number 0xfb0 is something to keep in consideration since this size helps me to keep the exploit stable. We'll see later that when exploiting remote, the return address Offset to overwrite may vary, so I recommend this size, but you can overflow with more if you need to.
 
@@ -163,7 +163,7 @@ r.sendline(payload)
 
 After that, we can confirm the crash again using the __!exchain__ command in windbg.
 
-![](img/2023-07-02-16-47-00.png)
+![](https://github.com/dplastico/dplastico.github.io/raw/main/_posts/img/2023-07-02-16-47-00.png)
 
 After the above is verified, we can check for bad characters. This way, we can avoid the use of them when sending our ROP-chain, the characters found were: 0x00, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x20.
 
@@ -176,7 +176,7 @@ After collecting gadgets, let's start creating our rop-chain.
 
 Ok, but wait... This is a SEH overflow, so we cannot just go into "mordor and start ropping".
 
-![](https://i.kym-cdn.com/entries/icons/original/000/000/143/493654d6ef.jpg)
+![](https://github.com/dplastico/dplastico.github.io/raw/main/_posts/img/2023-07-02-21-28-51.png)
 
 If we do the regular exploit plan for SEH, which is to find a "POP POP RET" gadget, we will jump and execute the NSEH, but this is pointless since we steal have not defeated __DEP__ and we will still need to execute something, this is a "stack pivot" gadget will help us. We just need to find a gadget that allows us to move the stack pointer to another area we control in our payload.
 
@@ -212,7 +212,7 @@ Now If we remember, we also download from the FTP server a _kernel32.dll_ file, 
 
 For this binary, I choose to use __VirtualAlloc__, but any of the other mentioned APIs used in __ROP__ techniques should work. We need to choose an address to calculate the Offset from it, and that it is imported, so I choose __TLSfree__ located at offset 0x90148 of the base address in the _idata_ or IAT (import address table)
 
-![](img/2023-07-02-17-07-36.png)
+![](https://github.com/dplastico/dplastico.github.io/raw/main/_posts/img/2023-07-02-17-07-36.png)
 
 Also, we can create a variable for later use.
 
@@ -222,11 +222,11 @@ tlsfree_iat = filesrv+0x00090148
 
 Now we need to calculate the Offset of that address to __VirtualAlloc__ within _kernel32.dll_, so we can load the downloaded _kernel32.dll_ in IDA and check the __exports__, but first, we should rebase the program with the base address 0x0 to show us just the Offset to the base address. After that, we can observe the Offset to __TLSFree__: 0x192e0
 
-![](img/2023-07-02-17-18-18.png)
+![](https://github.com/dplastico/dplastico.github.io/raw/main/_posts/img/2023-07-02-17-18-18.png)
 
 And also, We can observe the Offset from the base address to __VirtualAlloc__ in this case: 0x16250
 
-![](img/2023-07-02-17-18-49.png)
+![](https://github.com/dplastico/dplastico.github.io/raw/main/_posts/img/2023-07-02-17-18-49.png)
 
 We can then do some super-duper-math and calculate the Offset within the addresses of the functions.
 ```python
@@ -439,7 +439,7 @@ r.close()
 
 We can corroborate our chain is working using the debugger. We should stop before the _CC_ (breakpoint) instruction is executed.
 
-![](img/2023-07-02-19-08-35.png)
+![](https://github.com/dplastico/dplastico.github.io/raw/main/_posts/img/2023-07-02-19-08-35.png)
 
 Yay! Now we can execute on the stack (we can confirm by executing on the debugger). We also can control the execution to point to our desired Shellcode, so we can send a reverse shell. At the time, I used the following msfvenom command to generate it.
 
@@ -467,7 +467,7 @@ r.close()
 Now let's fire up the exploit and....
 
 
-![](img/2023-07-02-19-28-28.png)
+![](https://github.com/dplastico/dplastico.github.io/raw/main/_posts/img/2023-07-02-19-28-28.png)
 
 We got a shell (YAY!) as the user dev.
 
@@ -536,15 +536,15 @@ We then can host the shell in a Python web server and execute PowerShell in pour
 ```
 Now we got a meterpreter session. 
 
-![](img/2023-07-02-19-40-40.png)
+![](https://github.com/dplastico/dplastico.github.io/raw/main/_posts/img/2023-07-02-19-40-40.png)
 
 Getting SYSTEM is now trivial. We can just migrate to a SYSTEM process. We can enumerate them with the _ps_ command. I choose the _spoolsv_ process, and we can use the __migrate__ command in Metasploit to accomplish this.
 
-![](img/2023-07-02-19-44-42.png)
+![](https://github.com/dplastico/dplastico.github.io/raw/main/_posts/img/2023-07-02-19-44-42.png)
 
 We are now SYSTEM!! After some root-dance we can read the root.txt.
 
-![](img/2023-07-02-19-47-29.png)
+![](https://github.com/dplastico/dplastico.github.io/raw/main/_posts/img/2023-07-02-19-47-29.png)
 
 # Conclusion
 
