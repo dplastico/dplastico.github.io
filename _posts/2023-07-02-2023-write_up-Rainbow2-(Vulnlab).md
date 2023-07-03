@@ -202,7 +202,7 @@ payload += b"\x90" * (0xfb0-len(payload))
 r.sendline(payload)
 ```
 
-Great, so now it's time to start ropping? Well, wait a little bit...
+Great, so now it's time to start _ropping_? Well... let's wait a little bit...
 
 ![](https://i.kym-cdn.com/entries/icons/facebook/000/016/042/Wait-For-It.jpg)
 
@@ -210,11 +210,11 @@ We need to figure out what rop chain we should create first and to do that, we c
 
 Now If we remember, we also download from the FTP server a _kernel32.dll_ file, probably the one being used by the binary. It that's the case, it means that even if the API is not imported by the binary, we can calculate the Offset from another imported address f to any other API address we want form kernel32. So let's go ahead and do that.
 
-For this binary, I choose to use __VirtualAlloc__, but any of the other mentioned APIs used in __ROP__ techniques should work. We need to choose an address to calculate the Offset from it, and that it is imported, so I choose __TLSfree__ located at offset 0x90148 of the base address in the _idata_ or IAT (import address table)
+For this binary, I choose to use __VirtualAlloc__, but any of the other mentioned APIs used in __ROP__ techniques should work. We need to choose an address to calculate the Offset from it, and that it is imported, so I choose __TLSfree__ located at offset 0x90148 of the base address in the _idata_ or [IAT (import address table)](https://resources.infosecinstitute.com/topic/the-import-directory-part-1/)
 
 ![](https://github.com/dplastico/dplastico.github.io/raw/main/_posts/img/2023-07-02-17-07-36.png)
 
-Also, we can create a variable for later use.
+We can create a variable for later use with this address.
 
 ```python
 tlsfree_iat = filesrv+0x00090148
@@ -224,22 +224,24 @@ Now we need to calculate the Offset of that address to __VirtualAlloc__ within _
 
 ![](https://github.com/dplastico/dplastico.github.io/raw/main/_posts/img/2023-07-02-17-18-18.png)
 
-And also, We can observe the Offset from the base address to __VirtualAlloc__ in this case: 0x16250
+Continuing, we can observe the Offset from the base address to __VirtualAlloc__ in this case: 0x16250
 
 ![](https://github.com/dplastico/dplastico.github.io/raw/main/_posts/img/2023-07-02-17-18-49.png)
 
-We can then do some super-duper-math and calculate the Offset within the addresses of the functions.
+With some super-duper-math we can calculate the Offset within the addresses of the functions.
+
 ```python
 >>> hex(0x192e0 - 0x16250)
 >>> '0x3090'
 ```
+
 Great! We have the information that we need to get the __VirtualAlloc__ address. Let's start _ropping_ ...
 
 ![](https://cdn.tosavealife.com/wp-content/uploads/2018/05/Waiting-Memes-52918.jpg)
 
 Not yet... We need to look at how __VirtualAlloc__ [is defined in MSDN](https://learn.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-virtualalloc) so that way we know which parameter we should pass to the function.
 
-After reading the documentation since, we are dealing with x86, where we need to pass the parameter in the stack after the function address and the return address for the function after finishing the exection. We can create a stub in the stack that looks like the following.
+Since, we are dealing with x86, where we need to pass the parameter in the stack after the function address and the return address for the function after finishing the exection. We'll create a stub in the stack that looks like the following.
 
 ```
 - VirtualAlloc Address => The  Address of VirtualAlloc in kernel32.dll 
@@ -251,7 +253,7 @@ After reading the documentation since, we are dealing with x86, where we need to
 ```
 The above parameters should be set on the stack in the same order so this table can help us during exploitation.
 
-Finally! We have a plan, let's start ropping!
+Finally! We have a plan, let's start _ropping_!
 
 ![](https://gifdb.com/images/high/yay-gojo-satoru-jujutsu-kaisen-anime-meme-uv89d004fkc3imhv.gif)
 
@@ -263,7 +265,7 @@ rop += p32(filesrv+0x0007c5f6) * 4 #ret slide
 ```
 One of the first things that are good to do when starting a rop-chain is to save the current stack value, we'll need to do this since we are going to build the chain in the stack, and then it is also needed to direct execution to our Shellcode, so let's begin with that.
 
-The gadget I found to do this is the following.
+The gadget I found to perform this is the following.
 
 ```
 push esp; add dword ptr [eax], eax; pop ecx; ret;
