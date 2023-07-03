@@ -287,7 +287,7 @@ rop += p32(filesrv+0x0001bb91) # add ecx, edx; clc; pop ebp; ret;)
 rop += p32(0x41424344) #junk for ebp
 ```
 
-We used an addition, but we "pop" a negative value. This is done to avoid NULL bytes. _ECX_ now has the value of the stack-0x50, and we'll use it to point to our stub
+We'll use an addition, but we'll "pop" a negative value. This is done to avoid NULL bytes. _ECX_ now has the value of the stack-0x50, and we'll use it to point to our stub
 
 Next, We need to move the value of __TLSFree__ to a register. Since we have the IAT address stored in *tlsfree_iat*, we can dereference it and then subtract the Offset from __VirtualAlloc__
 
