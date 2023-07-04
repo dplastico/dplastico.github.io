@@ -19,7 +19,7 @@ some of the tools or frameworks I will be using during this post are th followin
 - [msfvenom](https://www.offsec.com/metasploit-unleashed/msfvenom/)
 - [metasploit](https://www.metasploit.com/)
 
-After all the talk above, and  once we got the machine running (again, from discord, really cool stuff), we can grab thw IP address and run an nmap, as shown below.
+After all the talk above, and  once we got the machine running (again, from discord, really cool stuff), we can grab the IP address and run an nmap, as shown below.
 
 ```
 # Nmap 7.94 scan initiated Sat Jun 24 01:17:24 2023 as: nmap -Pn -sV -sC -oN portscan.txt 10.10.88.129
@@ -52,7 +52,7 @@ Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
 
 ```
 
-Ee can tell from the above, This is a Windows machine, and there's an FTP service that allows anonymous login. We can log-in, inspect, and download the files in it. there's a _README.txt_ that contains the following:
+We can tell from the above, This is a Windows machine, and there's an FTP service that allows anonymous login. We can log-in, inspect, and download the files in it. there's a _README.txt_ that contains the following:
 
 ```
 # FileSrv v0.2
