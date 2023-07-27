@@ -108,7 +108,8 @@ La solución es:
 
 # Black Lotus
 
-Black lotus era una máquina bastante interesante, la cual parecía tener un servidor inestable, pero no (al analizar el binario y escribir el exploit era posible darse cuenta). La idea consistía en primero enumerar para descubrir un servidor web en el puerto 80 y otro en el 5555. (Felicitaciones a fjv de Ctrllz quien fue el único que resolvió esta maquina).
+Black lotus era una máquina bastante interesante, la cual parecía tener un servidor inestable, pero no (al analizar el binario y escribir el exploit era posible darse cuenta). La idea consistía en primero enumerar para descubrir un servidor web en el puerto 80 y otro en el 5555. (Felicitaciones a *fjv* quien fue el único que resolvió esta maquina).
+
 Enumerando el servidor web del puerto 80 podemos encontrar un robots.txt con la siguiente info.
 
 ```
