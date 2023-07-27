@@ -128,7 +128,7 @@ DEBUG %p-%p-%p
 0x7ffc94fa2156-0xffffffe0-0x5577dd3ea080
 ```
 
-Existe también un buffer overflow en el metodo POST (se puede observar reversando el binario), con lo que con los leaks + overflow podemos escribir un exploit, dado que no tenemos leak de libc, la idea del exploit es enviar el string de "/bin/sh\0" (null byte terminated) en el payload y usar el leak de stack para calcular la dirección relativa al string, luego de eso como el binario está corriendo en un docket, no es posible simplemente "llamar a /bin/sh" lo que debemos hacer es suplicar el stdin y stdout, y enviarlo por el socket, esto se puede hacer usando DUP2(). El exploit es el siguiente.
+Existe también un buffer overflow en el metodo POST (se puede observar reversando el binario), con lo que con los leaks + overflow podemos escribir un exploit, dado que no tenemos leak de libc, la idea del exploit es enviar el string de "/bin/sh\0" (null byte terminated) en el payload y usar el leak de stack para calcular la dirección relativa al string, luego de eso como el binario está corriendo en un socket, no es posible simplemente "llamar a /bin/sh" lo que debemos hacer es duplicar el stdin y stdout, y enviarlo por el socket, esto se puede hacer usando DUP2(). El exploit es el siguiente.
 
 
 ```python
