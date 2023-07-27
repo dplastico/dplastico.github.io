@@ -34,8 +34,11 @@ Q4{thisisthemorsewawave}
 # Super
 
 Este reto de stego consiste en descubrir un mensaje oculto en un zip. El zip tiene clave podemos hacerle bruteforce, el resultado es "forceofwill" con esto obtenemos una foto "super_mod.png" la cual solo contiene un color.
+
 ![](https://github.com/dplastico/dplastico.github.io/raw/main/_posts/img/2023-07-26-15-36-32.png)
+
 También un texto que podemos decodear usando base58, el texto es el siguiente.
+
 ```
 Fecha: 19 de Julio de 1989
 UbicaciÃ³n: Desconocida
@@ -50,7 +53,8 @@ Hacker: (curioso) Interesante... Entiendo lo que intentas decir. Me encargarÃ©
 Soldado: Lo sÃ©, amigo. Pero confÃ­o en que estÃ¡s a la altura de este desafÃ­o. Solo tÃº puedes entender el valor de esa clave y lo que significa para el mundo.
 Hacker: (con determinaciÃ³n) No te preocupes. Si hay un secreto escondido en esa clave, lo descubrirÃ© sin que nadie mÃ¡s lo sepa. UtilizarÃ© todas mis habilidades sin dejar rastro, como un operador silencioso en la 
 ```
-Podemos "inferir" (jajaja) Que podemos hacer un XOR 0xa(10) a la imagen, el problema es que si lo hacemos a todo el archivo el png falla y no se puede abrir ya que se daña el formato, por eso debemos hacer el XOR solamente a los bytes de data de imagen, conocimos como [pixel data](https://stackoverflow.com/questions/26456447/interpret-png-pixel-data). Con este script de python se puede obtener la solución (hecho con chat GPT)
+
+Podemos "inferir" (jajaja, perdón el troleo.) Que podemos hacer un XOR 10 a la imagen, el problema es que si lo hacemos a todo el archivo el png falla y no se puede abrir ya que se daña el formato, por eso debemos hacer el XOR solamente a los bytes de data de imagen, conocimos como [pixel data](https://stackoverflow.com/questions/26456447/interpret-png-pixel-data). Con este script de python se puede obtener la solución (hecho con chat GPT)
 
 ```python
 def xor_with_0xa(data):
@@ -265,7 +269,7 @@ r.interactive()
 ```
 # Ancestral Recall.
 
-Ancestral recall era un pwn que se resolvía con ret2DLResolve, tambien se podia hacer con ret2csu, yo opté por la última, el exploit es el siguiente
+Ancestral recall era un pwn que se resolvía con [ret2DLResolve](https://ir0nstone.gitbook.io/notes/types/stack/ret2dlresolve), también se podía hacer con [ret2csu](https://gist.github.com/kaftejiman/a853ccb659fc3633aa1e61a9e26266e9), yo opté por la última, el exploit es el siguiente.
 
 ```python
 #!/usr/bin/python3
