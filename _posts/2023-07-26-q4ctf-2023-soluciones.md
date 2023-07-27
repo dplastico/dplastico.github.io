@@ -4,7 +4,7 @@ Hola mundo! El fin de semana pasado concluyó [Q4CTF](https://q4hacking.com/) y 
 
 Ahora, acá van algunas de las soluciones. Fueron varios los retos que creamos para el evento, asi que aca van algunos con los que estoy mas familiarizado, pero pronto concentramos todo.
 
-Algunos de los retos que participé (como los de Windows AD) se vendrán pronto en otra tanda, esperamos poder entregar al menos la guía de solución. Si existe alguna duda con la solución particular d eun reto, pueden contactarme por Telegram o Discord.
+Algunos de los retos que participé (como los de Windows AD) se vendrán pronto en otra tanda, esperamos poder entregar al menos la guía de solución. Si existe alguna duda con la solución particular de uno de los desafios, pueden contactarme por Telegram o Discord.
 
 # Techno
 
