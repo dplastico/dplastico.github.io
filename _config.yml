@@ -64,6 +64,5 @@ remote_theme: "etcadinfinitum/mixtape"
 show_downloads: true
 header_links:
   # Formatted list of link/label pairs
-#  - url: https://github.com/dplastico
-#    name: github
-
+  - url: https://github.com/dplastico
+    name: github
